@@ -25,8 +25,8 @@ class FCNSubWindow(NodeEditorWidget):
 
         self.scene.addHasBeenModifiedListener(self.setTitle)
         self.scene.history.addHistoryRestoredListener(self.on_history_restored)
-        self.scene.addDragEnterListener(self.onDragEnter)
-        self.scene.addDropListener(self.onDrop)
+        self.scene.addDragEnterListener(self.on_drag_enter)
+        self.scene.addDropListener(self.on_drop)
         self.scene.setNodeClassSelector(self.get_node_class_from_data)
 
         self._close_event_listeners = []
@@ -76,70 +76,72 @@ class FCNSubWindow(NodeEditorWidget):
         self._close_event_listeners.append(callback)
 
     def closeEvent(self, event):
-        for callback in self._close_event_listeners: callback(self, event)
+        for callback in self._close_event_listeners:
+            callback(self, event)
 
-    def onDragEnter(self, event):
+    @staticmethod
+    def on_drag_enter(event):
         if event.mimeData().hasFormat(LISTBOX_MIMETYPE):
             event.acceptProposedAction()
         else:
-            # print(" ... denied drag enter event")
             event.setAccepted(False)
 
-    def onDrop(self, event):
+    def on_drop(self, event):
         if event.mimeData().hasFormat(LISTBOX_MIMETYPE):
-            eventData = event.mimeData().data(LISTBOX_MIMETYPE)
-            dataStream = QDataStream(eventData, QIODevice.ReadOnly)
+            event_data = event.mimeData().data(LISTBOX_MIMETYPE)
+            data_stream = QDataStream(event_data, QIODevice.ReadOnly)
             pixmap = QPixmap()
-            dataStream >> pixmap
-            op_code = dataStream.readInt32()
-            text = dataStream.readQString()
+            data_stream >> pixmap
+            op_code = data_stream.readInt32()
+            text = data_stream.readQString()
 
             mouse_position = event.pos()
             scene_position = self.scene.grScene.views()[0].mapToScene(mouse_position)
 
-            if DEBUG: print("GOT DROP: [%d] '%s'" % (op_code, text), "mouse:", mouse_position, "scene:", scene_position)
+            if DEBUG:
+                print("GOT DROP: [%d] '%s'" % (op_code, text), "mouse:", mouse_position, "scene:", scene_position)
 
             try:
                 node = get_class_from_opcode(op_code)(self.scene)
                 node.setPos(scene_position.x(), scene_position.y())
                 self.scene.history.storeHistory("Created node %s" % node.__class__.__name__)
-            except Exception as e: dumpException(e)
-
+            except Exception as e:
+                dumpException(e)
 
             event.setDropAction(Qt.MoveAction)
             event.accept()
         else:
-            # print(" ... drop ignored, not requested format '%s'" % LISTBOX_MIMETYPE)
             event.ignore()
-
 
     def contextMenuEvent(self, event):
         try:
             item = self.scene.getItemAt(event.pos())
-            if DEBUG_CONTEXT: print(item)
+            if DEBUG_CONTEXT:
+                print(item)
 
             if type(item) == QGraphicsProxyWidget:
                 item = item.widget()
 
             if hasattr(item, 'node') or hasattr(item, 'socket'):
-                self.handleNodeContextMenu(event)
+                self.handle_node_context_menu(event)
             elif hasattr(item, 'edge'):
-                self.handleEdgeContextMenu(event)
-            #elif item is None:
+                self.handle_edge_context_menu(event)
             else:
-                self.handleNewNodeContextMenu(event)
+                self.handle_new_node_context_menu(event)
 
             return super().contextMenuEvent(event)
-        except Exception as e: dumpException(e)
+        except Exception as e:
+            dumpException(e)
 
-    def handleNodeContextMenu(self, event):
-        if DEBUG_CONTEXT: print("CONTEXT: NODE")
+    def handle_node_context_menu(self, event):
+        if DEBUG_CONTEXT:
+            print("CONTEXT: NODE")
         context_menu = QMenu(self)
-        markDirtyAct = context_menu.addAction("Mark Dirty")
-        markDirtyDescendantsAct = context_menu.addAction("Mark Descendant Dirty")
-        markInvalidAct = context_menu.addAction("Mark Invalid")
-        unmarkInvalidAct = context_menu.addAction("Unmark Invalid")
-        evalAct = context_menu.addAction("Eval")
+        mark_dirty_act = context_menu.addAction("Mark Dirty")
+        mark_dirty_descendants_act = context_menu.addAction("Mark Descendant Dirty")
+        mark_invalid_act = context_menu.addAction("Mark Invalid")
+        unmark_invalid_act = context_menu.addAction("Unmark Invalid")
+        eval_act = context_menu.addAction("Eval")
         action = context_menu.exec_(self.mapToGlobal(event.pos()))
 
         selected = None
@@ -152,22 +154,28 @@ class FCNSubWindow(NodeEditorWidget):
         if hasattr(item, 'socket'):
             selected = item.socket.node
 
-        if DEBUG_CONTEXT: print("got item:", selected)
-        if selected and action == markDirtyAct: selected.markDirty()
-        if selected and action == markDirtyDescendantsAct: selected.markDescendantsDirty()
-        if selected and action == markInvalidAct: selected.markInvalid()
-        if selected and action == unmarkInvalidAct: selected.markInvalid(False)
-        if selected and action == evalAct:
+        if DEBUG_CONTEXT:
+            print("got item:", selected)
+        if selected and action == mark_dirty_act:
+            selected.markDirty()
+        if selected and action == mark_dirty_descendants_act:
+            selected.markDescendantsDirty()
+        if selected and action == mark_invalid_act:
+            selected.markInvalid()
+        if selected and action == unmark_invalid_act:
+            selected.markInvalid(False)
+        if selected and action == eval_act:
             val = selected.eval()
-            if DEBUG_CONTEXT: print("EVALUATED:", val)
+            if DEBUG_CONTEXT:
+                print("EVALUATED:", val)
 
-
-    def handleEdgeContextMenu(self, event):
-        if DEBUG_CONTEXT: print("CONTEXT: EDGE")
+    def handle_edge_context_menu(self, event):
+        if DEBUG_CONTEXT:
+            print("CONTEXT: EDGE")
         context_menu = QMenu(self)
-        bezierAct = context_menu.addAction("Bezier Edge")
-        directAct = context_menu.addAction("Direct Edge")
-        squareAct = context_menu.addAction("Square Edge")
+        bezier_act = context_menu.addAction("Bezier Edge")
+        direct_act = context_menu.addAction("Direct Edge")
+        square_act = context_menu.addAction("Square Edge")
         action = context_menu.exec_(self.mapToGlobal(event.pos()))
 
         selected = None
@@ -175,17 +183,23 @@ class FCNSubWindow(NodeEditorWidget):
         if hasattr(item, 'edge'):
             selected = item.edge
 
-        if selected and action == bezierAct: selected.edge_type = EDGE_TYPE_BEZIER
-        if selected and action == directAct: selected.edge_type = EDGE_TYPE_DIRECT
-        if selected and action == squareAct: selected.edge_type = EDGE_TYPE_SQUARE
+        if selected and action == bezier_act:
+            selected.edge_type = EDGE_TYPE_BEZIER
+        if selected and action == direct_act:
+            selected.edge_type = EDGE_TYPE_DIRECT
+        if selected and action == square_act:
+            selected.edge_type = EDGE_TYPE_SQUARE
 
     # helper functions
-    def determine_target_socket_of_node(self, was_dragged_flag, new_calc_node):
+    @staticmethod
+    def determine_target_socket_of_node(was_dragged_flag, new_calc_node):
         target_socket = None
         if was_dragged_flag:
-            if len(new_calc_node.inputs) > 0: target_socket = new_calc_node.inputs[0]
+            if len(new_calc_node.inputs) > 0:
+                target_socket = new_calc_node.inputs[0]
         else:
-            if len(new_calc_node.outputs) > 0: target_socket = new_calc_node.outputs[0]
+            if len(new_calc_node.outputs) > 0:
+                target_socket = new_calc_node.outputs[0]
         return target_socket
 
     def finish_new_node_state(self, new_calc_node):
@@ -193,10 +207,9 @@ class FCNSubWindow(NodeEditorWidget):
         new_calc_node.grNode.doSelect(True)
         new_calc_node.grNode.onSelected()
 
-
-    def handleNewNodeContextMenu(self, event):
-
-        if DEBUG_CONTEXT: print("CONTEXT: EMPTY SPACE")
+    def handle_new_node_context_menu(self, event):
+        if DEBUG_CONTEXT:
+            print("CONTEXT: EMPTY SPACE")
         context_menu = self.init_nodes_context_menu()
         action = context_menu.exec_(self.mapToGlobal(event.pos()))
 
@@ -204,14 +217,16 @@ class FCNSubWindow(NodeEditorWidget):
             new_calc_node = get_class_from_opcode(action.data())(self.scene)
             scene_pos = self.scene.getView().mapToScene(event.pos())
             new_calc_node.setPos(scene_pos.x(), scene_pos.y())
-            if DEBUG_CONTEXT: print("Selected node:", new_calc_node)
+            if DEBUG_CONTEXT:
+                print("Selected node:", new_calc_node)
 
             if self.scene.getView().mode == MODE_EDGE_DRAG:
                 # if we were dragging an edge...
-                target_socket = self.determine_target_socket_of_node(self.scene.getView().dragging.drag_start_socket.is_output, new_calc_node)
+                target_socket = self.determine_target_socket_of_node(
+                    self.scene.getView().dragging.drag_start_socket.is_output, new_calc_node)
+
                 if target_socket is not None:
                     self.scene.getView().dragging.edgeDragEnd(target_socket.grSocket)
                     self.finish_new_node_state(new_calc_node)
-
             else:
                 self.scene.history.storeHistory("Created %s" % new_calc_node.__class__.__name__)
