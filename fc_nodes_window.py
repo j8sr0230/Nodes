@@ -8,7 +8,7 @@ from nodeeditor.node_editor_window import NodeEditorWindow
 from fc_nodes_sub_window import CalculatorSubWindow
 from fc_nodes_drag_listbox import QDMDragListbox
 from nodeeditor.utils import dumpException, pp
-from fc_nodes_conf import CALC_NODES
+from fc_nodes_conf import FC_NODES
 
 # Enabling edge validators
 from nodeeditor.node_edge import Edge
@@ -45,7 +45,7 @@ class CalculatorWindow(NodeEditorWindow):
 
         if DEBUG:
             print("Registered nodes:")
-            pp(CALC_NODES)
+            pp(FC_NODES)
 
 
         self.mdiArea = QMdiArea()

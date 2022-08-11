@@ -2,7 +2,7 @@ from qtpy.QtGui import QPixmap, QIcon, QDrag
 from qtpy.QtCore import QSize, Qt, QByteArray, QDataStream, QMimeData, QIODevice, QPoint
 from qtpy.QtWidgets import QListWidget, QAbstractItemView, QListWidgetItem
 
-from fc_nodes_conf import CALC_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
+from fc_nodes_conf import FC_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 from nodeeditor.utils import dumpException
 
 
@@ -21,7 +21,7 @@ class QDMDragListbox(QListWidget):
 
 
     def addMyItems(self):
-        keys = list(CALC_NODES.keys())
+        keys = list(FC_NODES.keys())
         keys.sort()
         for key in keys:
             node = get_class_from_opcode(key)
