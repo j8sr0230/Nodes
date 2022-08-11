@@ -1,54 +1,57 @@
 import os
 
-from fc_nodes_conf import register_node, OP_NODE_ADD, OP_NODE_SUB, OP_NODE_MUL, OP_NODE_DIV
-from fc_nodes_node_base import CalcNode
+from fcn_conf import register_node, OP_NODE_ADD, OP_NODE_SUB, OP_NODE_MUL, OP_NODE_DIV
+from fcn_node_base import BaseNode
 
 
 @register_node(OP_NODE_ADD)
-class CalcNode_Add(CalcNode):
+class NumberAddNode(BaseNode):
+
     icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "add.png")
     op_code = OP_NODE_ADD
     op_title = "Add"
     content_label = "+"
     content_label_objname = "calc_node_bg"
 
-    def evalOperation(self, input1, input2):
+    def eval_operation(self, input1, input2):
         return input1 + input2
 
 
 @register_node(OP_NODE_SUB)
-class CalcNode_Sub(CalcNode):
+class NumberSubNode(BaseNode):
+
     icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "sub.png")
     op_code = OP_NODE_SUB
-    op_title = "Substract"
+    op_title = "Subtract"
     content_label = "-"
     content_label_objname = "calc_node_bg"
 
-    def evalOperation(self, input1, input2):
+    def eval_operation(self, input1, input2):
         return input1 - input2
 
+
 @register_node(OP_NODE_MUL)
-class CalcNode_Mul(CalcNode):
-    icon = os.path.join(os.path.abspath(__file__), "..", "..","icons", "mul.png")
+class NumberMulNode(BaseNode):
+
+    icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "mul.png")
     op_code = OP_NODE_MUL
     op_title = "Multiply"
     content_label = "*"
     content_label_objname = "calc_node_mul"
 
-    def evalOperation(self, input1, input2):
+    def eval_operation(self, input1, input2):
         print('foo')
         return input1 * input2
 
+
 @register_node(OP_NODE_DIV)
-class CalcNode_Div(CalcNode):
+class NumberDivNode(BaseNode):
+
     icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "divide.png")
     op_code = OP_NODE_DIV
     op_title = "Divide"
     content_label = "/"
     content_label_objname = "calc_node_div"
 
-    def evalOperation(self, input1, input2):
+    def eval_operation(self, input1, input2):
         return input1 / input2
-
-# way how to register by function call
-# register_node_now(OP_NODE_ADD, CalcNode_Add)

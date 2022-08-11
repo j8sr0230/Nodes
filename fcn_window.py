@@ -5,10 +5,10 @@ from qtpy.QtCore import Qt, QSignalMapper
 
 from nodeeditor.utils import loadStylesheets
 from nodeeditor.node_editor_window import NodeEditorWindow
-from fc_nodes_sub_window import CalculatorSubWindow
-from fc_nodes_drag_listbox import QDMDragListbox
+from fcn_sub_window import CalculatorSubWindow
+from fcn_drag_listbox import QDMDragListbox
 from nodeeditor.utils import dumpException, pp
-from fc_nodes_conf import FC_NODES
+from fcn_conf import FC_NODES
 
 # Enabling edge validators
 from nodeeditor.node_edge import Edge

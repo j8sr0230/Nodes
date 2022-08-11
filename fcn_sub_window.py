@@ -2,7 +2,7 @@ from qtpy.QtGui import QIcon, QPixmap
 from qtpy.QtCore import QDataStream, QIODevice, Qt
 from qtpy.QtWidgets import QAction, QGraphicsProxyWidget, QMenu
 
-from fc_nodes_conf import FC_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
+from fcn_conf import FC_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 from nodeeditor.node_editor_widget import NodeEditorWidget
 from nodeeditor.node_edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER, EDGE_TYPE_SQUARE
 from nodeeditor.node_graphics_view import MODE_EDGE_DRAG
@@ -36,7 +36,7 @@ class CalculatorSubWindow(NodeEditorWidget):
     def doEvalOutputs(self):
         # eval all output nodes
         for node in self.scene.nodes:
-            if node.__class__.__name__ == "CalcNode_Output":
+            if node.__class__.__name__ == "NumberOutputNode":
                 node.eval()
 
     def onHistoryRestored(self):

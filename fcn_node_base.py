@@ -1,9 +1,9 @@
 import os
+from typing import Union
 
 from qtpy.QtGui import QImage
 from qtpy.QtCore import QRectF
 from qtpy.QtWidgets import QLabel
-
 from nodeeditor.node_node import Node
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.node_graphics_node import QDMGraphicsNode
@@ -11,7 +11,18 @@ from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
 from nodeeditor.utils import dumpException
 
 
-class CalcGraphicsNode(QDMGraphicsNode):
+class BaseGraphicsNode(QDMGraphicsNode):
+
+    height: int
+    width: int
+    edge_roundness: int
+    edge_padding: int
+    title_horizontal_padding: int
+    title_vertical_padding: int
+    icons: Union[QImage, QImage]
+    input_socket_position: int
+    output_socket_position: int
+
     def initSizes(self):
         super().initSizes()
         self.width = 160
@@ -26,12 +37,14 @@ class CalcGraphicsNode(QDMGraphicsNode):
         path = os.path.join(os.path.abspath(__file__), "..", "icons", "status_icons.png")
         self.icons = QImage(path)
 
-    def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
-        super().paint(painter, QStyleOptionGraphicsItem, widget)
+    def paint(self, painter, q_style_option_graphics_item, widget=None):
+        super().paint(painter, q_style_option_graphics_item, widget)
 
         offset = 24.0
-        if self.node.isDirty(): offset = 0.0
-        if self.node.isInvalid(): offset = 48.0
+        if self.node.isDirty():
+            offset = 0.0
+        if self.node.isInvalid():
+            offset = 48.0
 
         painter.drawImage(
             QRectF(-10, -10, 24.0, 24.0),
@@ -40,25 +53,27 @@ class CalcGraphicsNode(QDMGraphicsNode):
         )
 
 
-class CalcContent(QDMNodeContentWidget):
+class BaseNodeContent(QDMNodeContentWidget):
     def initUI(self):
         lbl = QLabel(self.node.content_label, self)
         lbl.setObjectName(self.node.content_label_objname)
 
 
-class CalcNode(Node):
+class BaseNode(Node):
     icon = ""
     op_code = 0
     op_title = "Undefined"
     content_label = ""
     content_label_objname = "calc_node_bg"
 
-    GraphicsNode_class = CalcGraphicsNode
-    NodeContent_class = CalcContent
+    GraphicsNode_class = BaseGraphicsNode
+    NodeContent_class = BaseNodeContent
 
-    def __init__(self, scene, inputs=[2,2], outputs=[1]):
+    def __init__(self, scene, inputs=[2, 2], outputs=[1]):
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
 
+        self.output_socket_position = None
+        self.input_socket_position = None
         self.value = None
 
         # it's really important to mark all nodes Dirty by default
@@ -69,10 +84,10 @@ class CalcNode(Node):
         self.input_socket_position = LEFT_CENTER
         self.output_socket_position = RIGHT_CENTER
 
-    def evalOperation(self, input1, input2):
+    def eval_operation(self, input1, input2):
         return 123
 
-    def evalImplementation(self):
+    def eval_implementation(self):
         i1 = self.getInput(0)
         i2 = self.getInput(1)
 
@@ -81,26 +96,23 @@ class CalcNode(Node):
             self.markDescendantsDirty()
             self.grNode.setToolTip("Connect all inputs")
             return None
-
         else:
-            val = self.evalOperation(i1.eval(), i2.eval())
+            val = self.eval_operation(i1.eval(), i2.eval())
             self.value = val
             self.markDirty(False)
             self.markInvalid(False)
             self.grNode.setToolTip("")
-
             self.markDescendantsDirty()
             self.evalChildren()
-
             return val
 
-    def eval(self):
+    def eval(self, index=0):
         if not self.isDirty() and not self.isInvalid():
             print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
             return self.value
 
         try:
-            val = self.evalImplementation()
+            val = self.eval_implementation()
             return val
         except ValueError as e:
             self.markInvalid()
@@ -121,7 +133,9 @@ class CalcNode(Node):
         res['op_code'] = self.__class__.op_code
         return res
 
-    def deserialize(self, data, hashmap={}, restore_id=True):
+    def deserialize(self, data, hashmap=None, restore_id=True, *args, **kwargs) -> bool:
+        if hashmap is None:
+            hashmap = {}
         res = super().deserialize(data, hashmap, restore_id)
-        print("Deserialized CalcNode '%s'" % self.__class__.__name__, "res:", res)
+        print("Deserialized BaseNode '%s'" % self.__class__.__name__, "res:", res)
         return res

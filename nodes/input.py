@@ -2,13 +2,17 @@ import os
 
 from qtpy.QtWidgets import QLineEdit
 from qtpy.QtCore import Qt
-from fc_nodes_conf import register_node, OP_NODE_INPUT
-from fc_nodes_node_base import CalcNode, CalcGraphicsNode
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.utils import dumpException
 
+from fcn_conf import register_node, OP_NODE_INPUT
+from fcn_node_base import BaseNode, BaseGraphicsNode
 
-class CalcInputContent(QDMNodeContentWidget):
+
+class NumberInputContent(QDMNodeContentWidget):
+
+    edit: QLineEdit
+
     def initUI(self):
         self.edit = QLineEdit("1", self)
         self.edit.setAlignment(Qt.AlignRight)
@@ -19,7 +23,7 @@ class CalcInputContent(QDMNodeContentWidget):
         res['value'] = self.edit.text()
         return res
 
-    def deserialize(self, data, hashmap={}):
+    def deserialize(self, data, hashmap={}, restore_id=True) -> bool:
         res = super().deserialize(data, hashmap)
         try:
             value = data['value']
@@ -31,8 +35,9 @@ class CalcInputContent(QDMNodeContentWidget):
 
 
 @register_node(OP_NODE_INPUT)
-class CalcNode_Input(CalcNode):
-    icon = os.path.join(os.path.abspath(__file__), "..","..",  "icons", "in.png")
+class NumberInputNode(BaseNode):
+
+    icon = os.path.join(os.path.abspath(__file__), "..", "..",  "icons", "in.png")
     op_code = OP_NODE_INPUT
     op_title = "Input"
     content_label_objname = "calc_node_input"
@@ -42,11 +47,11 @@ class CalcNode_Input(CalcNode):
         self.eval()
 
     def initInnerClasses(self):
-        self.content = CalcInputContent(self)
-        self.grNode = CalcGraphicsNode(self)
+        self.content = NumberInputContent(self)
+        self.grNode = BaseGraphicsNode(self)
         self.content.edit.textChanged.connect(self.onInputChanged)
 
-    def evalImplementation(self):
+    def eval_implementation(self):
         u_value = self.content.edit.text()
         s_value = int(u_value)
         self.value = s_value

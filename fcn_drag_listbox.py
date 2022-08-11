@@ -3,7 +3,7 @@ from qtpy.QtCore import QSize, Qt, QByteArray, QDataStream, QMimeData, QIODevice
 from qtpy.QtWidgets import QListWidget, QAbstractItemView, QListWidgetItem
 from nodeeditor.utils import dumpException
 
-from fc_nodes_conf import FC_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
+from fcn_conf import FC_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 
 
 class QDMDragListbox(QListWidget):
