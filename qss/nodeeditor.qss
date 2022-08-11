@@ -1,9 +1,3 @@
-QLineEdit:disabled,
-QTextEdit:disabled {
-    color: #696969;
-    background-color: #494949;
-    border-color: #2a2a2a;
-}
 QDMNodeContentWidget {
   background: transparent;
 }
@@ -51,44 +45,4 @@ QDMNodeContentWidget QLineEdit#calc_node_input {
 }
 QGraphicsView {
   selection-background-color: #fff;
-}
-QDMNodeContentWidget QTextEdit#numbers_input_node {
-  margin: 5px;
-  border: 0px;
-  font-size: 12px;
-  background-color: #666;
-}
-QDMNodeContentWidget QTextEdit#numbers_input_node:focus {
-  background-color: #494949;
-}
-QDMNodeContentWidget QLineEdit#number_input_node {
-  margin: 5px;
-  font-size: 28px;
-}
-QDMNodeContentWidget QLineEdit#text_input_node {
-  margin: 5px;
-  font-size: 28px;
-}
-QDMNodeContentWidget QLineEdit#obj_input_node {
-  margin: 5px;
-  font-size: 28px;
-}
-QDMNodeContentWidget QLabel#vec_xyz_node {
-  background: transparent;
-  color: #373737;
-  font-size: 50px;
-}
-QDMNodeContentWidget QLabel#number_slider_node {
-  background: transparent;
-  font-size: 12px;
-}
-QDMNodeContentWidget QLabel#set_obj_shape_node {
-  background: transparent;
-  color: #373737;
-  font-size: 50px;
-}
-QDMNodeContentWidget QLabel#bspline_crv_node {
-  background: transparent;
-  color: #373737;
-  font-size: 50px;
 }
