@@ -5,7 +5,7 @@ from qtpy.QtCore import Qt, QSignalMapper
 
 from nodeeditor.utils import loadStylesheets
 from nodeeditor.node_editor_window import NodeEditorWindow
-from fcn_sub_window import CalculatorSubWindow
+from fcn_sub_window import FCNSubWindow
 from fcn_drag_listbox import QDMDragListbox
 from nodeeditor.utils import dumpException, pp
 from fcn_conf import FC_NODES
@@ -126,7 +126,7 @@ class CalculatorWindow(NodeEditorWindow):
                         self.mdiArea.setActiveSubWindow(existing)
                     else:
                         # we need to create new subWindow and open the file
-                        nodeeditor = CalculatorSubWindow()
+                        nodeeditor = FCNSubWindow()
                         if nodeeditor.fileLoad(fname):
                             self.statusBar().showMessage("File %s loaded" % fname, 5000)
                             nodeeditor.setTitle()
@@ -250,13 +250,13 @@ class CalculatorWindow(NodeEditorWindow):
         self.statusBar().showMessage("Ready")
 
     def createMdiChild(self, child_widget=None):
-        nodeeditor = child_widget if child_widget is not None else CalculatorSubWindow()
+        nodeeditor = child_widget if child_widget is not None else FCNSubWindow()
         subwnd = self.mdiArea.addSubWindow(nodeeditor)
         subwnd.setWindowIcon(self.empty_icon)
         # nodeeditor.scene.addItemSelectedListener(self.updateEditMenu)
         # nodeeditor.scene.addItemsDeselectedListener(self.updateEditMenu)
         nodeeditor.scene.history.addHistoryModifiedListener(self.updateEditMenu)
-        nodeeditor.addCloseEventListener(self.onSubWndClose)
+        nodeeditor.add_close_event_listener(self.onSubWndClose)
         return subwnd
 
     def onSubWndClose(self, widget, event):

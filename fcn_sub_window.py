@@ -1,55 +1,58 @@
 from qtpy.QtGui import QIcon, QPixmap
 from qtpy.QtCore import QDataStream, QIODevice, Qt
 from qtpy.QtWidgets import QAction, QGraphicsProxyWidget, QMenu
-
-from fcn_conf import FC_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 from nodeeditor.node_editor_widget import NodeEditorWidget
 from nodeeditor.node_edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER, EDGE_TYPE_SQUARE
 from nodeeditor.node_graphics_view import MODE_EDGE_DRAG
 from nodeeditor.utils import dumpException
 
+from fcn_conf import FC_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
+
+
 DEBUG = False
 DEBUG_CONTEXT = False
 
 
-class CalculatorSubWindow(NodeEditorWidget):
+class FCNSubWindow(NodeEditorWidget):
+    node_actions: dict
+
     def __init__(self):
         super().__init__()
-        # self.setAttribute(Qt.WA_DeleteOnClose)
 
         self.setTitle()
 
-        self.initNewNodeActions()
+        self.init_new_node_actions()
 
         self.scene.addHasBeenModifiedListener(self.setTitle)
-        self.scene.history.addHistoryRestoredListener(self.onHistoryRestored)
+        self.scene.history.addHistoryRestoredListener(self.on_history_restored)
         self.scene.addDragEnterListener(self.onDragEnter)
         self.scene.addDropListener(self.onDrop)
-        self.scene.setNodeClassSelector(self.getNodeClassFromData)
+        self.scene.setNodeClassSelector(self.get_node_class_from_data)
 
         self._close_event_listeners = []
 
-    def getNodeClassFromData(self, data):
-        if 'op_code' not in data: return Node
+    @staticmethod
+    def get_node_class_from_data(data):
+        if 'op_code' not in data:
+            return Node
         return get_class_from_opcode(data['op_code'])
 
-    def doEvalOutputs(self):
+    def do_eval_outputs(self):
         # eval all output nodes
         for node in self.scene.nodes:
             if node.__class__.__name__ == "NumberOutputNode":
                 node.eval()
 
-    def onHistoryRestored(self):
-        self.doEvalOutputs()
+    def on_history_restored(self):
+        self.do_eval_outputs()
 
     def fileLoad(self, filename):
         if super().fileLoad(filename):
-            self.doEvalOutputs()
+            self.do_eval_outputs()
             return True
-
         return False
 
-    def initNewNodeActions(self):
+    def init_new_node_actions(self):
         self.node_actions = {}
         keys = list(FC_NODES.keys())
         keys.sort()
@@ -58,17 +61,18 @@ class CalculatorSubWindow(NodeEditorWidget):
             self.node_actions[node.op_code] = QAction(QIcon(node.icon), node.op_title)
             self.node_actions[node.op_code].setData(node.op_code)
 
-    def initNodesContextMenu(self):
+    def init_nodes_context_menu(self):
         context_menu = QMenu(self)
         keys = list(FC_NODES.keys())
         keys.sort()
-        for key in keys: context_menu.addAction(self.node_actions[key])
+        for key in keys:
+            context_menu.addAction(self.node_actions[key])
         return context_menu
 
     def setTitle(self):
         self.setWindowTitle(self.getUserFriendlyFilename())
 
-    def addCloseEventListener(self, callback):
+    def add_close_event_listener(self, callback):
         self._close_event_listeners.append(callback)
 
     def closeEvent(self, event):
@@ -193,7 +197,7 @@ class CalculatorSubWindow(NodeEditorWidget):
     def handleNewNodeContextMenu(self, event):
 
         if DEBUG_CONTEXT: print("CONTEXT: EMPTY SPACE")
-        context_menu = self.initNodesContextMenu()
+        context_menu = self.init_nodes_context_menu()
         action = context_menu.exec_(self.mapToGlobal(event.pos()))
 
         if action is not None:
