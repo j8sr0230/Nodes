@@ -1,5 +1,4 @@
 import os
-from typing import Union
 
 from qtpy.QtGui import QImage
 from qtpy.QtCore import QRectF
@@ -12,14 +11,13 @@ from nodeeditor.utils import dumpException
 
 
 class BaseGraphicsNode(QDMGraphicsNode):
-
     height: int
     width: int
     edge_roundness: int
     edge_padding: int
     title_horizontal_padding: int
     title_vertical_padding: int
-    icons: Union[QImage, QImage]
+    icons: QImage
     input_socket_position: int
     output_socket_position: int
 
@@ -60,6 +58,9 @@ class BaseNodeContent(QDMNodeContentWidget):
 
 
 class BaseNode(Node):
+    input_socket_position: int
+    output_socket_position: int
+
     icon = ""
     op_code = 0
     op_title = "Undefined"
@@ -69,14 +70,9 @@ class BaseNode(Node):
     GraphicsNode_class = BaseGraphicsNode
     NodeContent_class = BaseNodeContent
 
-    def __init__(self, scene, inputs=[2, 2], outputs=[1]):
+    def __init__(self, scene, inputs=(2, 2), outputs=(1, )):
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
-
-        self.output_socket_position = None
-        self.input_socket_position = None
         self.value = None
-
-        # it's really important to mark all nodes Dirty by default
         self.markDirty()
 
     def initSettings(self):

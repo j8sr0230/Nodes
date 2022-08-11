@@ -23,7 +23,9 @@ class NumberInputContent(QDMNodeContentWidget):
         res['value'] = self.edit.text()
         return res
 
-    def deserialize(self, data, hashmap={}, restore_id=True) -> bool:
+    def deserialize(self, data, hashmap=None, restore_id=True) -> bool:
+        if hashmap is None:
+            hashmap = {}
         res = super().deserialize(data, hashmap)
         try:
             value = data['value']
