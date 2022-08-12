@@ -22,6 +22,7 @@ Edge.registerEdgeValidator(edge_validator_debug)
 Edge.registerEdgeValidator(edge_cannot_connect_two_outputs_or_two_inputs)
 Edge.registerEdgeValidator(edge_cannot_connect_input_and_output_of_same_node)
 
+
 DEBUG = False
 
 
@@ -38,6 +39,9 @@ class FCNWindow(NodeEditorWindow):
     act_separator: QAction
     act_about: QAction
     window_menu: QMenu
+    help_menu: QMenu
+    nodes_list_widget: QDMDragListbox
+    nodes_dock: QDockWidget
 
     def initUI(self):
         self.name_company = 'j8sr0230'
@@ -63,16 +67,16 @@ class FCNWindow(NodeEditorWindow):
         self.mdi_area.setTabsClosable(True)
         self.mdi_area.setTabsMovable(True)
         self.setCentralWidget(self.mdi_area)
-        self.mdi_area.subWindowActivated.connect(self.updateMenus)
+        self.mdi_area.subWindowActivated.connect(self.update_menus)
         self.window_mapper = QSignalMapper(self)
-        self.window_mapper.mapped[QWidget].connect(self.setActiveSubWindow)
+        self.window_mapper.mapped[QWidget].connect(self.set_active_sub_window)
 
-        self.createNodesDock()
+        self.create_nodes_dock()
         self.createActions()
         self.createMenus()
-        self.createToolBars()
+        self.create_tool_bars()
         self.createStatusBar()
-        self.updateMenus()
+        self.update_menus()
         self.readSettings()
         self.setWindowTitle("FreeCAD Nodes (fc_nodes)")
 
@@ -116,7 +120,7 @@ class FCNWindow(NodeEditorWindow):
 
     def onFileNew(self):
         try:
-            sub_wnd = self.createMdiChild()
+            sub_wnd = self.create_mdi_child()
             sub_wnd.widget().fileNew()
             sub_wnd.show()
         except Exception as e:
@@ -129,7 +133,7 @@ class FCNWindow(NodeEditorWindow):
         try:
             for file_name in file_names:
                 if file_name:
-                    existing = self.findMdiChild(file_name)
+                    existing = self.find_mdi_child(file_name)
                     if existing:
                         self.mdi_area.setActiveSubWindow(existing)
                     else:
@@ -138,7 +142,7 @@ class FCNWindow(NodeEditorWindow):
                         if nodeeditor.fileLoad(file_name):
                             self.statusBar().showMessage("File %s loaded" % file_name, 5000)
                             nodeeditor.setTitle()
-                            sub_wnd = self.createMdiChild(nodeeditor)
+                            sub_wnd = self.create_mdi_child(nodeeditor)
                             sub_wnd.show()
                         else:
                             nodeeditor.close()
@@ -154,49 +158,45 @@ class FCNWindow(NodeEditorWindow):
 
     def createMenus(self):
         super().createMenus()
-
         self.window_menu = self.menuBar().addMenu("&Window")
         self.update_window_menu()
         self.window_menu.aboutToShow.connect(self.update_window_menu)
-
         self.menuBar().addSeparator()
+        self.help_menu = self.menuBar().addMenu("&Help")
+        self.help_menu.addAction(self.act_about)
+        self.editMenu.aboutToShow.connect(self.update_edit_menu)
 
-        self.helpMenu = self.menuBar().addMenu("&Help")
-        self.helpMenu.addAction(self.act_about)
-
-        self.editMenu.aboutToShow.connect(self.updateEditMenu)
-
-    def updateMenus(self):
+    def update_menus(self):
         # print("update Menus")
         active = self.getCurrentNodeEditorWidget()
-        hasMdiChild = (active is not None)
+        has_mdi_child = (active is not None)
 
-        self.actSave.setEnabled(hasMdiChild)
-        self.actSaveAs.setEnabled(hasMdiChild)
-        self.act_close.setEnabled(hasMdiChild)
-        self.act_close_all.setEnabled(hasMdiChild)
-        self.act_tile.setEnabled(hasMdiChild)
-        self.act_cascade.setEnabled(hasMdiChild)
-        self.act_next.setEnabled(hasMdiChild)
-        self.act_previous.setEnabled(hasMdiChild)
-        self.act_separator.setVisible(hasMdiChild)
+        self.actSave.setEnabled(has_mdi_child)
+        self.actSaveAs.setEnabled(has_mdi_child)
+        self.act_close.setEnabled(has_mdi_child)
+        self.act_close_all.setEnabled(has_mdi_child)
+        self.act_tile.setEnabled(has_mdi_child)
+        self.act_cascade.setEnabled(has_mdi_child)
+        self.act_next.setEnabled(has_mdi_child)
+        self.act_previous.setEnabled(has_mdi_child)
+        self.act_separator.setVisible(has_mdi_child)
 
-        self.updateEditMenu()
+        self.update_edit_menu()
 
-    def updateEditMenu(self):
+    def update_edit_menu(self):
         try:
             # print("update Edit Menu")
             active = self.getCurrentNodeEditorWidget()
-            hasMdiChild = (active is not None)
+            has_mdi_child = (active is not None)
 
-            self.actPaste.setEnabled(hasMdiChild)
+            self.actPaste.setEnabled(has_mdi_child)
 
-            self.actCut.setEnabled(hasMdiChild and active.hasSelectedItems())
-            self.actCopy.setEnabled(hasMdiChild and active.hasSelectedItems())
-            self.actDelete.setEnabled(hasMdiChild and active.hasSelectedItems())
+            self.actCut.setEnabled(has_mdi_child and active.hasSelectedItems())
+            self.actCopy.setEnabled(has_mdi_child and active.hasSelectedItems())
+            self.actDelete.setEnabled(has_mdi_child and active.hasSelectedItems())
 
-            self.actUndo.setEnabled(hasMdiChild and active.canUndo())
-            self.actRedo.setEnabled(hasMdiChild and active.canRedo())
+            self.actUndo.setEnabled(has_mdi_child and active.canUndo())
+            self.actRedo.setEnabled(has_mdi_child and active.canRedo())
         except Exception as e:
             dumpException(e)
 
@@ -205,8 +205,8 @@ class FCNWindow(NodeEditorWindow):
 
         toolbar_nodes = self.window_menu.addAction("Nodes Toolbar")
         toolbar_nodes.setCheckable(True)
-        toolbar_nodes.triggered.connect(self.onWindowNodesToolbar)
-        toolbar_nodes.setChecked(self.nodesDock.isVisible())
+        toolbar_nodes.triggered.connect(self.on_window_nodes_toolbar)
+        toolbar_nodes.setChecked(self.nodes_dock.isVisible())
 
         self.window_menu.addSeparator()
 
@@ -236,39 +236,37 @@ class FCNWindow(NodeEditorWindow):
             action.triggered.connect(self.window_mapper.map)
             self.window_mapper.setMapping(action, window)
 
-    def onWindowNodesToolbar(self):
-        if self.nodesDock.isVisible():
-            self.nodesDock.hide()
+    def on_window_nodes_toolbar(self):
+        if self.nodes_dock.isVisible():
+            self.nodes_dock.hide()
         else:
-            self.nodesDock.show()
+            self.nodes_dock.show()
 
-    def createToolBars(self):
+    def create_tool_bars(self):
         pass
 
-    def createNodesDock(self):
-        self.nodesListWidget = QDMDragListbox()
-
-        self.nodesDock = QDockWidget("Nodes")
-        self.nodesDock.setWidget(self.nodesListWidget)
-        self.nodesDock.setFloating(False)
-
-        self.addDockWidget(Qt.RightDockWidgetArea, self.nodesDock)
+    def create_nodes_dock(self):
+        self.nodes_list_widget = QDMDragListbox()
+        self.nodes_dock = QDockWidget("Nodes")
+        self.nodes_dock.setWidget(self.nodes_list_widget)
+        self.nodes_dock.setFloating(False)
+        self.addDockWidget(Qt.RightDockWidgetArea, self.nodes_dock)
 
     def createStatusBar(self):
         self.statusBar().showMessage("Ready")
 
-    def createMdiChild(self, child_widget=None):
+    def create_mdi_child(self, child_widget=None):
         nodeeditor = child_widget if child_widget is not None else FCNSubWindow()
-        subwnd = self.mdi_area.addSubWindow(nodeeditor)
-        subwnd.setWindowIcon(self.empty_icon)
-        # nodeeditor.scene.addItemSelectedListener(self.updateEditMenu)
-        # nodeeditor.scene.addItemsDeselectedListener(self.updateEditMenu)
-        nodeeditor.scene.history.addHistoryModifiedListener(self.updateEditMenu)
-        nodeeditor.add_close_event_listener(self.onSubWndClose)
-        return subwnd
+        sub_wnd = self.mdi_area.addSubWindow(nodeeditor)
+        sub_wnd.setWindowIcon(self.empty_icon)
+        # nodeeditor.scene.addItemSelectedListener(self.update_edit_menu)
+        # nodeeditor.scene.addItemsDeselectedListener(self.update_edit_menu)
+        nodeeditor.scene.history.addHistoryModifiedListener(self.update_edit_menu)
+        nodeeditor.add_close_event_listener(self.on_sub_wnd_close)
+        return sub_wnd
 
-    def onSubWndClose(self, widget, event):
-        existing = self.findMdiChild(widget.filename)
+    def on_sub_wnd_close(self, widget, event):
+        existing = self.find_mdi_child(widget.filename)
         self.mdi_area.setActiveSubWindow(existing)
 
         if self.maybeSave():
@@ -276,12 +274,12 @@ class FCNWindow(NodeEditorWindow):
         else:
             event.ignore()
 
-    def findMdiChild(self, filename):
+    def find_mdi_child(self, filename):
         for window in self.mdi_area.subWindowList():
             if window.widget().filename == filename:
                 return window
         return None
 
-    def setActiveSubWindow(self, window):
+    def set_active_sub_window(self, window):
         if window:
             self.mdi_area.setActiveSubWindow(window)
