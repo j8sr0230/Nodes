@@ -4,7 +4,7 @@ A visual scripting environment for [FreeCAD](https://www.freecad.org) using
 [pyqt-node-editor](https://gitlab.com/pavel.krupala/pyqt-node-editor) 
 from Pavel Křupala.
 
-![FreeCAD Nodes](./img/fcn_snapshot.png)
+![FreeCAD Nodes](https://github.com/j8sr0230/fc_nodes/blob/main/img/fcn_snapshot.PNG)
 <!-- Add screenshots here -->
 
 ## Prerequisites
