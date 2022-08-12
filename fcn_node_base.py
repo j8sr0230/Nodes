@@ -70,7 +70,7 @@ class BaseNode(Node):
     GraphicsNode_class = BaseGraphicsNode
     NodeContent_class = BaseNodeContent
 
-    def __init__(self, scene, inputs=(2, 2), outputs=(1, )):
+    def __init__(self, scene, inputs=(0, 0), outputs=(0, )):
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
         self.value = None
         self.markDirty()

@@ -1,7 +1,8 @@
 import os
+import json
 
 from qtpy.QtGui import QIcon, QKeySequence
-from qtpy.QtWidgets import QMdiArea, QWidget, QDockWidget, QAction, QMessageBox, QFileDialog, QMenu
+from qtpy.QtWidgets import QApplication, QMdiArea, QWidget, QDockWidget, QAction, QMessageBox, QFileDialog, QMenu
 from qtpy.QtCore import Qt, QSignalMapper
 from nodeeditor.utils import loadStylesheets
 from nodeeditor.node_editor_window import NodeEditorWindow
@@ -9,7 +10,8 @@ from nodeeditor.node_edge import Edge
 from nodeeditor.node_edge_validators import (  # Enabling edge validators
     edge_validator_debug,
     edge_cannot_connect_two_outputs_or_two_inputs,
-    edge_cannot_connect_input_and_output_of_same_node
+    edge_cannot_connect_input_and_output_of_same_node,
+    edge_cannot_connect_input_and_output_of_different_type
 )
 import qss.nodeeditor_dark_resources  # Images for the dark skin
 
@@ -21,6 +23,7 @@ from fcn_conf import FC_NODES
 Edge.registerEdgeValidator(edge_validator_debug)
 Edge.registerEdgeValidator(edge_cannot_connect_two_outputs_or_two_inputs)
 Edge.registerEdgeValidator(edge_cannot_connect_input_and_output_of_same_node)
+Edge.registerEdgeValidator(edge_cannot_connect_input_and_output_of_different_type)
 
 
 DEBUG = False
@@ -283,3 +286,35 @@ class FCNWindow(NodeEditorWindow):
     def set_active_sub_window(self, window):
         if window:
             self.mdi_area.setActiveSubWindow(window)
+
+    def onEditCut(self):
+        """Handle Edit Cut to clipboard operation"""
+        if self.getCurrentNodeEditorWidget():
+            data = self.getCurrentNodeEditorWidget().scene.clipboard.serializeSelected(delete=True)
+            str_data = json.dumps(data, indent=4)
+            QApplication.clipboard().setText(str_data)
+
+    def onEditCopy(self):
+        """Handle Edit Copy to clipboard operation"""
+        if self.getCurrentNodeEditorWidget():
+            data = self.getCurrentNodeEditorWidget().scene.clipboard.serializeSelected(delete=False)
+            str_data = json.dumps(data, indent=4)
+            QApplication.clipboard().setText(str_data)
+
+    def onEditPaste(self):
+        """Handle Edit Paste from clipboard operation"""
+        if self.getCurrentNodeEditorWidget():
+            raw_data = QApplication.clipboard().text()
+
+            try:
+                data = json.loads(raw_data)
+            except ValueError as e:
+                print("Pasting of not valid json data!", e)
+                return
+
+            # check if the json data are correct
+            if 'nodes' not in data:
+                print("JSON does not contain any nodes!")
+                return
+
+            return self.getCurrentNodeEditorWidget().scene.clipboard.deserializeFromClipboard(data)
