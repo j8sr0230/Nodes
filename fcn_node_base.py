@@ -133,5 +133,5 @@ class BaseNode(Node):
         if hashmap is None:
             hashmap = {}
         res = super().deserialize(data, hashmap, restore_id)
-        print("Deserialized BaseNode '%s'" % self.__class__.__name__, "res:", res)
+        print("Deserialized FCNNode '%s'" % self.__class__.__name__, "res:", res)
         return res
