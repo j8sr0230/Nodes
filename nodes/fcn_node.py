@@ -1,18 +1,18 @@
 import os
 
 from qtpy.QtGui import QImage
-from qtpy.QtCore import QRectF, Qt
-from qtpy.QtWidgets import QWidget, QLabel, QLineEdit, QSlider
+from qtpy.QtCore import QRectF, Qt, QPoint
+from qtpy.QtWidgets import QWidget, QLabel, QLineEdit, QSlider, QFormLayout
 from nodeeditor.node_node import Node
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_content_widget import QDMNodeContentWidget
-from nodeeditor.node_socket import Socket, LEFT_TOP, LEFT_CENTER, LEFT_BOTTOM, RIGHT_CENTER, RIGHT_BOTTOM
+from nodeeditor.node_socket import Socket, LEFT_BOTTOM, RIGHT_BOTTOM
 from nodeeditor.node_graphics_socket import QDMGraphicsSocket
 from fcn_conf import register_node, OP_NODE_BASE
 from nodeeditor.utils import dumpException
 
 
-DEBUG = True
+DEBUG = False
 
 
 class FCNGraphicsSocket(QDMGraphicsSocket):
@@ -40,15 +40,17 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
         """
         self.label_widget = QLabel(socket_label)
         if self.socket.is_input:
-            self.label_widget.setAlignment(Qt.AlignLeft)
+            self.label_widget.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         else:
-            self.label_widget.setAlignment(Qt.AlignRight)
+            self.label_widget.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         self.input_widget = self.__class__.Socket_Input_Widget_Classes[socket_input_index]()
         if socket_input_index == 0:  # QLineEdit
             self.input_widget.setText("Input")
         elif socket_input_index == 1:  # QSlider
-            self.input_widget.setValue(1)
+            self.input_widget.setOrientation(Qt.Horizontal)
+            self.input_widget.setMinimum(1)
+            self.input_widget.setMaximum(100)
 
         if DEBUG:
             print(self.label_widget, self.input_widget)
@@ -59,7 +61,7 @@ class FCNSocket(Socket):
 
     Socket_GR_Class = FCNGraphicsSocket
 
-    def __init__(self, node: Node, index: int = 0, position: int = LEFT_TOP, socket_type: int = 1,
+    def __init__(self, node: Node, index: int = 0, position: int = LEFT_BOTTOM, socket_type: int = 1,
                  multi_edges: bool = True, count_on_this_node_side: int = 1, is_input: bool = False,
                  socket_label: str = "", socket_input_index: int = 0):
         """
@@ -102,9 +104,9 @@ class FCNGraphicsNode(QDMGraphicsNode):
     def initSizes(self):
         super().initSizes()
         self.width = 160
-        self.height = 74
+        self.height = 200
         self.edge_roundness = 6
-        self.edge_padding = 0
+        self.edge_padding = 10
         self.title_horizontal_padding = 8
         self.title_vertical_padding = 10
 
@@ -130,18 +132,52 @@ class FCNGraphicsNode(QDMGraphicsNode):
 
 
 class FCNNodeContent(QDMNodeContentWidget):
+    input_widgets: list
+    output_widgets: list
+    layout: QFormLayout
+
+    def __init__(self, node: 'Node', parent: QWidget = None):
+        """
+        :param node: reference to the :py:class:`~nodeeditor.node_node.Node`
+        :type node: :py:class:`~nodeeditor.node_node.Node`
+        :param parent: parent widget
+        :type parent: QWidget
+
+        :Instance Attributes:
+            - **node** - reference to the :class:`~nodeeditor.node_node.Node`
+            - **layout** - ``QLayout`` container
+        """
+        super().__init__(node, parent)
+
     def initUI(self):
-        lbl = QLabel(self.node.content_label, self)
-        lbl.setObjectName(self.node.content_label_objname)
+        self.hide()  # Hack for updating widget geometry
+        self.layout = QFormLayout(self)
+        self.setLayout(self.layout)
+
+    def populate_content(self):
+        self.input_widgets = []
+        self.output_widgets = []
+
+        for socket in self.node.inputs:
+            self.input_widgets.append(socket.grSocket.input_widget)
+            self.layout.addRow(socket.grSocket.label_widget, socket.grSocket.input_widget)
+
+        for socket in self.node.outputs:
+            self.output_widgets.append(socket.grSocket.label_widget)
+            self.layout.addRow(socket.grSocket.input_widget, socket.grSocket.label_widget)
+
+        self.show()  # Hack for updating widget geometry
 
 
 @register_node(OP_NODE_BASE)
 class FCNNode(Node):
+    input_socket_position: int
+    output_socket_position: int
+
     icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "freecad_default_icon.png")
     op_code = OP_NODE_BASE
     op_title = "FCN Node"
     content_label_objname = "calc_node_bg"
-    content_label = "Lbl"
 
     GraphicsNode_class = FCNGraphicsNode
     NodeContent_class = FCNNodeContent
@@ -150,37 +186,38 @@ class FCNNode(Node):
     def __init__(self, scene):
         super().__init__(scene, self.__class__.op_title, inputs=[(0, "In 1", 0), (0, "In 2", 0), (0, "In 3", 0)],
                          outputs=[(1, "Out 1", 1)])
+
+        self.content.populate_content()
+        self.initSockets([(0, "In 1", 0), (0, "In 2", 0), (0, "In 3", 0)], [(1, "Out 1", 1)], True)
         self.value = None
         self.markDirty()
         self.eval()
-        print("Init")
 
     def initInnerClasses(self):
         self.content = FCNNodeContent(self)
         self.grNode = FCNGraphicsNode(self)
-        #self.content.input_rows[0][1].textChanged.connect(self.onInputChanged)
-        #self.content.input_rows[1][1].textChanged.connect(self.onInputChanged)
-        #self.content.input_rows[2][1].textChanged.connect(self.onInputChanged)
+
+    def getSocketPosition(self, index: int, position: int, num_out_of: int = 1) -> '[x, y]':
+        x, y = super().getSocketPosition(index, position, num_out_of)
+
+        if hasattr(self.content, "input_widgets"):
+            if position == LEFT_BOTTOM:
+                elem = self.content.input_widgets[index]
+                y = self.grNode.title_vertical_padding + self.grNode.title_height + elem.geometry().topLeft().y() + \
+                    (elem.geometry().height() // 2)
+            elif position == RIGHT_BOTTOM:
+                elem = self.content.output_widgets[index]
+                y = self.grNode.title_vertical_padding + self.grNode.title_height + elem.geometry().topLeft().y() + \
+                    (elem.geometry().height() // 2)
+
+        return [x, y]
 
     def initSettings(self):
         super().initSettings()
         self.input_socket_position = LEFT_BOTTOM
         self.output_socket_position = RIGHT_BOTTOM
 
-    #def getSocketPosition(self, index: int, position: int, num_out_of: int = 1) -> '(x, y)':
-        # x, y = super().getSocketPosition(index, position, num_out_of)
-        #
-        # if position == LEFT_BOTTOM:
-        #     elem = self.content.input_rows[index][1]
-        #     y = 0.5 + self.grNode.title_height + (
-        #             elem.geometry().height() // 2) + elem.geometry().topLeft().y() - self.content.layout.geometry().topLeft().y()
-        # elif position == RIGHT_BOTTOM:
-        #     elem = self.content.output_rows[index]
-        #     y = 0.5 + self.grNode.title_height + (
-        #             elem.geometry().height() / 2) + elem.geometry().topLeft().y() - self.content.layout.geometry().topLeft().y()
-        # return [x, y]
-
-    def initSockets(self, inputs: list, outputs: list, reset: bool=True):
+    def initSockets(self, inputs: list, outputs: list, reset: bool = True):
         """
         Create sockets for inputs and outputs
 
@@ -191,7 +228,6 @@ class FCNNode(Node):
         :param reset: if ``True`` destroys and removes old `Sockets`
         :type reset: ``bool``
         """
-
         if reset:
             # clear old sockets
             if hasattr(self, 'inputs') and hasattr(self, 'outputs'):
@@ -222,12 +258,12 @@ class FCNNode(Node):
             counter += 1
             self.outputs.append(socket)
 
-    def eval(self):
+    def eval(self, index=0):
         if not self.isDirty() and not self.isInvalid():
             print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
             return self.value
         try:
-            val = self.evalImplementation()
+            val = self.eval_implementation()
             return val
         except ValueError as e:
             self.markInvalid()
@@ -238,84 +274,26 @@ class FCNNode(Node):
             self.grNode.setToolTip(str(e))
             dumpException(e)
 
-    def evalImplementation(self):
-        print(self.inputs[0].grSocket.label_widget.text())
-        pass
-        # x = self.getInput(0)
-        # y = self.getInput(1)
-        # z = self.getInput(2)
-        #
-        # if x is not None:
-        #     x_val = x.eval()
-        #     self.content.input_rows[0][1].setText(str(x_val))
-        # else:
-        #     x_val = float(self.content.input_rows[0][1].text())
-        #
-        # if y is not None:
-        #     y_val = y.eval()
-        #     self.content.input_rows[1][1].setText(str(y_val))
-        # else:
-        #     y_val = float(self.content.input_rows[1][1].text())
-        #
-        # if z is not None:
-        #     z_val = z.eval()
-        #     self.content.input_rows[2][1].setText(str(z_val))
-        # else:
-        #     z_val = float(self.content.input_rows[2][1].text())
-        #
-        # val = self.evalOperation(x_val, y_val, z_val)
-        # self.value = val
-        # self.markDirty(False)
-        # self.markInvalid(False)
-        # self.grNode.setToolTip("")
-        # self.markDescendantsDirty()
-        # self.evalChildren()
-        # print("%s::__eval()" % self.__class__.__name__, "self.value = ", self.value)
-        # return val
-        return None
+    def eval_implementation(self):
+        return self.eval_operation(1, 2, 3)
 
-    # def evalOperation(self, x, y, z):
-    #     vector = App.Vector(x, y, z)
-    #     if vector:
-    #         return vector
-    #     else:
-    #         raise ValueError('Wrong input values')
+    @staticmethod
+    def eval_operation(x, y, z):
+        return x, y, z
 
     def onInputChanged(self, socket=None):
-        pass
         self.markDirty()
         self.eval()
         print("%s::__onInputChanged" % self.__class__.__name__, "self.value = ", self.value)
 
-    # def onEdgeConnectionChanged(self, new_edge: 'Edge'):
-    #     """
-    #     Event handling that any connection (`Edge`) has changed.
-    #
-    #     :param new_edge: reference to the changed :class:`~nodeeditor.node_edge.Edge`
-    #     :type new_edge: :class:`~nodeeditor.node_edge.Edge`
-    #     """
-    #     if new_edge.end_socket != None:
-    #         if new_edge.end_socket.node == self:
-    #             # New edge in input
-    #             input_elem = self.content.input_rows[new_edge.end_socket.index][1]
-    #             input_elem.setText(str(self.getInput(new_edge.end_socket.index).eval()))
-    #             input_elem.setDisabled(True)
-    #         else:
-    #             # New edge on output
-    #             pass
-    #     else:
-    #         # Edge on input or output deleted
-    #         for socket in self.inputs:
-    #             if not socket.hasAnyEdge():
-    #                 input_elem = self.content.input_rows[socket.index][1]
-    #                 input_elem.setDisabled(False)
-    #
     def serialize(self):
         res = super().serialize()
         res['op_code'] = self.__class__.op_code
         return res
 
-    def deserialize(self, data, hashmap={}, restore_id=True):
+    def deserialize(self, data: dict, hashmap=None, restore_id: bool = True, *args, **kwargs) -> bool:
+        if hashmap is None:
+            hashmap = {}
         res = super().deserialize(data, hashmap, restore_id)
         # print("Deserialized Node '%s'" % self.__class__.__name__, "res:", res)
         return res
