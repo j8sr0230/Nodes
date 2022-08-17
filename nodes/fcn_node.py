@@ -174,7 +174,7 @@ class FCNNode(Node):
     input_socket_position: int
     output_socket_position: int
 
-    icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "freecad_default_icon.png")
+    icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
     op_code = OP_NODE_BASE
     op_title = "FCN Node"
     content_label_objname = "calc_node_bg"

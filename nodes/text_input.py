@@ -70,8 +70,7 @@ class TextInputGraphicsNode(QDMGraphicsNode):
 
 @register_node(OP_NODE_TXT_IN)
 class TextInputNode(Node):
-    icon = os.path.join(App.getUserAppDataDir(), "Macro", "pyqt-node-editor", "examples",
-                        "example_freecad", "icons", "freecad_default_icon.png")
+    icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
     op_code = OP_NODE_TXT_IN
     op_title = "Text"
     content_label_objname = "text_input_node"

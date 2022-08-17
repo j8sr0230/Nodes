@@ -56,8 +56,7 @@ class VecXYZGraphicsNode(QDMGraphicsNode):
 
 @register_node(OP_NODE_VEC_XYZ)
 class VecXYZNode(Node):
-    icon = os.path.join(App.getUserAppDataDir(), "Macro", "pyqt-node-editor", "examples",
-                        "example_freecad", "icons", "freecad_default_icon.png")
+    icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
     op_code = OP_NODE_VEC_XYZ
     op_title = "Vector XYZ"
     content_label_objname = "vec_xyz_node"

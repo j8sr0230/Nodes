@@ -7,7 +7,7 @@ from fcn_node_base import BaseNode
 @register_node(OP_NODE_ADD)
 class NumberAddNode(BaseNode):
 
-    icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "add.png")
+    icon = os.path.join(os.path.abspath(__file__), "..", "..",  "icons", "fcn_default.png")
     op_code = OP_NODE_ADD
     op_title = "Add"
     content_label = "+"
@@ -20,7 +20,7 @@ class NumberAddNode(BaseNode):
 @register_node(OP_NODE_SUB)
 class NumberSubNode(BaseNode):
 
-    icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "sub.png")
+    icon = os.path.join(os.path.abspath(__file__), "..", "..",  "icons", "fcn_default.png")
     op_code = OP_NODE_SUB
     op_title = "Subtract"
     content_label = "-"
@@ -33,7 +33,7 @@ class NumberSubNode(BaseNode):
 @register_node(OP_NODE_MUL)
 class NumberMulNode(BaseNode):
 
-    icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "mul.png")
+    icon = os.path.join(os.path.abspath(__file__), "..", "..",  "icons", "fcn_default.png")
     op_code = OP_NODE_MUL
     op_title = "Multiply"
     content_label = "*"
@@ -47,7 +47,7 @@ class NumberMulNode(BaseNode):
 @register_node(OP_NODE_DIV)
 class NumberDivNode(BaseNode):
 
-    icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "divide.png")
+    icon = os.path.join(os.path.abspath(__file__), "..", "..",  "icons", "fcn_default.png")
     op_code = OP_NODE_DIV
     op_title = "Divide"
     content_label = "/"

@@ -57,8 +57,7 @@ class BSplineCurveGraphicsNode(QDMGraphicsNode):
 
 @register_node(OP_NODE_BSPLINE_CRV)
 class BSplineCurveNode(Node):
-    icon = os.path.join(App.getUserAppDataDir(), "Macro", "pyqt-node-editor", "examples",
-                        "example_freecad", "icons", "freecad_default_icon.png")
+    icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
     op_code = OP_NODE_BSPLINE_CRV
     op_title = "BSpline Curve"
     content_label_objname = "bspline_crv_node"

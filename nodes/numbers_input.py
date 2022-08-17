@@ -70,8 +70,7 @@ class NumbersInputGraphicsNode(QDMGraphicsNode):
 
 @register_node(OP_NODE_NUMS_IN)
 class NumbersInputNode(Node):
-    icon = os.path.join(App.getUserAppDataDir(), "Macro", "pyqt-node-editor", "examples",
-                        "example_freecad", "icons", "freecad_default_icon.png")
+    icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
     op_code = OP_NODE_NUMS_IN
     op_title = "Numbers"
     content_label_objname = "numbers_input_node"

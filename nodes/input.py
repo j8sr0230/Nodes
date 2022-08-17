@@ -39,7 +39,7 @@ class NumberInputContent(QDMNodeContentWidget):
 @register_node(OP_NODE_INPUT)
 class NumberInputNode(BaseNode):
 
-    icon = os.path.join(os.path.abspath(__file__), "..", "..",  "icons", "in.png")
+    icon = os.path.join(os.path.abspath(__file__), "..", "..",  "icons", "fcn_default.png")
     op_code = OP_NODE_INPUT
     op_title = "Input"
     content_label_objname = "calc_node_input"

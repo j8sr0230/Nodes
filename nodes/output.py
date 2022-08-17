@@ -21,7 +21,7 @@ class NumberOutputContent(QDMNodeContentWidget):
 @register_node(OP_NODE_OUTPUT)
 class NumberOutputNode(BaseNode):
 
-    icon = os.path.join(os.path.abspath(__file__), "..", "..",  "icons", "out.png")
+    icon = os.path.join(os.path.abspath(__file__), "..", "..",  "icons", "fcn_default.png")
     op_code = OP_NODE_OUTPUT
     op_title = "Output"
     content_label_objname = "calc_node_output"
