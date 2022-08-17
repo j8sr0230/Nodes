@@ -136,19 +136,6 @@ class FCNNodeContent(QDMNodeContentWidget):
     output_widgets: list
     layout: QFormLayout
 
-    def __init__(self, node: 'Node', parent: QWidget = None):
-        """
-        :param node: reference to the :py:class:`~nodeeditor.node_node.Node`
-        :type node: :py:class:`~nodeeditor.node_node.Node`
-        :param parent: parent widget
-        :type parent: QWidget
-
-        :Instance Attributes:
-            - **node** - reference to the :class:`~nodeeditor.node_node.Node`
-            - **layout** - ``QLayout`` container
-        """
-        super().__init__(node, parent)
-
     def initUI(self):
         self.hide()  # Hack for updating widget geometry
         self.layout = QFormLayout(self)
@@ -188,7 +175,7 @@ class FCNNode(Node):
         self.output_init_list = [(1, "Out 1", 1)]
 
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
-        self.content.init_ui()  # Init content after super class an socket initialisation
+        self.content.init_ui()  # Init content after super class and socket initialisation
         self.initSockets(self.inputs_init_list, self.output_init_list, True)  # Reinit sockets to adjust position
 
         self.value = None
