@@ -154,7 +154,7 @@ class FCNNodeContent(QDMNodeContentWidget):
         self.layout = QFormLayout(self)
         self.setLayout(self.layout)
 
-    def populate_content(self):
+    def init_ui(self):
         self.input_widgets = []
         self.output_widgets = []
 
@@ -184,18 +184,16 @@ class FCNNode(Node):
     Socket_class = FCNSocket
 
     def __init__(self, scene):
-        super().__init__(scene, self.__class__.op_title, inputs=[(0, "In 1", 0), (0, "In 2", 0), (0, "In 3", 0)],
-                         outputs=[(1, "Out 1", 1)])
+        self.inputs_init_list = [(0, "In 1", 0), (0, "In 2", 0), (0, "In 3", 0)]
+        self.output_init_list = [(1, "Out 1", 1)]
 
-        self.content.populate_content()
-        self.initSockets([(0, "In 1", 0), (0, "In 2", 0), (0, "In 3", 0)], [(1, "Out 1", 1)], True)
+        super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
+        self.content.init_ui()  # Init content after super class an socket initialisation
+        self.initSockets(self.inputs_init_list, self.output_init_list, True)  # Reinit sockets to adjust position
+
         self.value = None
         self.markDirty()
         self.eval()
-
-    def initInnerClasses(self):
-        self.content = FCNNodeContent(self)
-        self.grNode = FCNGraphicsNode(self)
 
     def getSocketPosition(self, index: int, position: int, num_out_of: int = 1) -> '[x, y]':
         x, y = super().getSocketPosition(index, position, num_out_of)
