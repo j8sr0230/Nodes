@@ -46,14 +46,28 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
 
         self.input_widget = self.__class__.Socket_Input_Widget_Classes[socket_input_index]()
         if socket_input_index == 0:  # QLineEdit
-            self.input_widget.setText("Input")
+            self.input_widget.setText("Input1")
+            self.input_widget.textChanged[str].connect(self.on_input_change)
+
         elif socket_input_index == 1:  # QSlider
             self.input_widget.setOrientation(Qt.Horizontal)
             self.input_widget.setMinimum(1)
             self.input_widget.setMaximum(100)
 
-        if DEBUG:
-            print(self.label_widget, self.input_widget)
+    def on_input_change(self, text):
+        self.socket.node.markDirty()
+        self.socket.node.eval()
+        print("%s::on_input_change" % self.__class__.__name__, "text = ", text)
+
+    def update_connection_status(self):
+        if self.socket.hasAnyEdge():
+            # Socket is connected
+            self.input_widget.setDisabled(True)
+            connected_node = self.socket.node.getInput(self.socket.index)
+            self.input_widget.setText(str(connected_node.eval()))
+        else:
+            # Socket is unconnected
+            self.input_widget.setDisabled(False)
 
 
 class FCNSocket(Socket):
@@ -176,11 +190,17 @@ class FCNNode(Node):
 
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
         self.content.init_ui()  # Init content after super class and socket initialisation
-        self.initSockets(self.inputs_init_list, self.output_init_list, True)  # Reinit sockets to adjust position
+        self.place_sockets()  # Set sockets according content layout
 
         self.value = None
         self.markDirty()
         self.eval()
+
+    def place_sockets(self):
+        for socket in self.inputs:
+            socket.setSocketPosition()
+        for socket in self.outputs:
+            socket.setSocketPosition()
 
     def getSocketPosition(self, index: int, position: int, num_out_of: int = 1) -> '[x, y]':
         x, y = super().getSocketPosition(index, position, num_out_of)
@@ -270,6 +290,16 @@ class FCNNode(Node):
         self.markDirty()
         self.eval()
         print("%s::__onInputChanged" % self.__class__.__name__, "self.value = ", self.value)
+
+    def onEdgeConnectionChanged(self, new_edge: 'Edge'):
+        """
+        Event handling that any connection (`Edge`) has changed.
+
+        :param new_edge: reference to the changed :class:`~nodeeditor.node_edge.Edge`
+        :type new_edge: :class:`~nodeeditor.node_edge.Edge`
+        """
+        for socket in self.inputs:
+            socket.grSocket.update_connection_status()
 
     def serialize(self):
         res = super().serialize()
