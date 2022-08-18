@@ -18,7 +18,7 @@ DEBUG = False
 class FCNGraphicsSocket(QDMGraphicsSocket):
     """Visual representation of socket in scene."""
 
-    Socket_Input_Widget_Classes = [QLineEdit, QSlider]
+    Socket_Input_Widget_Classes = [QLineEdit, QSlider, QLabel]
 
     def __init__(self, socket: Socket = None):
         """
@@ -53,6 +53,10 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
             self.input_widget.setOrientation(Qt.Horizontal)
             self.input_widget.setMinimum(1)
             self.input_widget.setMaximum(100)
+            self.input_widget.valueChanged[int].connect(self.on_input_change)
+
+        elif socket_input_index == 2:  # Empty
+            pass
 
     def on_input_change(self, text):
         self.socket.node.markDirty()
@@ -64,7 +68,10 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
             # Socket is connected
             self.input_widget.setDisabled(True)
             connected_node = self.socket.node.getInput(self.socket.index)
-            self.input_widget.setText(str(connected_node.eval()))
+            if isinstance(self.input_widget, QLineEdit):
+                self.input_widget.setText(str(connected_node.eval()))
+            elif isinstance(self.input_widget, QSlider):
+                self.input_widget.setValue(int(connected_node.eval()))
         else:
             # Socket is unconnected
             self.input_widget.setDisabled(False)
@@ -117,8 +124,8 @@ class FCNGraphicsNode(QDMGraphicsNode):
 
     def initSizes(self):
         super().initSizes()
-        self.width = 160
-        self.height = 200
+        self.width = 250
+        self.height = 180
         self.edge_roundness = 6
         self.edge_padding = 10
         self.title_horizontal_padding = 8
@@ -185,8 +192,8 @@ class FCNNode(Node):
     Socket_class = FCNSocket
 
     def __init__(self, scene):
-        self.inputs_init_list = [(0, "In 1", 0), (0, "In 2", 0), (0, "In 3", 0)]
-        self.output_init_list = [(1, "Out 1", 1)]
+        self.inputs_init_list = [(0, "In 1", 0), (0, "In 2", 0), (0, "In 2", 1)]
+        self.output_init_list = [(1, "Out 1", 2)]
 
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
         self.content.init_ui()  # Init content after super class and socket initialisation
@@ -280,16 +287,45 @@ class FCNNode(Node):
             dumpException(e)
 
     def eval_implementation(self):
-        return self.eval_operation(1, 2, 3)
+        values = []
+
+        for socket in self.inputs:
+            input_nodes = self.getInputs(socket.index)
+            input_widget = self.content.input_widgets[socket.index]
+
+            if isinstance(input_widget, QLineEdit):
+                if len(input_nodes) > 0:
+                    input_value = input_nodes[0].eval()
+                    input_widget.setText(str(input_value))
+                else:
+                    input_value = input_widget.text()
+
+            elif isinstance(input_widget, QSlider):
+                if len(input_nodes) > 0:
+                    input_value = input_nodes[0].eval()
+                    input_widget.setValue(int(input_value))
+                else:
+                    input_value = input_widget.value()
+
+            else:
+                input_value = None
+
+            values.append(input_value)
+
+        val = self.eval_operation(values)
+
+        self.value = val
+        self.markDirty(False)
+        self.markInvalid(False)
+        self.grNode.setToolTip("")
+        self.markDescendantsDirty()
+        self.evalChildren()
+        print("%s::__eval()" % self.__class__.__name__, "self.value = ", self.value)
+        return val
 
     @staticmethod
-    def eval_operation(x, y, z):
-        return x, y, z
-
-    def onInputChanged(self, socket=None):
-        self.markDirty()
-        self.eval()
-        print("%s::__onInputChanged" % self.__class__.__name__, "self.value = ", self.value)
+    def eval_operation(values):
+        return values
 
     def onEdgeConnectionChanged(self, new_edge: 'Edge'):
         """
@@ -300,6 +336,9 @@ class FCNNode(Node):
         """
         for socket in self.inputs:
             socket.grSocket.update_connection_status()
+
+        #self.markDirty()
+        #self.eval()
 
     def serialize(self):
         res = super().serialize()
