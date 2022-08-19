@@ -1,3 +1,24 @@
+# -*- coding: utf-8 -*-
+"""Base node template for FreeCAD Nodes (fc_nodes).
+
+Author: R-Scharf-Wildenhain (j8sr0230), 19.08.2022
+Licence: LGPL-2.1
+Website: https://github.com/j8sr0230/fc_nodes
+
+This module contains all necessary classes to create custom nodes for
+the visual modeling environment FreeCAD Nodes (fc_nodes). It contains the
+classes:
+- FCNGraphicsSocket (socket visualization) and FCNSocket (socket model),
+- FCNGraphicsNode (node visualization) and FCNNode (node model) and
+- FCNContent (node content visualization)
+for the complete graphical and logical implementation of individual nodes.
+
+It uses significantly the modules QtPy as abstraction layer for PyQt5
+and PySide2 (https://pypi.org/project/QtPy/, MIT license) and the pyqt-node-editor
+by Pavel Křupala (https://gitlab.com/pavel.krupala/pyqt-node-editor, MIT license)
+as node editor base framework.
+"""
+
 import os
 from collections import OrderedDict
 
@@ -18,34 +39,50 @@ DEBUG = False
 
 
 class FCNGraphicsSocket(QDMGraphicsSocket):
-    """Visual representation of socket in scene."""
+    """Visual representation of a socket in the node editor scene.
+
+    The visual representation of the sockets consists of a label and
+    an input/display widget. For connected sockets, the input/display
+    widget shows the corresponding input value. For free sockets, the
+    socket value can be entered directly via this widget. This class
+    holds the visual elements of a socket consisting of a socket label
+    (QLabel) and an input/display widget (QWidget). All available
+    input/display elements are stored in the class variable
+    Socket_Input_Widget_Classes as a list. The selection of an explicit
+    input element from the listmSocket_Input_Widget_Classes is done
+    dynamically during FCNSocket initialisation.
+
+    Attributes:
+        label_widget (QLabel): Visual socket label.
+        input_widget (QWidget): Visual socket input element.
+    """
 
     Socket_Input_Widget_Classes = [QLabel, QLineEdit, QSlider, QComboBox]
 
-    def __init__(self, socket: Socket = None):
-        """
-        :param socket: Socket model for visual socket representation
-        :type socket: Socket
-        """
-        super().__init__(socket)
-        self.label_widget = None
-        self.input_widget = None
+    label_widget: QLabel
+    input_widget: QWidget
 
     def init_inner_widgets(self, socket_label, socket_input_index):
-        """
-        Initiates socket label and input widget.
+        """Generates the visual elements for socket label and input.
 
-        :param socket_label: Label of the socket
+        This method is called by the FCNSocket class and creates the
+        visual socket label and the input element specified by the
+        socket_input_index. In addition to the label alignment,
+        specific settings for the selected input widget is made.
+        :param socket_label: Label of the socket.
         :type socket_label: str
-        :param socket_input_index: Index of input class, referring to the Socket_Input_Classes list
+        :param socket_input_index: Index of input class, referring to the Socket_Input_Classes list.
         :type socket_input_index: int
         """
+
+        # Socket label setup
         self.label_widget = QLabel(socket_label)
         if self.socket.is_input:
             self.label_widget.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         else:
             self.label_widget.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
+        # Socket input widget setup
         self.input_widget = self.__class__.Socket_Input_Widget_Classes[socket_input_index]()
         if socket_input_index == 0:  # Empty
             pass
@@ -67,6 +104,16 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
             self.input_widget.currentIndexChanged.connect(self.socket.node.onInputChanged)
 
     def update_widget_value(self):
+        """Updates the value shown by the socket input widget.
+
+        Socket input/display widgets work in two directions. If no node is connected to
+        the socket, they serve for quick manipulation of the respective socket
+        input value, i.e. the serve as an input field. However, if a node is
+        connected to the socket, they will show the input value passed through that
+        node. This method evaluates the connected node and displays the
+        corresponding value in the input/display widget.
+        """
+
         if self.socket.hasAnyEdge():
             # If socket is connected
             connected_node = self.socket.node.getInput(self.socket.index)
@@ -78,6 +125,12 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
                 self.input_widget.setCurrentIndex(int(connected_node.eval()))
 
     def update_widget_status(self):
+        """Updates the input widget state (enabled or disabled).
+
+        In addition to the update_widget_value method, the input/display widget
+        of a connected socket is disabled by this update_widget_status method.
+        """
+
         if self.socket.hasAnyEdge():
             # If socket is connected
             self.input_widget.setDisabled(True)
