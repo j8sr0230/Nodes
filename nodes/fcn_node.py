@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 from qtpy.QtGui import QImage
 from qtpy.QtCore import QRectF, Qt, QPoint
-from qtpy.QtWidgets import QWidget, QLabel, QLineEdit, QSlider, QFormLayout
+from qtpy.QtWidgets import QWidget, QFormLayout, QLabel, QLineEdit, QSlider, QComboBox
 from nodeeditor.node_node import Node
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_content_widget import QDMNodeContentWidget
@@ -20,11 +20,11 @@ DEBUG = False
 class FCNGraphicsSocket(QDMGraphicsSocket):
     """Visual representation of socket in scene."""
 
-    Socket_Input_Widget_Classes = [QLabel, QLineEdit, QSlider]
+    Socket_Input_Widget_Classes = [QLabel, QLineEdit, QSlider, QComboBox]
 
     def __init__(self, socket: Socket = None):
         """
-        :param socket: Socket model for visual representation
+        :param socket: Socket model for visual socket representation
         :type socket: Socket
         """
         super().__init__(socket)
@@ -61,26 +61,28 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
             self.input_widget.setValue(int(self.socket.socket_default_value))
             self.input_widget.valueChanged.connect(self.socket.node.onInputChanged)
 
+        elif socket_input_index == 3:  # QComboBox
+            for text in self.socket.socket_default_value:
+                self.input_widget.addItem(text)
+            self.input_widget.currentIndexChanged.connect(self.socket.node.onInputChanged)
+
     def update_widget_value(self):
         if self.socket.hasAnyEdge():
-            # Socket is connected
+            # If socket is connected
             connected_node = self.socket.node.getInput(self.socket.index)
             if isinstance(self.input_widget, QLineEdit):
                 self.input_widget.setText(str(connected_node.eval()))
             elif isinstance(self.input_widget, QSlider):
                 self.input_widget.setValue(int(connected_node.eval()))
+            elif isinstance(self.input_widget, QComboBox):
+                self.input_widget.setCurrentIndex(int(connected_node.eval()))
 
     def update_widget_status(self):
         if self.socket.hasAnyEdge():
-            # Socket is connected
+            # If socket is connected
             self.input_widget.setDisabled(True)
-            connected_node = self.socket.node.getInput(self.socket.index)
-            if isinstance(self.input_widget, QLineEdit):
-                self.input_widget.setText(str(connected_node.eval()))
-            elif isinstance(self.input_widget, QSlider):
-                self.input_widget.setValue(int(connected_node.eval()))
+            self.update_widget_value()
         else:
-            # Socket is unconnected
             self.input_widget.setDisabled(False)
 
 
@@ -134,7 +136,7 @@ class FCNGraphicsNode(QDMGraphicsNode):
     def initSizes(self):
         super().initSizes()
         self.width = 250
-        self.height = 180
+        self.height = 230
         self.edge_roundness = 6
         self.edge_padding = 10
         self.title_horizontal_padding = 8
@@ -191,8 +193,10 @@ class FCNNodeContent(QDMNodeContentWidget):
         for idx, widget in enumerate(self.input_widgets):
             if isinstance(widget, QLineEdit):
                 res["widget" + str(idx)] = str(widget.text())
-            if isinstance(widget, QSlider):
+            elif isinstance(widget, QSlider):
                 res["widget" + str(idx)] = str(widget.value())
+            elif isinstance(widget, QComboBox):
+                res["widget" + str(idx)] = str(widget.currentIndex())
         return res
 
     def deserialize(self, data: dict, hashmap=None, restore_id: bool = True) -> bool:
@@ -204,8 +208,10 @@ class FCNNodeContent(QDMNodeContentWidget):
                 value = data["widget" + str(idx)]
                 if isinstance(widget, QLineEdit):
                     widget.setText(value)
-                if isinstance(widget, QSlider):
+                elif isinstance(widget, QSlider):
                     widget.setValue(int(value))
+                elif isinstance(widget, QComboBox):
+                    widget.setCurrentIndex(int(value))
         except Exception as e:
             dumpException(e)
         return res
@@ -226,7 +232,8 @@ class FCNNode(Node):
     Socket_class = FCNSocket
 
     def __init__(self, scene):
-        self.inputs_init_list = [(0, "Min", 1, 0), (0, "Max", 1, 100), (0, "Val", 2, 50)]
+        self.inputs_init_list = [(0, "Op", 3, ["Add", "Sub", "Mul", "Div"]), (0, "Min", 1, 0), (0, "Max", 1, 100),
+                                 (0, "Val", 2, 50)]
         self.output_init_list = [(0, "Out", 0, 0)]
 
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
@@ -338,13 +345,12 @@ class FCNNode(Node):
                 #  values.append(input_value)
                 pass
             elif isinstance(input_widget, QSlider):
-                input_widget.setRange(int(self.content.input_widgets[0].text()),
-                                      int(self.content.input_widgets[1].text()))
+                input_widget.setRange(int(self.content.input_widgets[1].text()),
+                                      int(self.content.input_widgets[2].text()))
                 input_value = float(input_widget.value())
                 values.append(input_value)
             else:
-                input_value = 0
-                values.append(input_value)
+                pass
 
         val = self.eval_operation(values)
         self.value = val
@@ -356,8 +362,8 @@ class FCNNode(Node):
         print("%s::__eval()" % self.__class__.__name__, "self.value = ", self.value)
         return val
 
-    @staticmethod
-    def eval_operation(values):
+    def eval_operation(self, values):
+        print(self.content.input_widgets[0].currentText())
         return values[0]
 
     def onInputChanged(self, socket=None):
