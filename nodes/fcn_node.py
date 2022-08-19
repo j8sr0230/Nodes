@@ -1,4 +1,5 @@
 import os
+from collections import OrderedDict
 
 from qtpy.QtGui import QImage
 from qtpy.QtCore import QRectF, Qt, QPoint
@@ -10,6 +11,7 @@ from nodeeditor.node_socket import Socket, LEFT_BOTTOM, RIGHT_BOTTOM
 from nodeeditor.node_graphics_socket import QDMGraphicsSocket
 from fcn_conf import register_node, OP_NODE_BASE
 from nodeeditor.utils import dumpException
+import FreeCAD as App
 
 
 DEBUG = False
@@ -46,24 +48,28 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
 
         self.input_widget = self.__class__.Socket_Input_Widget_Classes[socket_input_index]()
         if socket_input_index == 0:  # QLineEdit
-            self.input_widget.setText("Input1")
-            self.input_widget.textChanged[str].connect(self.on_input_change)
+            self.input_widget.setText(str(self.socket.socket_default_value))
+            self.input_widget.textChanged.connect(self.socket.node.onInputChanged)
 
         elif socket_input_index == 1:  # QSlider
             self.input_widget.setOrientation(Qt.Horizontal)
             self.input_widget.setMinimum(1)
             self.input_widget.setMaximum(100)
-            self.input_widget.valueChanged[int].connect(self.on_input_change)
+            self.input_widget.valueChanged[int].connect(self.socket.node.onInputChanged)
 
         elif socket_input_index == 2:  # Empty
             pass
 
-    def on_input_change(self, text):
-        self.socket.node.markDirty()
-        self.socket.node.eval()
-        print("%s::on_input_change" % self.__class__.__name__, "text = ", text)
+    def update_widget_value(self):
+        if self.socket.hasAnyEdge():
+            # Socket is connected
+            connected_node = self.socket.node.getInput(self.socket.index)
+            if isinstance(self.input_widget, QLineEdit):
+                self.input_widget.setText(str(connected_node.eval()))
+            elif isinstance(self.input_widget, QSlider):
+                self.input_widget.setValue(int(connected_node.eval()))
 
-    def update_connection_status(self):
+    def update_widget_status(self):
         if self.socket.hasAnyEdge():
             # Socket is connected
             self.input_widget.setDisabled(True)
@@ -84,7 +90,7 @@ class FCNSocket(Socket):
 
     def __init__(self, node: Node, index: int = 0, position: int = LEFT_BOTTOM, socket_type: int = 1,
                  multi_edges: bool = True, count_on_this_node_side: int = 1, is_input: bool = False,
-                 socket_label: str = "", socket_input_index: int = 0):
+                 socket_label: str = "", socket_input_index: int = 0, socket_default_value=0):
         """
         :param node: Parent node of the socket
         :type node: Node
@@ -108,6 +114,8 @@ class FCNSocket(Socket):
         super().__init__(node, index, position, socket_type, multi_edges, count_on_this_node_side, is_input)
         self.socket_label = socket_label
         self.socket_input_index = socket_input_index
+        self.socket_default_value = socket_default_value
+
         self.grSocket.init_inner_widgets(self.socket_label, self.socket_input_index)
 
 
@@ -176,6 +184,32 @@ class FCNNodeContent(QDMNodeContentWidget):
 
         self.show()  # Hack for updating widget geometry
 
+    def serialize(self) -> OrderedDict:
+        res = super().serialize()
+
+        for idx, widget in enumerate(self.input_widgets):
+            if isinstance(widget, QLineEdit):
+                res["widget" + str(idx)] = str(widget.text())
+            if isinstance(widget, QSlider):
+                res["widget" + str(idx)] = str(widget.value())
+        return res
+
+    def deserialize(self, data: dict, hashmap=None, restore_id: bool = True) -> bool:
+        if hashmap is None:
+            hashmap = {}
+        res = super().deserialize(data, hashmap)
+        try:
+            for idx, widget in enumerate(self.input_widgets):
+                value = data["widget" + str(idx)]
+                if isinstance(widget, QLineEdit):
+                    widget.setText(value)
+                if isinstance(widget, QSlider):
+                    widget.setValue(float(value))
+
+        except Exception as e:
+            dumpException(e)
+        return res
+
 
 @register_node(OP_NODE_BASE)
 class FCNNode(Node):
@@ -192,8 +226,8 @@ class FCNNode(Node):
     Socket_class = FCNSocket
 
     def __init__(self, scene):
-        self.inputs_init_list = [(0, "In 1", 0), (0, "In 2", 0), (0, "In 2", 1)]
-        self.output_init_list = [(1, "Out 1", 2)]
+        self.inputs_init_list = [(0, "X", 0, 1), (0, "Y", 0, 0), (0, "Z", 1, 0)]
+        self.output_init_list = [(1, "Vec", 2, 0)]
 
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
         self.content.init_ui()  # Init content after super class and socket initialisation
@@ -255,7 +289,8 @@ class FCNNode(Node):
             socket = self.__class__.Socket_class(
                 node=self, index=counter, position=self.input_socket_position,
                 socket_type=item[0], multi_edges=self.input_multi_edged,
-                count_on_this_node_side=len(inputs), is_input=True, socket_label=item[1], socket_input_index=item[2]
+                count_on_this_node_side=len(inputs), is_input=True, socket_label=item[1], socket_input_index=item[2],
+                socket_default_value=item[3]
             )
             counter += 1
             self.inputs.append(socket)
@@ -265,7 +300,8 @@ class FCNNode(Node):
             socket = self.__class__.Socket_class(
                 node=self, index=counter, position=self.output_socket_position,
                 socket_type=item[0], multi_edges=self.output_multi_edged,
-                count_on_this_node_side=len(outputs), is_input=False, socket_label=item[1], socket_input_index=item[2]
+                count_on_this_node_side=len(outputs), is_input=False, socket_label=item[1], socket_input_index=item[2],
+                socket_default_value=item[3]
             )
             counter += 1
             self.outputs.append(socket)
@@ -290,25 +326,16 @@ class FCNNode(Node):
         values = []
 
         for socket in self.inputs:
-            input_nodes = self.getInputs(socket.index)
-            input_widget = self.content.input_widgets[socket.index]
+
+            socket.grSocket.update_widget_value()
+            input_widget = socket.grSocket.input_widget
 
             if isinstance(input_widget, QLineEdit):
-                if len(input_nodes) > 0:
-                    input_value = input_nodes[0].eval()
-                    input_widget.setText(str(input_value))
-                else:
-                    input_value = input_widget.text()
-
+                input_value = float(input_widget.text())
             elif isinstance(input_widget, QSlider):
-                if len(input_nodes) > 0:
-                    input_value = input_nodes[0].eval()
-                    input_widget.setValue(int(input_value))
-                else:
-                    input_value = input_widget.value()
-
+                input_value = float(input_widget.value())
             else:
-                input_value = None
+                input_value = 0.
 
             values.append(input_value)
 
@@ -325,20 +352,20 @@ class FCNNode(Node):
 
     @staticmethod
     def eval_operation(values):
-        return values
+        vector = App.Vector(values)
+        if vector:
+            return vector
+        else:
+            raise ValueError('Wrong input values')
 
-    def onEdgeConnectionChanged(self, new_edge: 'Edge'):
-        """
-        Event handling that any connection (`Edge`) has changed.
+    def onInputChanged(self, socket=None):
+        super().onInputChanged(socket)
 
-        :param new_edge: reference to the changed :class:`~nodeeditor.node_edge.Edge`
-        :type new_edge: :class:`~nodeeditor.node_edge.Edge`
-        """
         for socket in self.inputs:
-            socket.grSocket.update_connection_status()
+            socket.grSocket.update_widget_status()
 
-        #self.markDirty()
-        #self.eval()
+        self.eval()
+        print("%s::__onInputChanged" % self.__class__.__name__, "self.value = ", self.value)
 
     def serialize(self):
         res = super().serialize()
