@@ -20,7 +20,7 @@ DEBUG = False
 class FCNGraphicsSocket(QDMGraphicsSocket):
     """Visual representation of socket in scene."""
 
-    Socket_Input_Widget_Classes = [QLineEdit, QSlider, QLabel]
+    Socket_Input_Widget_Classes = [QLabel, QLineEdit, QSlider]
 
     def __init__(self, socket: Socket = None):
         """
@@ -47,18 +47,19 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
             self.label_widget.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         self.input_widget = self.__class__.Socket_Input_Widget_Classes[socket_input_index]()
-        if socket_input_index == 0:  # QLineEdit
+        if socket_input_index == 0:  # Empty
+            pass
+
+        elif socket_input_index == 1:  # QLineEdit
             self.input_widget.setText(str(self.socket.socket_default_value))
             self.input_widget.textChanged.connect(self.socket.node.onInputChanged)
 
-        elif socket_input_index == 1:  # QSlider
+        elif socket_input_index == 2:  # QSlider
             self.input_widget.setOrientation(Qt.Horizontal)
-            self.input_widget.setMinimum(1)
+            self.input_widget.setMinimum(0)
             self.input_widget.setMaximum(100)
-            self.input_widget.valueChanged[int].connect(self.socket.node.onInputChanged)
-
-        elif socket_input_index == 2:  # Empty
-            pass
+            self.input_widget.setValue(int(self.socket.socket_default_value))
+            self.input_widget.valueChanged.connect(self.socket.node.onInputChanged)
 
     def update_widget_value(self):
         if self.socket.hasAnyEdge():
@@ -204,8 +205,7 @@ class FCNNodeContent(QDMNodeContentWidget):
                 if isinstance(widget, QLineEdit):
                     widget.setText(value)
                 if isinstance(widget, QSlider):
-                    widget.setValue(float(value))
-
+                    widget.setValue(int(value))
         except Exception as e:
             dumpException(e)
         return res
@@ -226,8 +226,8 @@ class FCNNode(Node):
     Socket_class = FCNSocket
 
     def __init__(self, scene):
-        self.inputs_init_list = [(0, "X", 0, 1), (0, "Y", 0, 0), (0, "Z", 1, 0)]
-        self.output_init_list = [(1, "Vec", 2, 0)]
+        self.inputs_init_list = [(0, "Min", 1, 0), (0, "Max", 1, 100), (0, "Val", 2, 50)]
+        self.output_init_list = [(0, "Out", 0, 0)]
 
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
         self.content.init_ui()  # Init content after super class and socket initialisation
@@ -236,6 +236,10 @@ class FCNNode(Node):
         self.value = None
         self.markDirty()
         self.eval()
+
+    def update_content_status(self):
+        for socket in self.inputs:
+            socket.grSocket.update_widget_status()
 
     def place_sockets(self):
         for socket in self.inputs:
@@ -326,21 +330,23 @@ class FCNNode(Node):
         values = []
 
         for socket in self.inputs:
-
             socket.grSocket.update_widget_value()
             input_widget = socket.grSocket.input_widget
 
             if isinstance(input_widget, QLineEdit):
-                input_value = float(input_widget.text())
+                #  input_value = float(input_widget.text())
+                #  values.append(input_value)
+                pass
             elif isinstance(input_widget, QSlider):
+                input_widget.setRange(int(self.content.input_widgets[0].text()),
+                                      int(self.content.input_widgets[1].text()))
                 input_value = float(input_widget.value())
+                values.append(input_value)
             else:
-                input_value = 0.
-
-            values.append(input_value)
+                input_value = 0
+                values.append(input_value)
 
         val = self.eval_operation(values)
-
         self.value = val
         self.markDirty(False)
         self.markInvalid(False)
@@ -352,18 +358,11 @@ class FCNNode(Node):
 
     @staticmethod
     def eval_operation(values):
-        vector = App.Vector(values)
-        if vector:
-            return vector
-        else:
-            raise ValueError('Wrong input values')
+        return values[0]
 
     def onInputChanged(self, socket=None):
         super().onInputChanged(socket)
-
-        for socket in self.inputs:
-            socket.grSocket.update_widget_status()
-
+        self.update_content_status()
         self.eval()
         print("%s::__onInputChanged" % self.__class__.__name__, "self.value = ", self.value)
 

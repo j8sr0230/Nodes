@@ -49,6 +49,10 @@ class FCNSubWindow(NodeEditorWidget):
     def fileLoad(self, filename):
         if super().fileLoad(filename):
             self.do_eval_outputs()
+            for node in self.scene.nodes:
+                if hasattr(node, "update_content_status"):
+                    # Just new nodes have this method
+                    node.update_content_status()
             return True
         return False
 
