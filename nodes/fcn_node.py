@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Base node template for FreeCAD Nodes (fc_nodes).
 
-Author: R-Scharf-Wildenhain (j8sr0230), 19.08.2022
+Author: R. Scharf-Wildenhain (j8sr0230), 19.08.2022
 Licence: LGPL-2.1
 Website: https://github.com/j8sr0230/fc_nodes
 
@@ -13,7 +13,7 @@ modeling environment FreeCAD Nodes (fc_nodes). It contains the classes:
 for the complete graphical and logical implementation of individual nodes.
 
 It uses significantly the modules QtPy as abstraction layer for PyQt5 and PySide2
-(https://pypi.org/project/QtPy/, MIT license) and the pyqt-node-editorby Pavel
+(https://pypi.org/project/QtPy/, MIT license) and the pyqt-node-editor by Pavel
 Křupala (https://gitlab.com/pavel.krupala/pyqt-node-editor, MIT license) as node
 editor base framework.
 """
@@ -38,7 +38,7 @@ DEBUG = False
 
 
 class FCNGraphicsSocket(QDMGraphicsSocket):
-    """Visual representation of a socket in the node editor scene.
+    """Visual representation of a socket in a node editor scene.
 
     The visual representation of the sockets consists of a label and an input/
     display widget. For connected sockets, the input/display widget shows the
@@ -61,10 +61,10 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
     input_widget: QWidget
 
     def init_inner_widgets(self, socket_label: str = "", socket_input_index: int = 0):
-        """Generates the visual elements for socket label and input.
+        """Generates the ui widgets for socket label and input.
 
         This method is called by the FCNSocket class and creates the visual socket
-        label and the input element specified by the socket_input_index. In
+        label and the input widget specified by the socket_input_index. In
         addition to the label alignment, specific settings for the selected input
         widget is made.
         :param socket_label: Label of the socket.
@@ -139,7 +139,7 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
 
 
 class FCNSocket(Socket):
-    """Model class for input or output socket of a node.
+    """Model class for an input or output socket of a node.
 
     Each node has input and output sockets for communication with other nodes.
     A socket is the data interface between two nodes. They are connected to
@@ -188,6 +188,19 @@ class FCNSocket(Socket):
 
 
 class FCNGraphicsNode(QDMGraphicsNode):
+    """Visual representation of a node in a node editor scene.
+
+    The visual node is a QGraphicsItem that is display in a QGraphicsScene instance.
+    In addition, it serves as a container for the visual node content (see
+    FCNNodeContent class).The FCNGraphicsNode class specifies all the necessary
+    geometric information needed, to display a node.
+
+    Attributes:
+        Todo
+        label_widget (QLabel): Visual socket label.
+        input_widget (QWidget): Visual socket input element.
+    """
+
     height: int
     width: int
     edge_roundness: int
@@ -195,8 +208,6 @@ class FCNGraphicsNode(QDMGraphicsNode):
     title_horizontal_padding: int
     title_vertical_padding: int
     icons: QImage
-    input_socket_position: int
-    output_socket_position: int
 
     def initSizes(self):
         super().initSizes()
@@ -229,6 +240,10 @@ class FCNGraphicsNode(QDMGraphicsNode):
 
 
 class FCNNodeContent(QDMNodeContentWidget):
+    """The visual representation of the node content is composed by the labels and
+    input widgets delivered by the initialised input and output sockets.
+    """
+
     input_widgets: list
     output_widgets: list
     layout: QFormLayout
