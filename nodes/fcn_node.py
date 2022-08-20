@@ -202,7 +202,7 @@ class FCNGraphicsNode(QDMGraphicsNode):
         edge_padding (int): Padding between node and node content.
         title_horizontal_padding (int): Horizontal padding between node and node title.
         title_vertical_padding (int): Vertical padding between node and node title.
-        icons (QImage);
+        icons (QImage): Status icons of the node, that is displayed in the top left corner.
     """
 
     width: int
@@ -263,8 +263,18 @@ class FCNGraphicsNode(QDMGraphicsNode):
 
 
 class FCNNodeContent(QDMNodeContentWidget):
-    """The visual representation of the node content is composed by the labels and
-    input widgets delivered by the initialised input and output sockets.
+    """The visual representation of the node content.
+
+    The visual node content is composed by the labels and input widgets passed
+    by the initialised input and output sockets. All widgets are arranged row wise
+    by a QFormLayout and stored in class attributes. Widgets of input sockets are
+    stored in the input_widgets list and widgets of output sockets are passed to
+    the output_widgets list.
+
+    Attributes:
+        input_widgets (list[QWidget]): Input widgets of the input sockets.
+        output_widgets (list[QWidget]): Output widgets of the output sockets.
+        layout (QFormLayout): Layout of the node content widget.
     """
 
     input_widgets: list
@@ -272,11 +282,33 @@ class FCNNodeContent(QDMNodeContentWidget):
     layout: QFormLayout
 
     def initUI(self):
-        self.hide()  # Hack for updating widget geometry
+        """Initializes the node content user interface layout.
+
+       The initUI method initializes and sets the layout of the content widget
+       as a QFormLayout. It is called by the contractor of the parent class
+       QDMNodeContentWidget.
+       """
+
+        self.hide()  # Hack: Needed for updating widget geometry
         self.layout = QFormLayout(self)
         self.setLayout(self.layout)
 
-    def init_ui(self):
+    def fill_content_layout(self):
+        """Populates the content layout with socket labels and widgets.
+
+        This method loops over all present input and output sockets af the parent
+        node. Labels and input widgets are added to the QFormLayout and references
+        the input widgets are saved in the class attribute lists. Widgets of input
+        sockets are passed to the input_widgets list and widgets of output sockets
+        are stored in the output_widget list. To query the individual sockets, they
+        must already be initiated.
+
+        Note:
+            For this reason the call of this methode does not take place in the
+            initUI method of this class, but in the constructor of the FCNNode
+            class after initiation of the Node parent class.
+       """
+
         self.input_widgets = []
         self.output_widgets = []
 
@@ -288,9 +320,15 @@ class FCNNodeContent(QDMNodeContentWidget):
             self.output_widgets.append(socket.grSocket.label_widget)
             self.layout.addRow(socket.grSocket.input_widget, socket.grSocket.label_widget)
 
-        self.show()  # Hack for updating widget geometry
+        self.show()  # Hack: Needed for updating widget geometry
 
     def serialize(self) -> OrderedDict:
+        """Serialises the node content to human-readable json file.
+
+        The serialise method adds the content (int, float, sting, ...) of each
+        socket widget to a dictionary and returns it. It is called by the serialise
+        method o the parent node.
+        """
         res = super().serialize()
 
         for idx, widget in enumerate(self.input_widgets):
@@ -303,6 +341,22 @@ class FCNNodeContent(QDMNodeContentWidget):
         return res
 
     def deserialize(self, data: dict, hashmap=None, restore_id: bool = True) -> bool:
+        """Deserializes the node content.
+
+        Deserialization method which takes data in dict format with helping
+        hashmap containing references to existing entities.
+
+        :param data: Dictionary containing serialized data.
+        :type data: dict
+        :param hashmap: Helper dictionary containing references (by id == key) to existing objects.
+        :type hashmap: dict
+        :param restore_id: True if we are creating new content. False is useful when loading existing
+            content of which we want to keep the existing object's id.
+        :type restore_id: bool
+        :return: True if deserialization was successful, otherwise False.
+        :rtype: bool
+        """
+
         if hashmap is None:
             hashmap = {}
         res = super().deserialize(data, hashmap)
@@ -340,7 +394,7 @@ class FCNNode(Node):
         self.output_init_list = [(0, "Out", 0, 0)]
 
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
-        self.content.init_ui()  # Init content after super class and socket initialisation
+        self.content.fill_content_layout()  # Init content after super class and socket initialisation
         self.place_sockets()  # Set sockets according content layout
 
         self.value = None
