@@ -5,18 +5,17 @@ Author: R-Scharf-Wildenhain (j8sr0230), 19.08.2022
 Licence: LGPL-2.1
 Website: https://github.com/j8sr0230/fc_nodes
 
-This module contains all necessary classes to create custom nodes for
-the visual modeling environment FreeCAD Nodes (fc_nodes). It contains the
-classes:
+This module contains all necessary classes to create custom nodes for the visual
+modeling environment FreeCAD Nodes (fc_nodes). It contains the classes:
 - FCNGraphicsSocket (socket visualization) and FCNSocket (socket model),
 - FCNGraphicsNode (node visualization) and FCNNode (node model) and
 - FCNContent (node content visualization)
 for the complete graphical and logical implementation of individual nodes.
 
-It uses significantly the modules QtPy as abstraction layer for PyQt5
-and PySide2 (https://pypi.org/project/QtPy/, MIT license) and the pyqt-node-editor
-by Pavel Křupala (https://gitlab.com/pavel.krupala/pyqt-node-editor, MIT license)
-as node editor base framework.
+It uses significantly the modules QtPy as abstraction layer for PyQt5 and PySide2
+(https://pypi.org/project/QtPy/, MIT license) and the pyqt-node-editorby Pavel
+Křupala (https://gitlab.com/pavel.krupala/pyqt-node-editor, MIT license) as node
+editor base framework.
 """
 
 import os
@@ -41,15 +40,14 @@ DEBUG = False
 class FCNGraphicsSocket(QDMGraphicsSocket):
     """Visual representation of a socket in the node editor scene.
 
-    The visual representation of the sockets consists of a label and
-    an input/display widget. For connected sockets, the input/display
-    widget shows the corresponding input value. For free sockets, the
-    socket value can be entered directly via this widget. This class
-    holds the visual elements of a socket consisting of a socket label
-    (QLabel) and an input/display widget (QWidget). All available
-    input/display elements are stored in the class variable
-    Socket_Input_Widget_Classes as a list. The selection of an explicit
-    input element from the listmSocket_Input_Widget_Classes is done
+    The visual representation of the sockets consists of a label and an input/
+    display widget. For connected sockets, the input/display widget shows the
+    corresponding input value. For free sockets, the socket value can be
+    entered directly via this widget. This class holds the visual elements of
+    a socket consisting of a socket label (QLabel) and an input/display
+    widget (QWidget). All available input/display elements are stored in the
+    class variable Socket_Input_Widget_Classes as a list. The selection of
+    an explicit input element from the list Socket_Input_Widget_Classes is done
     dynamically during FCNSocket initialisation.
 
     Attributes:
@@ -62,13 +60,13 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
     label_widget: QLabel
     input_widget: QWidget
 
-    def init_inner_widgets(self, socket_label, socket_input_index):
+    def init_inner_widgets(self, socket_label: str = "", socket_input_index: int = 0):
         """Generates the visual elements for socket label and input.
 
-        This method is called by the FCNSocket class and creates the
-        visual socket label and the input element specified by the
-        socket_input_index. In addition to the label alignment,
-        specific settings for the selected input widget is made.
+        This method is called by the FCNSocket class and creates the visual socket
+        label and the input element specified by the socket_input_index. In
+        addition to the label alignment, specific settings for the selected input
+        widget is made.
         :param socket_label: Label of the socket.
         :type socket_label: str
         :param socket_input_index: Index of input class, referring to the Socket_Input_Classes list.
@@ -106,12 +104,13 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
     def update_widget_value(self):
         """Updates the value shown by the socket input widget.
 
-        Socket input/display widgets work in two directions. If no node is connected to
-        the socket, they serve for quick manipulation of the respective socket
-        input value, i.e. the serve as an input field. However, if a node is
-        connected to the socket, they will show the input value passed through that
-        node. This method evaluates the connected node and displays the
-        corresponding value in the input/display widget.
+        Socket input/display widgets work in two directions. If no node is
+        connected to the socket, they serve for quick manipulation of the
+        respective socket input value, i.e. the serve as an input field.
+        However, if a node is connected to the socket, they will show the
+        input value passed through that node. This method evaluates the
+        connected node and displays the corresponding value in the input/
+        display widget.
         """
 
         if self.socket.hasAnyEdge():
@@ -140,38 +139,51 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
 
 
 class FCNSocket(Socket):
-    """Modified socket class with socket label and input widget."""
+    """Model class for input or output socket of a node.
+
+    Each node has input and output sockets for communication with other nodes.
+    A socket is the data interface between two nodes. They are connected to
+    sockets from other nodes via edges and thus ensure the data flow in the node
+    graph. This class has the Socket_GR_Class class variable that defines the
+    user interface class for the FCNSocket. The class name FCNGraphicsSocket is
+    passed to it. In addition to the inherited methods and parameters, FCNSocket
+    essentially has a socket_label to name the socket, a socket_input_index to
+    identify the desired input widget and a socket_default_value.
+    """
 
     Socket_GR_Class = FCNGraphicsSocket
 
     def __init__(self, node: Node, index: int = 0, position: int = LEFT_BOTTOM, socket_type: int = 1,
                  multi_edges: bool = True, count_on_this_node_side: int = 1, is_input: bool = False,
-                 socket_label: str = "", socket_input_index: int = 0, socket_default_value=0):
-        """
-        :param node: Parent node of the socket
+                 socket_label: str = "", socket_input_index: int = 0, socket_default_value: object = 0):
+        """Initiator of the FCNGraphicsSocket class.
+
+        :param node: Parent node of the socket.
         :type node: Node
-        :param index: Current index of this socket in the position
+        :param index: Current index of this socket in the position.
         :type index: int
         :param position: Socket position
         :type position: int
-        :param socket_type: Type (color) of this socket
+        :param socket_type: Type (color) the socket.
         :type socket_type: int
-        :param multi_edges: Can this socket handle multiple edges input
+        :param multi_edges: Can this socket handle multiple edges input?
         :type multi_edges: bool
-        :param count_on_this_node_side: Total number of sockets on this position
+        :param count_on_this_node_side: Total number of sockets on this position.
         :type count_on_this_node_side: int
-        :param is_input: Is this an input socket
+        :param is_input: Is this an input socket?
         :type is_input: bool
         :param socket_label: Socket label
         :type socket_label: str
-        :param socket_input_index: Index of input class, referring to the Socket.Socket_Input_Classes list
+        :param socket_input_index: Index of input class, referring to the
+        FCNGraphicsSocket.Socket_Input_Classes list.
         :type socket_input_index: int
+        :param socket_default_value: Default value of the socket input widget.
+        :type socket_input_index: object
         """
         super().__init__(node, index, position, socket_type, multi_edges, count_on_this_node_side, is_input)
         self.socket_label = socket_label
         self.socket_input_index = socket_input_index
         self.socket_default_value = socket_default_value
-
         self.grSocket.init_inner_widgets(self.socket_label, self.socket_input_index)
 
 
