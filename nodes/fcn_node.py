@@ -193,16 +193,20 @@ class FCNGraphicsNode(QDMGraphicsNode):
     The visual node is a QGraphicsItem that is display in a QGraphicsScene instance.
     In addition, it serves as a container for the visual node content (see
     FCNNodeContent class).The FCNGraphicsNode class specifies all the necessary
-    geometric information needed, to display a node.
+    geometric information needed, to display a node in the scene.
 
     Attributes:
-        Todo
-        label_widget (QLabel): Visual socket label.
-        input_widget (QWidget): Visual socket input element.
+        width (int): Width of the node.
+        height (int): Height of the node.
+        edge_roundness (int): Roundness of the node corners.
+        edge_padding (int): Padding between node and node content.
+        title_horizontal_padding (int): Horizontal padding between node and node title.
+        title_vertical_padding (int): Vertical padding between node and node title.
+        icons (QImage);
     """
 
-    height: int
     width: int
+    height: int
     edge_roundness: int
     edge_padding: int
     title_horizontal_padding: int
@@ -210,6 +214,12 @@ class FCNGraphicsNode(QDMGraphicsNode):
     icons: QImage
 
     def initSizes(self):
+        """Initialises the size of the visual node.
+
+        This method sets the class attributes for the node dimensions and content
+        paddings.
+        """
+
         super().initSizes()
         self.width = 250
         self.height = 230
@@ -219,11 +229,24 @@ class FCNGraphicsNode(QDMGraphicsNode):
         self.title_vertical_padding = 10
 
     def initAssets(self):
+        """Initialises the status icons of the node.
+
+        Status icons indicate whether a node is valid, invalid or dirty. This method sets
+        the class attribute for the status icons.
+        """
+
         super().initAssets()
         path = os.path.join(os.path.abspath(__file__), "../..", "icons", "status_icons.png")
         self.icons = QImage(path)
 
     def paint(self, painter, q_style_option_graphics_item, widget=None):
+        """Paints the appropriate status icons on the visual node representation.
+
+       Status icons indicate whether a node is valid, invalid or dirty. All status
+       icons are in a single landscape image. A corresponding horizontal offset is
+       used to select the required image section via this offset. This method
+       selects and draws the corresponding image section through the QPainter instance.
+       """
         super().paint(painter, q_style_option_graphics_item, widget)
 
         offset = 24.0
