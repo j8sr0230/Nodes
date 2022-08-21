@@ -607,9 +607,10 @@ class FCNNode(Node):
 
         This method prepares the actual calculation of the socket output values.
         Input values are collected, stored in a suitable data structure and passed
-        to the eval_operation method.
+        to the eval_operation method. After successful calculation this method sends
+        the result back to the top level eval method.
 
-        :return: Calculated output value.
+        :return: Calculated output values.
         :rtype: object
         """
 
