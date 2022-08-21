@@ -34,9 +34,6 @@ from nodeeditor.utils import dumpException
 import FreeCAD as App
 
 
-DEBUG = False
-
-
 class FCNGraphicsSocket(QDMGraphicsSocket):
     """Visual representation of a socket in a node editor scene.
 
@@ -327,7 +324,10 @@ class FCNNodeContent(QDMNodeContentWidget):
 
         The serialise method adds the content (int, float, sting, ...) of each
         socket widget to a dictionary and returns it. It is called by the serialise
-        method o the parent node.
+        method of the parent node.
+
+        :return: Serialised date as human-readable json file.
+        :rtype: OrderedDict
         """
         res = super().serialize()
 
@@ -573,12 +573,12 @@ class FCNNode(Node):
             self.outputs.append(socket)
 
     def eval(self, index: int = 0) -> object:
-        """Evaluates the node.
+        """Top level evaluation method of the node.
 
-        Evaluates the values for the output sockets based on the input socket
-        values and the processing logic of the eval_implementation method. If a
-        node is not dirty or invalid, the cached value is returned. Otherwise,
-        a new calculation is delegated to the eval_implementation method.
+        A node evaluates the values for the output sockets based on the input
+        socket values and the processing logic of the eval_preparation method.
+        If a node is not dirty or invalid, the cached value is returned.
+        Otherwise, a new calculation is delegated to the eval_preparation method.
 
         :param index: Index of the output socket, that is to be evaluated (in progress).
         :type index: int
@@ -591,7 +591,7 @@ class FCNNode(Node):
             print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
             return self.value
         try:
-            val = self.eval_implementation()
+            val = self.eval_preparation()
             return val
         except ValueError as e:
             self.markInvalid()
@@ -602,14 +602,15 @@ class FCNNode(Node):
             self.grNode.setToolTip(str(e))
             dumpException(e)
 
-    def eval_implementation(self):
-        """Calculation logic of the node.
+    def eval_preparation(self) -> object:
+        """Prepares the evaluation of the output socket values.
 
-        This method actually calculates the values of the socket output
-        based on the input values and returns the result to the eval method.
-        For this purpose this method collects all input values of the input
-        sockets.The explicit arithmetic operation is delegated to the eval_operation
-        method in this implementation.
+        This method prepares the actual calculation of the socket output values.
+        Input values are collected, stored in a suitable data structure and passed
+        to the eval_operation method.
+
+        :return: Calculated output value.
+        :rtype: object
         """
 
         values = []  # Container or all input values
@@ -640,24 +641,71 @@ class FCNNode(Node):
         print("%s::__eval()" % self.__class__.__name__, "self.value = ", self.value)
         return val
 
-    def eval_operation(self, values):
+    def eval_operation(self, values) -> object:
+        """Calculation of the socket output values.
+
+        The eval_operation is responsible or the actual calculation of the output
+        values. It processes the input data structure passed in through the method
+        parameter values and returns the calculation result.
+
+        :param values: Socket input values as list data structure.
+        :type values: list
+        :return: Calculated output values.
+        :rtype: object
+        """
+
         print(self.content.input_widgets[0].currentText())
         return values[0]
 
-    def onInputChanged(self, socket=None):
+    def onInputChanged(self, socket: FCNSocket = None):
+        """Callback method for input changed events.
+
+        Each new data input or connection requires updating the content widgets
+        (enabled or disabled) and recalculating the node. This is triggered by
+        this callback methode.
+
+        :param socket: Socket trigger of the input change (not implemented yet).
+        :type socket: FCNSocket
+        """
+
         super().onInputChanged(socket)
         self.update_content_status()
         self.eval()
         print("%s::__onInputChanged" % self.__class__.__name__, "self.value = ", self.value)
 
-    def serialize(self):
+    def serialize(self) -> OrderedDict:
+        """Serialises the node to human-readable json file.
+
+        The serialise method adds the node date to a dictionary and returns it.
+        It is called by the serialise method of the QGraphicsScene node_scene.Scene.serialize.
+
+        :return: Serialised date as human-readable json file.
+        :rtype: OrderedDict
+        """
+
         res = super().serialize()
         res['op_code'] = self.__class__.op_code
         return res
 
     def deserialize(self, data: dict, hashmap=None, restore_id: bool = True, *args, **kwargs) -> bool:
+        """Deserializes the node.
+
+        Deserialization method which takes data in dict format with helping
+        hashmap containing references to existing entities.
+
+        :param data: Dictionary containing serialized data.
+        :type data: dict
+        :param hashmap: Helper dictionary containing references (by id == key) to existing objects.
+        :type hashmap: dict
+        :param restore_id: True if we are creating new content. False is useful when loading existing
+            content of which we want to keep the existing object's id.
+        :type restore_id: bool
+        :return: True if deserialization was successful, otherwise False.
+        :rtype: bool
+        """
+
         if hashmap is None:
             hashmap = {}
         res = super().deserialize(data, hashmap, restore_id)
-        # print("Deserialized Node '%s'" % self.__class__.__name__, "res:", res)
+        print("Deserialized Node '%s'" % self.__class__.__name__, "res:", res)
         return res
