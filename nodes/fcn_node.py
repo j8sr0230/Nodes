@@ -55,7 +55,7 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
         input_widget (QWidget): Visual socket input element.
     """
 
-    Socket_Input_Widget_Classes = [QLabel, QLineEdit, QSlider, QComboBox]
+    Socket_Input_Widget_Classes: list = [QLabel, QLineEdit, QSlider, QComboBox]
 
     label_widget: QLabel
     input_widget: QWidget
@@ -156,13 +156,13 @@ class FCNSocket(Socket):
     def __init__(self, node: Node, index: int = 0, position: int = LEFT_BOTTOM, socket_type: int = 1,
                  multi_edges: bool = True, count_on_this_node_side: int = 1, is_input: bool = False,
                  socket_label: str = "", socket_input_index: int = 0, socket_default_value: object = 0):
-        """Initiator of the FCNGraphicsSocket class.
+        """Constructor of the FCNGraphicsSocket class.
 
         :param node: Parent node of the socket.
         :type node: Node
         :param index: Current index of this socket in the position.
         :type index: int
-        :param position: Socket position
+        :param position: Initial position of the socket, referring to node_sockets.py.
         :type position: int
         :param socket_type: Type (color) the socket.
         :type socket_type: int
@@ -376,45 +376,124 @@ class FCNNodeContent(QDMNodeContentWidget):
 
 @register_node(OP_NODE_BASE)
 class FCNNode(Node):
+    """Data model class for a node in FreeCAD Nodes (fc_nodes).
+
+     The FCNNode class contains the complete data model of a node. All necessary
+     information is stored and managed either in class variables or attributes.
+     This concerns not only the visual representation of the node in the node editor
+     scene including node content and sockets, but also the complete evaluation
+     logic.
+
+     General instance independent data are stored in class variables. These are:
+     - icon (str): Path to the node image, displayed in the node list box (QListWidget).
+     - op_code (int): Unique index of the node, used to register the node in the app,
+        referring to fcn_conf.py.
+     - op_title (str): Title of the node, display in the node header.
+     - content_label_objname (str): Label of the content widget, used by qss stylesheets.
+     - GraphicsNode_class (QDMGraphicsNode): Name of node ui class.
+     - NodeContent_class (QDMNodeContentWidget): Name of node content ui class.
+     - Socket_class (Socket): Name of socket class.
+
+     Attributes:
+        input_init_list (list(tuple)): Definition of the input sockets with the signature
+            [(socket_type (int), socket_label (str), socket_widget_index (int),
+            widget_default_value (obj), multi_edge (bool))]
+        output_init_list (list(tuples)): Definition of the output sockets with the signature
+            [(socket_type (int), socket_label (str), socket_widget_index (int),
+            widget_default_value (obj), multi_edge (bool))]
+        content (FCNNodeContent): Reference to the node content widget.
+        value (object): Result of the node evaluation, used as cache storage to limit evaluation cycles.
+        input_socket_position (int): Initial position of the input sockets, referring to node_sockets.py.
+        output_socket_position (int): Initial position of the output sockets, referring to node_sockets.py.
+
+     Note:
+        If input_socket_position is set to LEFT_BOTTOM and output_socket_position
+        is set to RIGHT_BOTTOM, the socket positions are calculated by the content
+        layout based on the input and output widgets of the sockets.
+    """
+
+    icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
+    op_code: int = OP_NODE_BASE
+    op_title: str = "FCN Node"
+    content_label_objname: str = "fcn_node_bg"
+
+    GraphicsNode_class: FCNGraphicsNode = FCNGraphicsNode
+    NodeContent_class: FCNNodeContent = FCNNodeContent
+    Socket_class: Socket = FCNSocket
+
+    inputs_init_list: list
+    output_init_list: list
+    content: 'FCNNodeContent'
+    value: object
     input_socket_position: int
     output_socket_position: int
 
-    icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
-    op_code = OP_NODE_BASE
-    op_title = "FCN Node"
-    content_label_objname = "calc_node_bg"
-
-    GraphicsNode_class = FCNGraphicsNode
-    NodeContent_class = FCNNodeContent
-    Socket_class = FCNSocket
-
     def __init__(self, scene):
-        self.inputs_init_list = [(0, "Op", 3, ["Add", "Sub", "Mul", "Div"]), (0, "Min", 1, 0), (0, "Max", 1, 100),
-                                 (0, "Val", 2, 50)]
-        self.output_init_list = [(0, "Out", 0, 0)]
+        """Constructor of the FCNNode class.
+
+        :param scene: Parent node of the socket.
+        :type scene: Scene
+        """
+
+        self.inputs_init_list = [(0, "Op", 3, ["Add", "Sub", "Mul", "Div"], False), (0, "Min", 1, 0, False),
+                                 (0, "Max", 1, 100, False), (0, "Val", 2, 50, False)]
+        self.output_init_list = [(0, "Out", 0, 0, True)]
 
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
-        self.content.fill_content_layout()  # Init content after super class and socket initialisation
-        self.place_sockets()  # Set sockets according content layout
+
+        # Init content after parent (and socket initialisation) initiation, because
+        # the fill_content_layout method loops over all sockets.
+        self.content.fill_content_layout()
+        self.place_sockets()  # Adjusts socket position according content widget positions
 
         self.value = None
         self.markDirty()
         self.eval()
 
     def update_content_status(self):
+        """Updates the content input widget state (enabled or disabled).
+
+        The input/display widget status of all connected sockets is update by
+        this method.
+        """
+
         for socket in self.inputs:
             socket.grSocket.update_widget_status()
 
     def place_sockets(self):
+        """Updates the socket positions.
+
+        Calls the setSocketPosition method of all sockets. It causes all sockets
+        to re-fetch their position within the node using the getSocketPosition
+        method o this class.
+        """
+
         for socket in self.inputs:
             socket.setSocketPosition()
         for socket in self.outputs:
             socket.setSocketPosition()
 
-    def getSocketPosition(self, index: int, position: int, num_out_of: int = 1) -> '[x, y]':
+    def getSocketPosition(self, index: int, position: int, num_out_of: int = 1) -> [int, int]:
+        """Calculates the position of an individual socket within th node geometry.
+
+        Calls the setSocketPosition method of all sockets. It causes all sockets
+        to re-fetch their position within the node using the getSocketPosition
+        method o this class.
+
+        :param index: Index of the target socket.
+        :type index: int
+        :param position: Position of the target socket, referring to node_sockets.py.
+        :type position: int
+        :param num_out_of: Total number of sockets on this position.
+        :type num_out_of: int
+        :return: Calculated position vector of the socket.
+        :rtype: [int, int]
+        """
+
         x, y = super().getSocketPosition(index, position, num_out_of)
 
         if hasattr(self.content, "input_widgets"):
+            # If sockets have already been initiated
             if position == LEFT_BOTTOM:
                 elem = self.content.input_widgets[index]
                 y = self.grNode.title_vertical_padding + self.grNode.title_height + elem.geometry().topLeft().y() + \
@@ -427,36 +506,55 @@ class FCNNode(Node):
         return [x, y]
 
     def initSettings(self):
+        """Initiates socket positions.
+
+       The socket positions input_socket_position and output_socket_position are used, to calculate
+       the visual socket distribution within the node.
+
+       Note:
+           If set to LEFT_BOTTOM and RIGHT_BOTTOM, the position of the socket input widgets within
+           the content layout is used, to calculate the socket positions.
+       """
+
         super().initSettings()
         self.input_socket_position = LEFT_BOTTOM
         self.output_socket_position = RIGHT_BOTTOM
 
     def initSockets(self, inputs: list, outputs: list, reset: bool = True):
-        """
-        Create sockets for inputs and outputs
+        """Create the input and output sockets of the node.
 
-        :param inputs: list of Socket Types (int)
-        :type inputs: ``list``
-        :param outputs: list of Socket Types (int)
-        :type outputs: ``list``
-        :param reset: if ``True`` destroys and removes old `Sockets`
-        :type reset: ``bool``
+        The initSockets method instantiates the socket data model classes, along
+        with the corresponding socket ui classes. All necessary information for
+        the individual sockets are passes through the inputs and outputs list to
+        the method.
+
+        :param inputs: Definition of the input sockets with the signature
+            [(socket_type (int), socket_label (str), socket_widget_index (int),
+            widget_default_value (obj), multi_edge (bool))]
+        :type inputs: list(tuple)
+        :param outputs: Definition of the output sockets with the signature
+            [(socket_type (int), socket_label (str), socket_widget_index (int),
+            widget_default_value (obj), multi_edge (bool))]
+        :type outputs: list(tuple)
+        :param reset: True destroys and removes old sockets.
+        :type reset: bool
         """
+
         if reset:
-            # clear old sockets
+            # Clear old sockets
             if hasattr(self, 'inputs') and hasattr(self, 'outputs'):
-                # remove grSockets from scene
+                # Remove visual sockets from scene
                 for socket in (self.inputs+self.outputs):
                     self.scene.grScene.removeItem(socket.grSocket)
                 self.inputs = []
                 self.outputs = []
 
-        # create new sockets
+        # Create new sockets
         counter = 0
         for item in inputs:
             socket = self.__class__.Socket_class(
                 node=self, index=counter, position=self.input_socket_position,
-                socket_type=item[0], multi_edges=self.input_multi_edged,
+                socket_type=item[0], multi_edges=item[4],
                 count_on_this_node_side=len(inputs), is_input=True, socket_label=item[1], socket_input_index=item[2],
                 socket_default_value=item[3]
             )
@@ -467,15 +565,27 @@ class FCNNode(Node):
         for item in outputs:
             socket = self.__class__.Socket_class(
                 node=self, index=counter, position=self.output_socket_position,
-                socket_type=item[0], multi_edges=self.output_multi_edged,
+                socket_type=item[0], multi_edges=item[4],
                 count_on_this_node_side=len(outputs), is_input=False, socket_label=item[1], socket_input_index=item[2],
                 socket_default_value=item[3]
             )
             counter += 1
             self.outputs.append(socket)
 
-    def eval(self, index=0):
+    def eval(self, index: int = 0) -> object:
+        """Evaluates the node.
+
+       Calculates the values for the output sockets based on the input socket
+       values and the processing logic of the eval_implementation method.
+
+       :param index: Index of the output socket, that is to be evaluated (in progress).
+       :type index: int
+       :return: Result of the evaluation.
+       :rtype: object
+       """
+
         if not self.isDirty() and not self.isInvalid():
+            # Return cached result
             print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
             return self.value
         try:
