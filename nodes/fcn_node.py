@@ -575,14 +575,16 @@ class FCNNode(Node):
     def eval(self, index: int = 0) -> object:
         """Evaluates the node.
 
-       Calculates the values for the output sockets based on the input socket
-       values and the processing logic of the eval_implementation method.
+        Evaluates the values for the output sockets based on the input socket
+        values and the processing logic of the eval_implementation method. If a
+        node is not dirty or invalid, the cached value is returned. Otherwise,
+        a new calculation is delegated to the eval_implementation method.
 
-       :param index: Index of the output socket, that is to be evaluated (in progress).
-       :type index: int
-       :return: Result of the evaluation.
-       :rtype: object
-       """
+        :param index: Index of the output socket, that is to be evaluated (in progress).
+        :type index: int
+        :return: Result of the evaluation.
+        :rtype: object
+        """
 
         if not self.isDirty() and not self.isInvalid():
             # Return cached result
@@ -601,21 +603,30 @@ class FCNNode(Node):
             dumpException(e)
 
     def eval_implementation(self):
-        values = []
+        """Calculation logic of the node.
+
+        This method actually calculates the values of the socket output
+        based on the input values and returns the result to the eval method.
+        For this purpose this method collects all input values of the input
+        sockets.The explicit arithmetic operation is delegated to the eval_operation
+        method in this implementation.
+        """
+
+        values = []  # Container or all input values
 
         for socket in self.inputs:
             socket.grSocket.update_widget_value()
             input_widget = socket.grSocket.input_widget
 
             if isinstance(input_widget, QLineEdit):
-                #  input_value = float(input_widget.text())
-                #  values.append(input_value)
                 pass
             elif isinstance(input_widget, QSlider):
                 input_widget.setRange(int(self.content.input_widgets[1].text()),
                                       int(self.content.input_widgets[2].text()))
                 input_value = float(input_widget.value())
                 values.append(input_value)
+            elif isinstance(input_widget, QComboBox):
+                pass
             else:
                 pass
 
