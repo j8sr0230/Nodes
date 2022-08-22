@@ -20,9 +20,10 @@ editor base framework.
 
 import os
 from collections import OrderedDict
+from typing import Union
 
 from qtpy.QtGui import QImage
-from qtpy.QtCore import QRectF, Qt, QPoint
+from qtpy.QtCore import QRectF, Qt
 from qtpy.QtWidgets import QWidget, QFormLayout, QLabel, QLineEdit, QSlider, QComboBox
 from nodeeditor.node_node import Node
 from nodeeditor.node_graphics_node import QDMGraphicsNode
@@ -31,7 +32,6 @@ from nodeeditor.node_socket import Socket, LEFT_BOTTOM, RIGHT_BOTTOM
 from nodeeditor.node_graphics_socket import QDMGraphicsSocket
 from fcn_conf import register_node, OP_NODE_BASE
 from nodeeditor.utils import dumpException
-import FreeCAD as App
 
 
 class FCNGraphicsSocket(QDMGraphicsSocket):
@@ -57,17 +57,20 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
     label_widget: QLabel
     input_widget: QWidget
 
-    def init_inner_widgets(self, socket_label: str = "", socket_input_index: int = 0):
+    def init_inner_widgets(self, socket_label: str = "", socket_input_index: int = 0,
+                           socket_default_values: Union[int, str, list] = 0):
         """Generates the ui widgets for socket label and input.
 
         This method is called by the FCNSocket class and creates the visual socket
-        label and the input widget specified by the socket_input_index. In
-        addition to the label alignment, specific settings for the selected input
-        widget is made.
+        label and the input widget specified by the socket_input_index and
+        socket_default_value. In addition to the label alignment, specific settings
+        for the selected input widget is made.
         :param socket_label: Label of the socket.
         :type socket_label: str
         :param socket_input_index: Index of input class, referring to the Socket_Input_Classes list.
         :type socket_input_index: int
+        :param socket_default_values: Socket widget default value object.
+        :type socket_default_values: object
         """
 
         # Socket label setup
@@ -83,18 +86,18 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
             pass
 
         elif socket_input_index == 1:  # QLineEdit
-            self.input_widget.setText(str(self.socket.socket_default_value))
+            self.input_widget.setText(str(socket_default_values))
             self.input_widget.textChanged.connect(self.socket.node.onInputChanged)
 
         elif socket_input_index == 2:  # QSlider
             self.input_widget.setOrientation(Qt.Horizontal)
             self.input_widget.setMinimum(0)
             self.input_widget.setMaximum(100)
-            self.input_widget.setValue(int(self.socket.socket_default_value))
+            self.input_widget.setValue(int(socket_default_values))
             self.input_widget.valueChanged.connect(self.socket.node.onInputChanged)
 
         elif socket_input_index == 3:  # QComboBox
-            for text in self.socket.socket_default_value:
+            for text in socket_default_values:
                 self.input_widget.addItem(text)
             self.input_widget.currentIndexChanged.connect(self.socket.node.onInputChanged)
 
@@ -150,6 +153,10 @@ class FCNSocket(Socket):
 
     Socket_GR_Class = FCNGraphicsSocket
 
+    socket_label: str
+    socket_input_index: int
+    socket_default_value: object
+
     def __init__(self, node: Node, index: int = 0, position: int = LEFT_BOTTOM, socket_type: int = 1,
                  multi_edges: bool = True, count_on_this_node_side: int = 1, is_input: bool = False,
                  socket_label: str = "", socket_input_index: int = 0, socket_default_value: object = 0):
@@ -177,11 +184,12 @@ class FCNSocket(Socket):
         :param socket_default_value: Default value of the socket input widget.
         :type socket_input_index: object
         """
+
         super().__init__(node, index, position, socket_type, multi_edges, count_on_this_node_side, is_input)
         self.socket_label = socket_label
         self.socket_input_index = socket_input_index
         self.socket_default_value = socket_default_value
-        self.grSocket.init_inner_widgets(self.socket_label, self.socket_input_index)
+        self.grSocket.init_inner_widgets(self.socket_label, self.socket_input_index, self.socket_default_value)
 
 
 class FCNGraphicsNode(QDMGraphicsNode):
