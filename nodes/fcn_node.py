@@ -116,12 +116,15 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
         if self.socket.hasAnyEdge():
             # If socket is connected
             connected_node = self.socket.node.getInput(self.socket.index)
+            connected_output_index = self.socket.edges[0].getOtherSocket(self.socket).index
+            print("Connected node:", connected_node, "on output socket:", connected_output_index)
+
             if isinstance(self.input_widget, QLineEdit):
-                self.input_widget.setText(str(connected_node.eval()))
+                self.input_widget.setText(str(connected_node.eval(connected_output_index)))
             elif isinstance(self.input_widget, QSlider):
-                self.input_widget.setValue(int(connected_node.eval()))
+                self.input_widget.setValue(int(connected_node.eval(connected_output_index)))
             elif isinstance(self.input_widget, QComboBox):
-                self.input_widget.setCurrentIndex(int(connected_node.eval()))
+                self.input_widget.setCurrentIndex(int(connected_node.eval(connected_output_index)))
 
     def update_widget_status(self):
         """Updates the input widget state (enabled or disabled).
@@ -133,7 +136,7 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
         if self.socket.hasAnyEdge():
             # If socket is connected
             self.input_widget.setDisabled(True)
-            self.update_widget_value()
+            #self.update_widget_value()
         else:
             self.input_widget.setDisabled(False)
 
@@ -431,7 +434,7 @@ class FCNNode(Node):
 
     inputs_init_list: list
     output_init_list: list
-    content: 'FCNNodeContent'
+    content: FCNNodeContent
     value: object
     input_socket_position: int
     output_socket_position: int
@@ -443,9 +446,9 @@ class FCNNode(Node):
         :type scene: Scene
         """
 
-        self.inputs_init_list = [(0, "Op", 3, ["Add", "Sub", "Mul", "Div"], False), (0, "Min", 1, 0, False),
-                                 (0, "Max", 1, 100, False), (0, "Val", 2, 50, False)]
-        self.output_init_list = [(0, "Out", 0, 0, True)]
+        self.inputs_init_list = [(0, "Op", 3, ["Add", "Sub", "Mul", "Div"], True), (0, "Min", 1, 0, True),
+                                 (0, "Max", 1, 100, True), (0, "Val", 2, 50, True)]
+        self.output_init_list = [(0, "Out 1", 0, 0, True), (0, "Out 2", 0, 0, True)]
 
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
 
@@ -599,7 +602,8 @@ class FCNNode(Node):
             print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
             return self.value
         try:
-            val = self.eval_preparation()
+            print("In eval Index:", index)
+            val = self.eval_preparation(index)
             return val
         except ValueError as e:
             self.markInvalid()
@@ -610,7 +614,7 @@ class FCNNode(Node):
             self.grNode.setToolTip(str(e))
             dumpException(e)
 
-    def eval_preparation(self) -> object:
+    def eval_preparation(self, index: int = 0) -> object:
         """Prepares the evaluation of the output socket values.
 
         This method prepares the actual calculation of the socket output values.
@@ -618,29 +622,55 @@ class FCNNode(Node):
         to the eval_operation method. After successful calculation this method sends
         the result back to the top level eval method.
 
+        :param index: Index of the output socket, that is to be evaluated (in progress).
+        :type index: int
         :return: Calculated output values.
         :rtype: object
         """
-
+        print("In OP Index:", index)
         values = []  # Container or all input values
 
+        # Generate eval stack from connected sockets
+        eval_stack = []
         for socket in self.inputs:
-            socket.grSocket.update_widget_value()
-            input_widget = socket.grSocket.input_widget
 
-            if isinstance(input_widget, QLineEdit):
-                pass
-            elif isinstance(input_widget, QSlider):
-                input_widget.setRange(int(self.content.input_widgets[1].text()),
-                                      int(self.content.input_widgets[2].text()))
-                input_value = float(input_widget.value())
-                values.append(input_value)
-            elif isinstance(input_widget, QComboBox):
-                pass
-            else:
-                pass
+            input_paths = []
+            for edge in socket.edges:
+                connected_socket = edge.getOtherSocket(socket)
+                connected_node = connected_socket.node
+                input_paths.append((connected_node, connected_socket.index))
 
-        val = self.eval_operation(values)
+            eval_stack.append(input_paths)
+        print("Eval stack:", eval_stack)
+
+        # Process eval stack by evaluating connected nodes and collect input data
+        for in_socket in eval_stack:
+            for connection in in_socket:
+                if len(connection) > 0:
+                    print("Connection:", connection)
+                    call_node = connection[0]
+                    call_index = connection[1]
+                    print("Call index", call_index)
+                    print("Call op", call_node.eval(call_index))
+                    values.append([call_node.eval(call_index)])
+
+            #socket.grSocket.update_widget_value()
+            #input_widget = socket.grSocket.input_widget
+
+            # if isinstance(input_widget, QLineEdit):
+            #     pass
+            # elif isinstance(input_widget, QSlider):
+            #     input_widget.setRange(int(self.content.input_widgets[1].text()),
+            #                           int(self.content.input_widgets[2].text()))
+            #     input_value = float(input_widget.value())
+            #     values.append(input_value)
+            # elif isinstance(input_widget, QComboBox):
+            #     pass
+            # else:
+            #     pass
+
+        print("Values:", values)
+        val = self.eval_operation(values, index)
         self.value = val
         self.markDirty(False)
         self.markInvalid(False)
@@ -650,7 +680,7 @@ class FCNNode(Node):
         print("%s::__eval()" % self.__class__.__name__, "self.value = ", self.value)
         return val
 
-    def eval_operation(self, values) -> object:
+    def eval_operation(self, values, index) -> object:
         """Calculation of the socket output values.
 
         The eval_operation is responsible or the actual calculation of the output
@@ -659,12 +689,20 @@ class FCNNode(Node):
 
         :param values: Socket input values as list data structure.
         :type values: list
+        :param index: Index of the output socket, that is to be evaluated (in progress).
+        :type index: int
         :return: Calculated output values.
         :rtype: object
         """
 
-        print(self.content.input_widgets[0].currentText())
-        return values[0]
+        print("Index:", index)
+        if index == 0:
+            return 0
+        if index == 1:
+            return 1
+
+        #print(self.content.input_widgets[0].currentText())
+        #return values[0]
 
     def onInputChanged(self, socket: FCNSocket = None):
         """Callback method for input changed events.
