@@ -69,7 +69,7 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
         :type socket_label: str
         :param socket_input_index: Index of input class, referring to the Socket_Input_Classes list.
         :type socket_input_index: int
-        :param socket_default_values: Socket widget default value object.
+        :param socket_default_values: Socket widget default data object.
         :type socket_default_values: object
         """
 
@@ -136,7 +136,7 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
         if self.socket.hasAnyEdge():
             # If socket is connected
             self.input_widget.setDisabled(True)
-            #self.update_widget_value()
+            # self.update_widget_value()
         else:
             self.input_widget.setDisabled(False)
 
@@ -413,7 +413,7 @@ class FCNNode(Node):
             [(socket_type (int), socket_label (str), socket_widget_index (int),
             widget_default_value (obj), multi_edge (bool))]
         content (FCNNodeContent): Reference to the node content widget.
-        value (object): Result of the node evaluation, used as cache storage to limit evaluation cycles.
+        data (list): Result of the node evaluation, used as cache storage to limit evaluation cycles.
         input_socket_position (int): Initial position of the input sockets, referring to node_sockets.py.
         output_socket_position (int): Initial position of the output sockets, referring to node_sockets.py.
 
@@ -435,7 +435,7 @@ class FCNNode(Node):
     inputs_init_list: list
     output_init_list: list
     content: FCNNodeContent
-    value: object
+    data: list
     input_socket_position: int
     output_socket_position: int
 
@@ -457,7 +457,7 @@ class FCNNode(Node):
         self.content.fill_content_layout()
         self.place_sockets()  # Adjusts socket position according content widget positions
 
-        self.value = None
+        self.data = list()
         self.markDirty()
         self.eval()
 
@@ -583,28 +583,30 @@ class FCNNode(Node):
             counter += 1
             self.outputs.append(socket)
 
-    def eval(self, index: int = 0) -> object:
+    def eval(self, index: int = 0) -> list:
         """Top level evaluation method of the node.
 
         A node evaluates the values for the output sockets based on the input
         socket values and the processing logic of the eval_preparation method.
-        If a node is not dirty or invalid, the cached value is returned.
+        If a node is not dirty or invalid, the cached data is returned.
         Otherwise, a new calculation is delegated to the eval_preparation method.
 
-        :param index: Index of the output socket, that is to be evaluated (in progress).
+        :param index: Index of the output socket, that is to be evaluated.
         :type index: int
         :return: Result of the evaluation.
-        :rtype: object
+        :rtype: list
         """
 
         if not self.isDirty() and not self.isInvalid():
             # Return cached result
-            print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
-            return self.value
+            print("_> returning cached %s data:" % self.__class__.__name__, self.data[index])
+            return self.data[index]
         try:
-            print("In eval Index:", index)
-            val = self.eval_preparation(index)
-            return val
+            # Run new evaluation
+            socket_output_data = self.eval_preparation()
+            print("%s::__eval(%s)" % (self.__class__.__name__, index),
+                  "self.socket_output_data[%s] = " % index, socket_output_data[index])
+            return socket_output_data[index]
         except ValueError as e:
             self.markInvalid()
             self.grNode.setToolTip(str(e))
@@ -614,95 +616,69 @@ class FCNNode(Node):
             self.grNode.setToolTip(str(e))
             dumpException(e)
 
-    def eval_preparation(self, index: int = 0) -> object:
+    def eval_preparation(self) -> list:
         """Prepares the evaluation of the output socket values.
 
         This method prepares the actual calculation of the socket output values.
         Input values are collected, stored in a suitable data structure and passed
-        to the eval_operation method. After successful calculation this method sends
+        to the eval_operation method. After successful calculation, this method sends
         the result back to the top level eval method.
 
-        :param index: Index of the output socket, that is to be evaluated (in progress).
-        :type index: int
-        :return: Calculated output values.
-        :rtype: object
+        Note:
+            All output sockets are evaluated. The resulting data structure is returned
+            and passed to the data class attribute.
+
+        :return: Calculated output data structure.
+        :rtype: list
         """
-        print("In OP Index:", index)
-        values = []  # Container or all input values
 
-        # Generate eval stack from connected sockets
-        eval_stack = []
+        # Collect input date from all input sockets and generates input data
+        # structure (list of lists)
+        sockets_input_data = []
         for socket in self.inputs:
+            socket_input_data = []
+            if socket.hasAnyEdge():
+                # Collect input data
+                for edge in socket.edges:
+                    other_socket = edge.getOtherSocket(socket)
+                    other_socket_node = other_socket.node
+                    other_socket_index = other_socket.index
+                    other_socket_value = other_socket_node.eval(other_socket_index)
+                    socket_input_data.append(other_socket_value)
+            else:
+                # Use default socket data set
+                socket_input_data.append(socket.socket_default_value)
+            sockets_input_data.append(socket_input_data)
 
-            input_paths = []
-            for edge in socket.edges:
-                connected_socket = edge.getOtherSocket(socket)
-                connected_node = connected_socket.node
-                input_paths.append((connected_node, connected_socket.index))
-
-            eval_stack.append(input_paths)
-        print("Eval stack:", eval_stack)
-
-        # Process eval stack by evaluating connected nodes and collect input data
-        for in_socket in eval_stack:
-            for connection in in_socket:
-                if len(connection) > 0:
-                    print("Connection:", connection)
-                    call_node = connection[0]
-                    call_index = connection[1]
-                    print("Call index", call_index)
-                    print("Call op", call_node.eval(call_index))
-                    values.append([call_node.eval(call_index)])
-
-            #socket.grSocket.update_widget_value()
-            #input_widget = socket.grSocket.input_widget
-
-            # if isinstance(input_widget, QLineEdit):
-            #     pass
-            # elif isinstance(input_widget, QSlider):
-            #     input_widget.setRange(int(self.content.input_widgets[1].text()),
-            #                           int(self.content.input_widgets[2].text()))
-            #     input_value = float(input_widget.value())
-            #     values.append(input_value)
-            # elif isinstance(input_widget, QComboBox):
-            #     pass
-            # else:
-            #     pass
-
-        print("Values:", values)
-        val = self.eval_operation(values, index)
-        self.value = val
+        socket_output_data = self.eval_operation(sockets_input_data)
+        self.data = socket_output_data
         self.markDirty(False)
         self.markInvalid(False)
         self.grNode.setToolTip("")
         self.markDescendantsDirty()
         self.evalChildren()
-        print("%s::__eval()" % self.__class__.__name__, "self.value = ", self.value)
-        return val
+        print("%s::__eval()" % self.__class__.__name__, "self.data = ", self.data)
+        return socket_output_data
 
-    def eval_operation(self, values, index) -> object:
+    @staticmethod
+    def eval_operation(socket_input_data) -> list:
         """Calculation of the socket output values.
 
         The eval_operation is responsible or the actual calculation of the output
         values. It processes the input data structure passed in through the method
-        parameter values and returns the calculation result.
+        parameter socket_input_data and returns the calculation result as a list of
+        lists with one sublist per output socket.
 
-        :param values: Socket input values as list data structure.
-        :type values: list
-        :param index: Index of the output socket, that is to be evaluated (in progress).
-        :type index: int
-        :return: Calculated output values.
-        :rtype: object
+        :param socket_input_data: Socket input values as list data structure.
+        :type socket_input_data: list
+        :return: Calculated output values as list with one sublist per output socket.
+        :rtype: list
         """
 
-        print("Index:", index)
-        if index == 0:
-            return 0
-        if index == 1:
-            return 1
+        out1_val = socket_input_data[1][0]
+        out2_val = socket_input_data[2][0]
 
-        #print(self.content.input_widgets[0].currentText())
-        #return values[0]
+        return [out1_val, out2_val]
 
     def onInputChanged(self, socket: FCNSocket = None):
         """Callback method for input changed events.
@@ -718,7 +694,7 @@ class FCNNode(Node):
         super().onInputChanged(socket)
         self.update_content_status()
         self.eval()
-        print("%s::__onInputChanged" % self.__class__.__name__, "self.value = ", self.value)
+        print("%s::__onInputChanged" % self.__class__.__name__, "self.data = ", self.data)
 
     def serialize(self) -> OrderedDict:
         """Serialises the node to human-readable json file.
