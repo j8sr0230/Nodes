@@ -111,10 +111,14 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
         input value passed through that node. This method evaluates the
         connected node and displays the corresponding value in the input/
         display widget.
+
+        Note:
+            The update_widget_value method is limited to sockets with one
+            connection.
         """
 
-        if self.socket.hasAnyEdge():
-            # If socket is connected
+        if self.socket.hasAnyEdge() and len(self.socket.edges) == 1:
+            # If socket is connected with just one edge
             connected_node = self.socket.node.getInput(self.socket.index)
             connected_output_index = self.socket.edges[0].getOtherSocket(self.socket).index
             print("Connected node:", connected_node, "on output socket:", connected_output_index)
@@ -136,7 +140,7 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
         if self.socket.hasAnyEdge():
             # If socket is connected
             self.input_widget.setDisabled(True)
-            # self.update_widget_value()
+            self.update_widget_value()
         else:
             self.input_widget.setDisabled(False)
 
@@ -583,29 +587,28 @@ class FCNNode(Node):
             counter += 1
             self.outputs.append(socket)
 
-    def eval(self, index: int = 0) -> list:
+    def eval(self, index: int = 0) -> object:
         """Top level evaluation method of the node.
 
         A node evaluates the values for the output sockets based on the input
-        socket values and the processing logic of the eval_preparation method.
-        If a node is not dirty or invalid, the cached data is returned.
-        Otherwise, a new calculation is delegated to the eval_preparation method.
+        socket values and the processing logic of the eval_preparation and
+        eval_operation methods. If a node is not dirty or invalid, the cached
+        data is returned. Otherwise, a new calculation is delegated to the
+        eval_preparation method.
 
         :param index: Index of the output socket, that is to be evaluated.
         :type index: int
         :return: Result of the evaluation.
-        :rtype: list
+        :rtype: object
         """
 
         if not self.isDirty() and not self.isInvalid():
-            # Return cached result
-            print("_> returning cached %s data:" % self.__class__.__name__, self.data[index])
+            # Return cached result or the desired output socket (index)
+            print("_> returning cached %s data:" % self.__class__.__name__, self.data)
             return self.data[index]
         try:
-            # Run new evaluation
+            # Run new evaluation and return the desired output socket (index)
             socket_output_data = self.eval_preparation()
-            print("%s::__eval(%s)" % (self.__class__.__name__, index),
-                  "self.socket_output_data[%s] = " % index, socket_output_data[index])
             return socket_output_data[index]
         except ValueError as e:
             self.markInvalid()
@@ -620,25 +623,39 @@ class FCNNode(Node):
         """Prepares the evaluation of the output socket values.
 
         This method prepares the actual calculation of the socket output values.
-        Input values are collected, stored in a suitable data structure and passed
-        to the eval_operation method. After successful calculation, this method sends
-        the result back to the top level eval method.
+        Input values are collected from connected nodes or socket input widgets,
+        stored in a list data structure and passed to the eval_operation method.
+        After successful calculation, this method sends the result back to the
+        top level eval method.
 
         Note:
             All output sockets are evaluated. The resulting data structure is returned
             and passed to the data class attribute.
 
-        :return: Calculated output data structure.
+        :return: Calculated output data structure as list o lists with all socket outputs.
         :rtype: list
         """
 
-        # Collect input date from all input sockets and generates input data
-        # structure (list of lists)
-        sockets_input_data = []
+        # Collect input date either from all input sockets or from the input widget
+        # if possible and generates input data structure
+        sockets_input_data = []  # Container for input data
+
         for socket in self.inputs:
             socket_input_data = []
-            if socket.hasAnyEdge():
-                # Collect input data
+            socket_input_widget = socket.grSocket.input_widget
+
+            if socket.hasAnyEdge() and len(socket.edges) >= 1:
+                # At least one edge connected
+                if len(socket.edges) > 1:
+                    # More than on edge connected
+                    socket_input_widget.hide()
+                else:
+                    # Exactly one edge connected
+                    socket.grSocket.update_widget_status()
+                    socket_input_widget.show()
+                self.place_sockets()  # Replace socket positions
+
+                # Collect input data from connected nodes
                 for edge in socket.edges:
                     other_socket = edge.getOtherSocket(socket)
                     other_socket_node = other_socket.node
@@ -646,11 +663,28 @@ class FCNNode(Node):
                     other_socket_value = other_socket_node.eval(other_socket_index)
                     socket_input_data.append(other_socket_value)
             else:
-                # Use default socket data set
-                socket_input_data.append(socket.socket_default_value)
-            sockets_input_data.append(socket_input_data)
+                # No edge connected
+                # socket_input_data.append(socket.socket_default_value)  # Use default socket data
 
+                # Use input widget data
+                socket_input_widget = socket.grSocket.input_widget
+                if socket_input_widget is not None:
+                    if isinstance(socket_input_widget, QLineEdit):
+                        input_value = int(socket_input_widget.text())
+                        socket_input_data.append(input_value)
+                    elif isinstance(socket_input_widget, QSlider):
+                        socket_input_widget.setRange(int(self.content.input_widgets[1].text()),
+                                                     int(self.content.input_widgets[2].text()))
+                        input_value = int(socket_input_widget.value())
+                        socket_input_data.append(input_value)
+                    elif isinstance(socket_input_widget, QComboBox):
+                        pass
+                    else:
+                        pass
+
+            sockets_input_data.append(socket_input_data)
         socket_output_data = self.eval_operation(sockets_input_data)
+
         self.data = socket_output_data
         self.markDirty(False)
         self.markInvalid(False)
@@ -666,15 +700,16 @@ class FCNNode(Node):
 
         The eval_operation is responsible or the actual calculation of the output
         values. It processes the input data structure passed in through the method
-        parameter socket_input_data and returns the calculation result as a list of
-        lists with one sublist per output socket.
+        parameter socket_input_data and returns the calculation result as a list,
+        with one sublist per output socket.
 
         :param socket_input_data: Socket input values as list data structure.
         :type socket_input_data: list
-        :return: Calculated output values as list with one sublist per output socket.
+        :return: Calculated output data as list with one sublist per output socket.
         :rtype: list
         """
 
+        # Example implementation
         out1_val = socket_input_data[1][0]
         out2_val = socket_input_data[2][0]
 
