@@ -108,15 +108,13 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
         corresponding value in the input/display widget.
 
         Note:
-            The update_widget_value method is limited to sockets with one
-            connection.
+            The update_widget_value method is limited to sockets with one connection.
         """
 
         if self.socket.hasAnyEdge() and len(self.socket.edges) == 1:
             # If socket is connected with just one edge
             connected_node = self.socket.node.getInput(self.socket.index)
             connected_output_index = self.socket.edges[0].getOtherSocket(self.socket).index
-            print("Connected node:", connected_node, "on output socket:", connected_output_index)
 
             if isinstance(self.input_widget, QLineEdit):
                 self.input_widget.setText(str(connected_node.eval(connected_output_index)))
@@ -133,10 +131,17 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
         """
 
         if self.socket.hasAnyEdge():
-            # If socket is connected
-            self.input_widget.setDisabled(True)
-            self.update_widget_value()
+            if len(self.socket.edges) == 1:
+                # If socket is connected to one node
+                self.input_widget.show()
+                self.input_widget.setDisabled(True)
+                self.update_widget_value()
+            else:
+                # Socket has more than one connection
+                self.input_widget.hide()
         else:
+            # No node connected to socket
+            self.input_widget.show()
             self.input_widget.setDisabled(False)
 
 
@@ -646,20 +651,9 @@ class FCNNode(Node):
 
         for socket in self.inputs:
             socket_input_data = []
-            socket_input_widget = socket.grSocket.input_widget
 
             if socket.hasAnyEdge() and len(socket.edges) >= 1:
-                # At least one edge connected
-                if len(socket.edges) > 1:
-                    # More than on edge connected
-                    socket_input_widget.hide()
-                else:
-                    # Exactly one edge connected
-                    socket.grSocket.update_widget_status()
-                    socket_input_widget.show()
-                self.content.hide()
-                self.content.show()
-                self.place_sockets()  # Replace socket positions
+                socket.grSocket.update_widget_status()
 
                 # Collect input data from connected nodes
                 for edge in socket.edges:
@@ -670,7 +664,7 @@ class FCNNode(Node):
                     socket_input_data.append(other_socket_value)
             else:
                 # No edge connected
-                # socket_input_data.append(socket.socket_default_value)  # Use default socket data
+                # sockets_input_data.append(socket.socket_default_value)  # Use default socket data
 
                 # Use input widget data
                 socket_input_widget = socket.grSocket.input_widget
@@ -689,19 +683,19 @@ class FCNNode(Node):
                         pass
 
             sockets_input_data.append(socket_input_data)
-        socket_output_data = self.eval_operation(sockets_input_data)
+        sockets_output_data = self.eval_operation(sockets_input_data)
 
-        self.data = socket_output_data
+        self.data = sockets_output_data
         self.markDirty(False)
         self.markInvalid(False)
         self.grNode.setToolTip("")
         self.markDescendantsDirty()
         self.evalChildren()
         print("%s::__eval()" % self.__class__.__name__, "self.data = ", self.data)
-        return socket_output_data
+        return sockets_output_data
 
     @staticmethod
-    def eval_operation(socket_input_data) -> list:
+    def eval_operation(sockets_input_data) -> list:
         """Calculation of the socket output values.
 
         The eval_operation is responsible or the actual calculation of the output
@@ -709,15 +703,15 @@ class FCNNode(Node):
         parameter socket_input_data and returns the calculation result as a list,
         with one sublist per output socket.
 
-        :param socket_input_data: Socket input values as list data structure.
-        :type socket_input_data: list
+        :param sockets_input_data: Socket input values as list data structure.
+        :type sockets_input_data: list
         :return: Calculated output data as list with one sublist per output socket.
         :rtype: list
         """
 
         # Example implementation
-        out1_val = socket_input_data[1][0]
-        out2_val = socket_input_data[2][0]
+        out1_val = sockets_input_data[1][0]
+        out2_val = sockets_input_data[2][0]
 
         return [out1_val, out2_val]
 
@@ -733,9 +727,23 @@ class FCNNode(Node):
         """
 
         super().onInputChanged(socket)
-        self.update_content_status()
         self.eval()
         print("%s::__onInputChanged" % self.__class__.__name__, "self.data = ", self.data)
+
+    def onEdgeConnectionChanged(self, new_edge: 'Edge'):
+        """
+        Event handling that any connection (`Edge`) has changed. Currently not used...
+
+        :param new_edge: reference to the changed :class:`~nodeeditor.node_edge.Edge`
+        :type new_edge: :class:`~nodeeditor.node_edge.Edge`
+        """
+
+        super().onEdgeConnectionChanged(new_edge)
+        self.update_content_status()
+        self.content.hide()  # Hack or recalculating content geometry before updating socket position
+        self.content.show()  # Hack (see above comment)
+        self.place_sockets()  # Replace socket positions
+        self.updateConnectedEdges()  # Update edge position
 
     def serialize(self) -> OrderedDict:
         """Serialises the node to human-readable json file.
