@@ -124,10 +124,10 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
                 self.input_widget.setCurrentIndex(int(connected_node.eval(connected_output_index)))
 
     def update_widget_status(self):
-        """Updates the input widget state (enabled or disabled).
+        """Updates the input widget state.
 
         In addition to the update_widget_value method, the input/display widget of a connected socket is enabled,
-        disabled, shown and hidden by this update_widget_status method.
+        disabled, shown and hidden by the update_widget_status method.
         """
 
         if self.socket.hasAnyEdge():
@@ -148,14 +148,12 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
 class FCNSocket(Socket):
     """Model class for an input or output socket of a node.
 
-    Each node has input and output sockets for communication with other nodes.
-    A socket is the data interface between two nodes. They are connected to
-    sockets from other nodes via edges and thus ensure the data flow in the node
-    graph. This class has the Socket_GR_Class class variable that defines the
-    user interface class for the FCNSocket. The class name FCNGraphicsSocket is
-    passed to it. In addition to the inherited methods and parameters, FCNSocket
-    essentially has a socket_label to name the socket, a socket_input_index to
-    identify the desired input widget and a socket_default_value.
+    Each node has input and output sockets for communication with other nodes. A socket is the data interface between
+    two nodes. They are connected to sockets from other nodes via edges and thus ensure the data flow in the node graph.
+    This class has the Socket_GR_Class class variable that defines the user interface class for the FCNSocket. The name
+    of the actual Socket UI class is passed to this variable. In this case it's the FCNGraphicsSocket class. In addition
+    to the inherited methods and parameters, FCNSocket essentially has a socket_label to name the socket, a
+    socket_input_index to identify the desired input widget and the corresponding socket_default_value.
     """
 
     Socket_GR_Class = FCNGraphicsSocket
@@ -202,10 +200,9 @@ class FCNSocket(Socket):
 class FCNGraphicsNode(QDMGraphicsNode):
     """Visual representation of a node in a node editor scene.
 
-    The visual node is a QGraphicsItem that is display in a QGraphicsScene instance.
-    In addition, it serves as a container for the visual node content (see
-    FCNNodeContent class).The FCNGraphicsNode class specifies all the necessary
-    geometric information needed, to display a node in the scene.
+    The visual node is a QGraphicsItem that is display in a QGraphicsScene instance. In addition, it serves as a
+    container for the visual node content (see FCNNodeContent class).The FCNGraphicsNode class specifies all the
+    necessary geometric information needed, to display a node in the scene.
 
     Attributes:
         width (int): Width of the node.
@@ -228,8 +225,7 @@ class FCNGraphicsNode(QDMGraphicsNode):
     def initSizes(self):
         """Initialises the size of the visual node.
 
-        This method sets the class attributes for the node dimensions and content
-        paddings.
+        This method sets the class attributes for the node dimensions and content paddings.
         """
 
         super().initSizes()
@@ -243,8 +239,8 @@ class FCNGraphicsNode(QDMGraphicsNode):
     def initAssets(self):
         """Initialises the status icons of the node.
 
-        Status icons indicate whether a node is valid, invalid or dirty. This method sets
-        the class attribute for the status icons.
+        Status icons indicate whether a node is valid, invalid or dirty. This method sets the class attribute for the
+        status icons.
         """
 
         super().initAssets()
@@ -254,10 +250,9 @@ class FCNGraphicsNode(QDMGraphicsNode):
     def paint(self, painter, q_style_option_graphics_item, widget=None):
         """Paints the appropriate status icons on the visual node representation.
 
-       Status icons indicate whether a node is valid, invalid or dirty. All status
-       icons are in a single landscape image. A corresponding horizontal offset is
-       used to select the required image section via this offset. This method
-       selects and draws the corresponding image section through the QPainter instance.
+       Status icons indicate whether a node is valid, invalid or dirty. All status icons are in a single landscape
+       image. A corresponding horizontal offset is used to select the required image section via this offset. This
+       method selects and draws the corresponding image section through the QPainter instance.
        """
         super().paint(painter, q_style_option_graphics_item, widget)
 
@@ -277,17 +272,15 @@ class FCNGraphicsNode(QDMGraphicsNode):
 class FCNNodeContent(QDMNodeContentWidget):
     """The visual representation of the node content.
 
-    The visual node content is composed by the labels and input widgets passed
-    by the initialised input and output sockets. All widgets are arranged row wise
-    by a QFormLayout and stored in class attributes. Labels and widgets of input
-    sockets are stored in the input_labels and input_widgets lists and labels and
-    widgets of output sockets are passed to the output_labels and output_widgets
-    lists.
+    The visual node content is composed by the labels and input widgets passed by the initialised input and output
+    sockets. All widgets are arranged row wise by a QFormLayout and stored in class attributes. Labels and widgets of
+    input sockets are stored in the input_labels and input_widgets lists and labels and widgets of output sockets are
+    passed to the output_labels and output_widgets lists.
 
     Attributes:
-        input_labels (list[QLabel]): Input label of the input sockets.
+        input_labels (list[QLabel]): Input labels of the input sockets.
         input_widgets (list[QWidget]): Input widgets of the input sockets.
-        output_labels (list[QLabel]): Output label of the output sockets.
+        output_labels (list[QLabel]): Output labels of the output sockets.
         output_widgets (list[QWidget]): Output widgets of the output sockets.
         layout (QFormLayout): Layout of the node content widget.
     """
@@ -301,29 +294,26 @@ class FCNNodeContent(QDMNodeContentWidget):
     def initUI(self):
         """Initializes the node content user interface layout.
 
-       The initUI method initializes and sets the layout of the content widget
-       as a QFormLayout. It is called by the contractor of the parent class
-       QDMNodeContentWidget.
+       The initUI method initializes and sets the layout of the content widget as a QFormLayout. It is called by the
+       contractor of the parent class QDMNodeContentWidget.
        """
 
-        self.hide()  # Hack: Needed for updating widget geometry
+        self.hide()  # Hack or recalculating content geometry before updating socket position
         self.layout = QFormLayout(self)
         self.setLayout(self.layout)
 
     def fill_content_layout(self):
         """Populates the content layout with socket labels and widgets.
 
-        This method loops over all present input and output sockets af the parent
-        node. Labels and input widgets are added to the QFormLayout and references
-        the input widgets are saved in the class attribute lists. Widgets of input
-        sockets are passed to the input_widgets list and widgets of output sockets
-        are stored in the output_widget list. To query the individual sockets, they
-        must already be initiated.
+        This method loops over all present input and output sockets af the parent node. Labels and input widgets are
+        added to the QFormLayout and references the widgets and labels are saved in the class attribute lists. Labels
+        and widgets of input sockets are stored in the input_labels and input_widgets lists and labels and widgets of
+        output sockets are passed to the output_labels and output_widgets lists.
 
         Note:
-            For this reason the call of this methode does not take place in the
-            initUI method of this class, but in the constructor of the FCNNode
-            class after initiation of the Node parent class.
+            To query the individual sockets, they must already be initiated. For this reason the call of this methode
+            does not take place in the initUI method of this class, but in the constructor of the FCNNode class after
+            initiation of the node with its sockets.
        """
 
         self.input_labels = []
@@ -341,14 +331,13 @@ class FCNNodeContent(QDMNodeContentWidget):
             self.output_widgets.append(socket.grSocket.label_widget)
             self.layout.addRow(socket.grSocket.input_widget, socket.grSocket.label_widget)
 
-        self.show()  # Hack: Needed for updating widget geometry
+        self.show()  # Hack or recalculating content geometry before updating socket position
 
     def serialize(self) -> OrderedDict:
         """Serialises the node content to human-readable json file.
 
-        The serialise method adds the content (int, float, sting, ...) of each
-        socket widget to a dictionary and returns it. It is called by the serialise
-        method of the parent node.
+        The serialise method adds the content (int, float, sting, ...) of each socket widget to a dictionary and returns
+        it. It is called by the serialise method of the parent node.
 
         :return: Serialised date as human-readable json file.
         :rtype: OrderedDict
@@ -367,8 +356,8 @@ class FCNNodeContent(QDMNodeContentWidget):
     def deserialize(self, data: dict, hashmap=None, restore_id: bool = True) -> bool:
         """Deserializes the node content.
 
-        Deserialization method which takes data in dict format with helping
-        hashmap containing references to existing entities.
+        Deserialization method which takes data in dict format with helping hashmap containing references to existing
+        entities.
 
         :param data: Dictionary containing serialized data.
         :type data: dict
@@ -402,16 +391,13 @@ class FCNNodeContent(QDMNodeContentWidget):
 class FCNNode(Node):
     """Data model class for a node in FreeCAD Nodes (fc_nodes).
 
-     The FCNNode class contains the complete data model of a node. All necessary
-     information is stored and managed either in class variables or attributes.
-     This concerns not only the visual representation of the node in the node editor
-     scene including node content and sockets, but also the complete evaluation
-     logic.
+     The FCNNode class contains the complete data model of a node. All necessary information is stored and managed
+     either in class variables or attributes. This concerns not only the visual representation (ui) of the node in the
+     node editor scene including node content and sockets, but also the complete evaluation logic.
 
      General instance independent data are stored in class variables. These are:
      - icon (str): Path to the node image, displayed in the node list box (QListWidget).
-     - op_code (int): Unique index of the node, used to register the node in the app,
-        referring to fcn_conf.py.
+     - op_code (int): Unique index of the node, used to register the node in the app, referring to fcn_conf.py.
      - op_title (str): Title of the node, display in the node header.
      - content_label_objname (str): Label of the content widget, used by qss stylesheets.
      - GraphicsNode_class (QDMGraphicsNode): Name of node ui class.
@@ -419,21 +405,18 @@ class FCNNode(Node):
      - Socket_class (Socket): Name of socket class.
 
      Attributes:
-        input_init_list (list(tuple)): Definition of the input sockets with the signature
-            [(socket_type (int), socket_label (str), socket_widget_index (int),
-            widget_default_value (obj), multi_edge (bool))]
-        output_init_list (list(tuples)): Definition of the output sockets with the signature
-            [(socket_type (int), socket_label (str), socket_widget_index (int),
-            widget_default_value (obj), multi_edge (bool))]
+        input_init_list (list(tuple)): Definition of the input sockets with the signature [(socket_type (int),
+            socket_label (str), socket_widget_index (int), widget_default_value (obj), multi_edge (bool))]
+        output_init_list (list(tuples)): Definition of the output sockets with the signature [(socket_type (int),
+            socket_label (str), socket_widget_index (int),widget_default_value (obj), multi_edge (bool))]
         content (FCNNodeContent): Reference to the node content widget.
         data (list): Result of the node evaluation, used as cache storage to limit evaluation cycles.
         input_socket_position (int): Initial position of the input sockets, referring to node_sockets.py.
         output_socket_position (int): Initial position of the output sockets, referring to node_sockets.py.
 
      Note:
-        If input_socket_position is set to LEFT_BOTTOM and output_socket_position
-        is set to RIGHT_BOTTOM, the socket positions are calculated by the content
-        layout based on the input and output widgets of the sockets.
+        If input_socket_position is set to LEFT_BOTTOM and output_socket_position is set to RIGHT_BOTTOM,
+        the socket positions are calculated by the content layout based on the input and output widgets of the sockets.
     """
 
     icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
@@ -452,7 +435,7 @@ class FCNNode(Node):
     input_socket_position: int
     output_socket_position: int
 
-    def __init__(self, scene):
+    def __init__(self, scene: 'Scene'):
         """Constructor of the FCNNode class.
 
         :param scene: Parent node of the socket.
@@ -465,8 +448,7 @@ class FCNNode(Node):
 
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
 
-        # Init content after parent (and socket initialisation) initiation, because
-        # the fill_content_layout method loops over all sockets.
+        # Init content after parent and socket, because the fill_content_layout method loops over all sockets.
         self.content.fill_content_layout()
         self.place_sockets()  # Adjusts socket position according content widget positions
 
@@ -487,9 +469,8 @@ class FCNNode(Node):
     def place_sockets(self):
         """Updates the socket positions.
 
-        Calls the setSocketPosition method of all sockets. It causes all sockets
-        to re-fetch their position within the node using the getSocketPosition
-        method o this class.
+        Calls the setSocketPosition method of all sockets. It causes all sockets to re-fetch their position within
+        the node using the getSocketPosition method of this class.
         """
 
         for socket in self.inputs:
@@ -500,9 +481,8 @@ class FCNNode(Node):
     def getSocketPosition(self, index: int, position: int, num_out_of: int = 1) -> [int, int]:
         """Calculates the position of an individual socket within the node geometry.
 
-        Calls the setSocketPosition method of all sockets. It causes all sockets
-        to re-fetch their position within the node using the getSocketPosition
-        method of this class.
+        The node position is determined by the updated node content layout. Each node is horizontally centered to its
+        node label, that is arranged by the node content layout.
 
         :param index: Index of the target socket.
         :type index: int
@@ -532,8 +512,8 @@ class FCNNode(Node):
     def initSettings(self):
         """Initiates socket positions.
 
-       The socket positions input_socket_position and output_socket_position are used, to calculate
-       the visual socket distribution within the node.
+       The socket positions input_socket_position and output_socket_position are used, to calculate the visual socket
+       location and distribution within the node geometry.
 
        Note:
            If set to LEFT_BOTTOM and RIGHT_BOTTOM, the position of the socket input widgets within
@@ -547,18 +527,15 @@ class FCNNode(Node):
     def initSockets(self, inputs: list, outputs: list, reset: bool = True):
         """Create the input and output sockets of the node.
 
-        The initSockets method instantiates the socket data model classes, along
-        with the corresponding socket ui classes. All necessary information for
-        the individual sockets are passes through the inputs and outputs list to
+        The initSockets method instantiates the socket data model classes, along with the corresponding socket ui
+        classes. All necessary information for the individual sockets are passes through the inputs and outputs list to
         the method.
 
-        :param inputs: Definition of the input sockets with the signature
-            [(socket_type (int), socket_label (str), socket_widget_index (int),
-            widget_default_value (obj), multi_edge (bool))]
+        :param inputs: Definition of the input sockets with the signature [(socket_type (int), socket_label (str),
+            socket_widget_index (int), widget_default_value (obj), multi_edge (bool))]
         :type inputs: list(tuple)
-        :param outputs: Definition of the output sockets with the signature
-            [(socket_type (int), socket_label (str), socket_widget_index (int),
-            widget_default_value (obj), multi_edge (bool))]
+        :param outputs: Definition of the output sockets with the signature [(socket_type (int), socket_label (str),
+            socket_widget_index (int), widget_default_value (obj), multi_edge (bool))]
         :type outputs: list(tuple)
         :param reset: True destroys and removes old sockets.
         :type reset: bool
@@ -599,13 +576,12 @@ class FCNNode(Node):
     def eval(self, index: int = 0) -> object:
         """Top level evaluation method of the node.
 
-        A node evaluates the values for the output sockets based on the input
-        socket values and the processing logic of the eval_preparation and
-        eval_operation methods. If a node is not dirty or invalid, the cached
-        data is returned. Otherwise, a new calculation is delegated to the
-        eval_preparation method.
+        A node evaluates the values for the output sockets based on the input socket values and the processing logic of
+        the eval_preparation and eval_operation methods. If a node is not dirty or invalid, the cached data is returned.
+        Otherwise, a new calculation is delegated to the eval_preparation method. The method calculates the data for all
+        output sockets, but only outputs the requested data, (see index parameter).
 
-        :param index: Index of the output socket, that is to be evaluated.
+        :param index: Index of the output socket data, that is to be returned.
         :type index: int
         :return: Result of the evaluation.
         :rtype: object
@@ -631,31 +607,27 @@ class FCNNode(Node):
     def eval_preparation(self) -> list:
         """Prepares the evaluation of the output socket values.
 
-        This method prepares the actual calculation of the socket output values.
-        Input values are collected from connected nodes or socket input widgets,
-        stored in a list data structure and passed to the eval_operation method.
-        After successful calculation, this method sends the result back to the
-        top level eval method.
+        This method prepares the actual calculation of the socket output data. Input values are collected from connected
+        nodes or socket input widgets, stored in a list data structure and passed to the eval_operation method. After
+        successful calculation, this method sends the result back to the top level eval method.
 
         Note:
-            All output sockets are evaluated. The resulting data structure is returned
-            and passed to the data class attribute.
+            All output sockets are evaluated. The resulting data structure is returned and passed to the data class
+            attribute.
 
-        :return: Calculated output data structure as list o lists with all socket outputs.
+        :return: Calculated output data structure with all socket outputs.
         :rtype: list
         """
 
-        # Collect input date either from all input sockets or from the input widget
-        # if possible and generates input data structure
-        sockets_input_data = []  # Container for input data
+        self.update_content_status()  # Update node content widgets
 
+        # Build input data structure
+        sockets_input_data = []  # Container for input data
         for socket in self.inputs:
             socket_input_data = []
 
-            if socket.hasAnyEdge() and len(socket.edges) >= 1:
-                socket.grSocket.update_widget_status()
-
-                # Collect input data from connected nodes
+            if socket.hasAnyEdge():
+                # From connected nodes
                 for edge in socket.edges:
                     other_socket = edge.getOtherSocket(socket)
                     other_socket_node = other_socket.node
@@ -663,28 +635,27 @@ class FCNNode(Node):
                     other_socket_value = other_socket_node.eval(other_socket_index)
                     socket_input_data.append(other_socket_value)
             else:
-                # No edge connected
-                # sockets_input_data.append(socket.socket_default_value)  # Use default socket data
-
-                # Use input widget data
+                # From input data widgets
                 socket_input_widget = socket.grSocket.input_widget
                 if socket_input_widget is not None:
                     if isinstance(socket_input_widget, QLineEdit):
                         input_value = int(socket_input_widget.text())
                         socket_input_data.append(input_value)
+
                     elif isinstance(socket_input_widget, QSlider):
+                        # Complex widget property manipulation during runtime
                         socket_input_widget.setRange(int(self.content.input_widgets[1].text()),
                                                      int(self.content.input_widgets[2].text()))
+
                         input_value = int(socket_input_widget.value())
                         socket_input_data.append(input_value)
+
                     elif isinstance(socket_input_widget, QComboBox):
-                        pass
-                    else:
                         pass
 
             sockets_input_data.append(socket_input_data)
-        sockets_output_data = self.eval_operation(sockets_input_data)
 
+        sockets_output_data = self.eval_operation(sockets_input_data)  # Calculate socket output
         self.data = sockets_output_data
         self.markDirty(False)
         self.markInvalid(False)
@@ -695,15 +666,14 @@ class FCNNode(Node):
         return sockets_output_data
 
     @staticmethod
-    def eval_operation(sockets_input_data) -> list:
-        """Calculation of the socket output values.
+    def eval_operation(sockets_input_data: list) -> list:
+        """Calculation of the socket output data.
 
-        The eval_operation is responsible or the actual calculation of the output
-        values. It processes the input data structure passed in through the method
-        parameter socket_input_data and returns the calculation result as a list,
+        The eval_operation is responsible or the actual calculation of the outputs. It processes the input data
+        structure passed in through the method parameter socket_input_data and returns the calculation result as a list,
         with one sublist per output socket.
 
-        :param sockets_input_data: Socket input values as list data structure.
+        :param sockets_input_data: Socket input data.
         :type sockets_input_data: list
         :return: Calculated output data as list with one sublist per output socket.
         :rtype: list
@@ -715,15 +685,14 @@ class FCNNode(Node):
 
         return [out1_val, out2_val]
 
-    def onInputChanged(self, socket: FCNSocket = None):
+    def onInputChanged(self, socket: Socket):
         """Callback method for input changed events.
 
-        Each new data input or connection requires updating the content widgets
-        (enabled or disabled) and recalculating the node. This is triggered by
-        this callback methode.
+        Each data input (i.e. a text change in a socket input widget) requires a recalculation of the node. Revaluation
+        is triggered by this callback methode.
 
         :param socket: Socket trigger of the input change (not implemented yet).
-        :type socket: FCNSocket
+        :type socket: Socket
         """
 
         super().onInputChanged(socket)
@@ -731,11 +700,13 @@ class FCNNode(Node):
         print("%s::__onInputChanged" % self.__class__.__name__, "self.data = ", self.data)
 
     def onEdgeConnectionChanged(self, new_edge: 'Edge'):
-        """
-        Event handling that any connection (`Edge`) has changed. Currently not used...
+        """Callback method for connection changed events.
 
-        :param new_edge: reference to the changed :class:`~nodeeditor.node_edge.Edge`
-        :type new_edge: :class:`~nodeeditor.node_edge.Edge`
+        After a new connection, the content of the socket widgets may change. The necessary update of the content
+        layout and the new positioning of the sockets and edges is handled by this callback.
+
+        :param new_edge: Reference to the changed edge.
+        :type new_edge: Edge
         """
 
         super().onEdgeConnectionChanged(new_edge)
@@ -748,8 +719,8 @@ class FCNNode(Node):
     def serialize(self) -> OrderedDict:
         """Serialises the node to human-readable json file.
 
-        The serialise method adds the node date to a dictionary and returns it.
-        It is called by the serialise method of the QGraphicsScene node_scene.Scene.serialize.
+        The serialise method adds the node date to a dictionary and returns it. It is called by the serialise method of
+        the QGraphicsScene node_scene.Scene.serialize.
 
         :return: Serialised date as human-readable json file.
         :rtype: OrderedDict
@@ -762,15 +733,15 @@ class FCNNode(Node):
     def deserialize(self, data: dict, hashmap=None, restore_id: bool = True, *args, **kwargs) -> bool:
         """Deserializes the node.
 
-        Deserialization method which takes data in dict format with helping
-        hashmap containing references to existing entities.
+        Deserialization method which takes data in dict format with helping hashmap containing references to existing
+        entities.
 
         :param data: Dictionary containing serialized data.
         :type data: dict
         :param hashmap: Helper dictionary containing references (by id == key) to existing objects.
         :type hashmap: dict
-        :param restore_id: True if we are creating new content. False is useful when loading existing
-            content of which we want to keep the existing object's id.
+        :param restore_id: True if we are creating new content. False is useful when loading existing content of which
+            we want to keep the existing object's id.
         :type restore_id: bool
         :return: True if deserialization was successful, otherwise False.
         :rtype: bool
