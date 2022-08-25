@@ -104,7 +104,7 @@ class BaseNode(Node):
 
     def eval(self, index=0):
         if not self.isDirty() and not self.isInvalid():
-            print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
+            # print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
             return self.value
 
         try:
@@ -120,7 +120,7 @@ class BaseNode(Node):
             dumpException(e)
 
     def onInputChanged(self, socket=None):
-        print("%s::__onInputChanged" % self.__class__.__name__)
+        # print("%s::__onInputChanged" % self.__class__.__name__)
         self.markDirty()
         self.eval()
 
@@ -133,5 +133,5 @@ class BaseNode(Node):
         if hashmap is None:
             hashmap = {}
         res = super().deserialize(data, hashmap, restore_id)
-        print("Deserialized FCNNode '%s'" % self.__class__.__name__, "res:", res)
+        # print("Deserialized FCNNode '%s'" % self.__class__.__name__, "res:", res)
         return res

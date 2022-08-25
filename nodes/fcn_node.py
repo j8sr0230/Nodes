@@ -33,6 +33,9 @@ from fcn_conf import register_node, OP_NODE_BASE
 from nodeeditor.utils import dumpException
 
 
+DEBUG = False
+
+
 class FCNGraphicsSocket(QDMGraphicsSocket):
     """Visual representation of a socket in a node editor scene.
 
@@ -589,7 +592,8 @@ class FCNNode(Node):
 
         if not self.isDirty() and not self.isInvalid():
             # Return cached result or the desired output socket (index)
-            print("_> returning cached %s data:" % self.__class__.__name__, self.data)
+            if DEBUG:
+                print("_> returning cached %s data:" % self.__class__.__name__, self.data)
             return self.data[index]
         try:
             # Run new evaluation and return the desired output socket (index)
@@ -659,10 +663,11 @@ class FCNNode(Node):
         self.data = sockets_output_data
         self.markDirty(False)
         self.markInvalid(False)
-        self.grNode.setToolTip("")
+        self.grNode.setToolTip(str(self.data))
         self.markDescendantsDirty()
         self.evalChildren()
-        print("%s::__eval()" % self.__class__.__name__, "self.data = ", self.data)
+        if DEBUG:
+            print("%s::__eval()" % self.__class__.__name__, "self.data = ", self.data)
         return sockets_output_data
 
     @staticmethod
@@ -697,7 +702,8 @@ class FCNNode(Node):
 
         super().onInputChanged(socket)
         self.eval()
-        print("%s::__onInputChanged" % self.__class__.__name__, "self.data = ", self.data)
+        if DEBUG:
+            print("%s::__onInputChanged" % self.__class__.__name__, "self.data = ", self.data)
 
     def onEdgeConnectionChanged(self, new_edge: 'Edge'):
         """Callback method for connection changed events.
@@ -750,5 +756,6 @@ class FCNNode(Node):
         if hashmap is None:
             hashmap = {}
         res = super().deserialize(data, hashmap, restore_id)
-        print("Deserialized Node '%s'" % self.__class__.__name__, "res:", res)
+        if DEBUG:
+            print("Deserialized Node '%s'" % self.__class__.__name__, "res:", res)
         return res
