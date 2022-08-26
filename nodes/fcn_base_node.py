@@ -21,6 +21,7 @@ import os
 from collections import OrderedDict
 from typing import Union
 
+import numpy as np
 from qtpy.QtGui import QImage
 from qtpy.QtCore import QRectF, Qt
 from qtpy.QtWidgets import QWidget, QFormLayout, QLabel, QLineEdit, QSlider, QComboBox
@@ -121,11 +122,11 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
             connected_output_index = self.socket.edges[0].getOtherSocket(self.socket).index
 
             if isinstance(self.input_widget, QLineEdit):
-                self.input_widget.setText(str(connected_node.eval(connected_output_index)[0]))
+                self.input_widget.setText(str(np.array(connected_node.eval(connected_output_index)).flat[0]))
             elif isinstance(self.input_widget, QSlider):
-                self.input_widget.setValue(int(connected_node.eval(connected_output_index)[0]))
+                self.input_widget.setValue(int(np.array(connected_node.eval(connected_output_index)).flat[0]))
             elif isinstance(self.input_widget, QComboBox):
-                self.input_widget.setCurrentIndex(int(connected_node.eval(connected_output_index)[0]))
+                self.input_widget.setCurrentIndex(int(np.array(connected_node.eval(connected_output_index)).flat[0]))
 
     def update_widget_status(self):
         """Updates the input widget state.
