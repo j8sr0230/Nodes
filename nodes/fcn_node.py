@@ -445,9 +445,9 @@ class FCNNode(Node):
         :type scene: Scene
         """
 
-        self.inputs_init_list = [(0, "Op", 3, ["Add", "Sub", "Mul", "Div"], True), (0, "Min", 1, 0, True),
+        self.inputs_init_list = [(0, "Format", 3, ["Value", "Percent"], True), (0, "Min", 1, 0, True),
                                  (0, "Max", 1, 100, True), (0, "Val", 2, 50, True)]
-        self.output_init_list = [(0, "Out 1", 0, 0, True), (0, "Out 2", 0, 0, True)]
+        self.output_init_list = [(0, "Range", 0, 0, True), (0, "Val", 0, 0, True)]
 
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
 
@@ -655,7 +655,8 @@ class FCNNode(Node):
                         socket_input_data.append(input_value)
 
                     elif isinstance(socket_input_widget, QComboBox):
-                        pass
+                        input_value = socket_input_widget.currentIndex()
+                        socket_input_data.append(input_value)
 
             sockets_input_data.append(socket_input_data)
 
@@ -685,8 +686,19 @@ class FCNNode(Node):
         """
 
         # Example implementation
-        out1_val = sockets_input_data[1][0]
-        out2_val = sockets_input_data[2][0]
+        op_code = sockets_input_data[0][0]
+        min_val = sockets_input_data[1][0]
+        max_val = sockets_input_data[2][0]
+        cur_val = sockets_input_data[3][0]
+
+        out1_val = [min_val, max_val]
+
+        max_val_trans = max_val - min_val
+        cur_val_trans = cur_val - min_val
+        if op_code == 0:
+            out2_val = sockets_input_data[3][0]
+        else:
+            out2_val = (100 * cur_val_trans) / max_val_trans
 
         return [out1_val, out2_val]
 
