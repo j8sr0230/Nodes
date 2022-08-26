@@ -29,8 +29,9 @@ from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.node_socket import Socket, LEFT_BOTTOM, RIGHT_BOTTOM
 from nodeeditor.node_graphics_socket import QDMGraphicsSocket
-from fcn_conf import register_node, OP_NODE_BASE
 from nodeeditor.utils import dumpException
+
+#  from fcn_conf import register_node, OP_NODE_BASE
 
 
 DEBUG = False
@@ -120,11 +121,11 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
             connected_output_index = self.socket.edges[0].getOtherSocket(self.socket).index
 
             if isinstance(self.input_widget, QLineEdit):
-                self.input_widget.setText(str(connected_node.eval(connected_output_index)))
+                self.input_widget.setText(str(connected_node.eval(connected_output_index)[0]))
             elif isinstance(self.input_widget, QSlider):
-                self.input_widget.setValue(int(connected_node.eval(connected_output_index)))
+                self.input_widget.setValue(int(connected_node.eval(connected_output_index)[0]))
             elif isinstance(self.input_widget, QComboBox):
-                self.input_widget.setCurrentIndex(int(connected_node.eval(connected_output_index)))
+                self.input_widget.setCurrentIndex(int(connected_node.eval(connected_output_index)[0]))
 
     def update_widget_status(self):
         """Updates the input widget state.
@@ -390,7 +391,7 @@ class FCNNodeContent(QDMNodeContentWidget):
         return res
 
 
-@register_node(OP_NODE_BASE)
+#  @register_node(OP_NODE_BASE)
 class FCNNode(Node):
     """Data model class for a node in FreeCAD Nodes (fc_nodes).
 
@@ -410,7 +411,7 @@ class FCNNode(Node):
      Attributes:
         input_init_list (list(tuple)): Definition of the input sockets with the signature [(socket_type (int),
             socket_label (str), socket_widget_index (int), widget_default_value (obj), multi_edge (bool))]
-        output_init_list (list(tuples)): Definition of the output sockets with the signature [(socket_type (int),
+        outputs_init_list (list(tuples)): Definition of the output sockets with the signature [(socket_type (int),
             socket_label (str), socket_widget_index (int),widget_default_value (obj), multi_edge (bool))]
         content (FCNNodeContent): Reference to the node content widget.
         data (list): Result of the node evaluation, used as cache storage to limit evaluation cycles.
@@ -423,7 +424,7 @@ class FCNNode(Node):
     """
 
     icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
-    op_code: int = OP_NODE_BASE
+    #  op_code: int = OP_NODE_BASE
     op_title: str = "FCN Node"
     content_label_objname: str = "fcn_node_bg"
 
@@ -438,21 +439,48 @@ class FCNNode(Node):
     input_socket_position: int
     output_socket_position: int
 
-    def __init__(self, scene: 'Scene'):
+    def __init__(self, scene: 'Scene', inputs_init_list: list = None, outputs_init_list: list = None,
+                 width: int = 250, height: int = 230):
         """Constructor of the FCNNode class.
 
         :param scene: Parent node of the socket.
         :type scene: Scene
+        :param inputs_init_list: Definition of the input sockets with the signature [(socket_type (int), socket_label
+            (str), socket_widget_index (int), widget_default_value (obj), multi_edge (bool))]
+        :type inputs_init_list: list
+        :param outputs_init_list: Definition of the output sockets with the signature [(socket_type (int), socket_label
+            (str), socket_widget_index (int), widget_default_value (obj), multi_edge (bool))]
+        :type outputs_init_list: list
+        :param width: Width of the node.
+        :type width: int
+        :param height: Height of the node.
+        :type height: int
         """
 
-        self.inputs_init_list = [(0, "Format", 3, ["Value", "Percent"], True), (0, "Min", 1, 0, True),
-                                 (0, "Max", 1, 100, True), (0, "Val", 2, 50, True)]
-        self.output_init_list = [(0, "Range", 0, 0, True), (0, "Val", 0, 0, True)]
+        if inputs_init_list is None:
+            # Default inputs_init_list as example implementation
+            inputs_init_list = [(0, "Format", 3, ["Value", "Percent"], True),
+                                (0, "Min", 1, 0, True), (0, "Max", 1, 100, True),
+                                (0, "Val", 2, 50, True)]
+
+        if outputs_init_list is None:
+            # Default outputs_init_list as example implementation
+            outputs_init_list = [(0, "Range", 0, 0, True), (0, "Val", 0, 0, True)]
+
+        self.inputs_init_list = inputs_init_list
+        self.output_init_list = outputs_init_list
 
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
 
         # Init content after parent and socket, because the fill_content_layout method loops over all sockets.
         self.content.fill_content_layout()
+
+        # Rest node size,  adjust content layout and recalculate socket position
+        self.grNode.height = height
+        self.grNode.width = width
+        self.content.setFixedHeight(self.grNode.height - self.grNode.title_vertical_padding -
+                                    self.grNode.edge_padding - self.grNode.title_height)
+        self.content.setFixedWidth(self.grNode.width - 2 * self.grNode.edge_padding)
         self.place_sockets()  # Adjusts socket position according content widget positions
 
         self.data = list()
@@ -643,7 +671,7 @@ class FCNNode(Node):
                 socket_input_widget = socket.grSocket.input_widget
                 if socket_input_widget is not None:
                     if isinstance(socket_input_widget, QLineEdit):
-                        input_value = int(socket_input_widget.text())
+                        input_value = float(socket_input_widget.text())
                         socket_input_data.append(input_value)
 
                     elif isinstance(socket_input_widget, QSlider):

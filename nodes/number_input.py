@@ -1,141 +1,66 @@
 import os
 
-from qtpy.QtCore import Qt, QRectF
-from qtpy.QtGui import QImage
-from qtpy.QtWidgets import QLineEdit, QVBoxLayout
-import FreeCAD as App
-
-from nodeeditor.node_node import Node
-from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
-from nodeeditor.node_graphics_node import QDMGraphicsNode
-from nodeeditor.node_content_widget import QDMNodeContentWidget
 from fcn_conf import register_node, OP_NODE_NUM_IN
-from nodeeditor.utils import dumpException
-
-
-class NumberInputContent(QDMNodeContentWidget):
-    def initUI(self):
-        self.layout = QVBoxLayout()
-        self.layout.setContentsMargins(0,0,0,0)
-        self.setLayout(self.layout)
-        self.edit = QLineEdit("1.11", self)
-        self.edit.setObjectName(self.node.content_label_objname)
-        self.layout.addWidget(self.edit)
-
-    def serialize(self):
-        res = super().serialize()
-        res['number'] = self.edit.text()
-        return res
-
-    def deserialize(self, data, hashmap={}):
-        res = super().deserialize(data, hashmap)
-        try:
-            value = data['number']
-            self.edit.setText(value)
-            return True & res
-        except Exception as e:
-            dumpException(e)
-        return res
-
-
-class NumberInputGraphicsNode(QDMGraphicsNode):
-    def initSizes(self):
-        super().initSizes()
-        self.width = 160
-        self.height = 75
-        self.edge_roundness = 6
-        self.edge_padding = 0
-        self.title_horizontal_padding = 8
-        self.title_vertical_padding = 10
-
-    def initAssets(self):
-        super().initAssets()
-        status_icon = os.path.join(App.getUserAppDataDir(), "Macro", "pyqt-node-editor", "examples",
-                                   "example_freecad", "icons", "status_icons.png")
-        self.icons = QImage(status_icon)
-
-    def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
-        super().paint(painter, QStyleOptionGraphicsItem, widget)
-
-        offset = 24.0
-        if self.node.isDirty(): offset = 0.0
-        if self.node.isInvalid(): offset = 48.0
-
-        painter.drawImage(
-            QRectF(-10, -10, 24.0, 24.0),
-            self.icons,
-            QRectF(offset, 0, 24.0, 24.0)
-        )
+from nodes.fcn_base_node import FCNNode
 
 
 @register_node(OP_NODE_NUM_IN)
-class NumberInputNode(Node):
-    icon = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
+class NumberInput(FCNNode):
+    """Number input node.
+
+    The Numbers node has an input field that can be used to enter any integer or fractional number. General instance
+    independent data are stored in class variables. These are:
+     - icon (str): Path to the node image, displayed in the node list box (QListWidget).
+     - op_code (int): Unique index of the node, used to register the node in the app, referring to fcn_conf.py.
+     - op_title (str): Title of the node, display in the node header.
+    """
+
+    icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
     op_code = OP_NODE_NUM_IN
     op_title = "Number"
-    content_label_objname = "number_input_node"
-
-    GraphicsNode_class = NumberInputGraphicsNode
-    NodeContent_class = NumberInputContent
 
     def __init__(self, scene):
-        super().__init__(scene, self.__class__.op_title, inputs=[], outputs=[0])
-        self.value = None
-        self.markDirty()
-        self.eval()
+        """Constructor of the FCNNode class.
 
-    def initSettings(self):
-        super().initSettings()
-        self.input_socket_position = LEFT_CENTER
-        self.output_socket_position = RIGHT_CENTER
+        Calls the constructor of the parent class FCNNode.__init(scene, inputs_init_list, outputs_init_list, width,
+        height). For more information see the FCNNode documentation in fcn_node_base.py.
 
-    def initInnerClasses(self):
-        self.content = NumberInputContent(self)
-        self.grNode = NumberInputGraphicsNode(self)
-        self.content.edit.textChanged.connect(self.onInputChanged)
+        Note:
+            Each socket list has a set tuples as list items with the information for every socket. A single socket tuple
+            has the signature
+            (socket type (int),
+             socket label (str),
+             input widget type (int),
+             default value (object),
+             multi edge support (bool)).
 
-    def eval(self):
-        if not self.isDirty() and not self.isInvalid():
-            print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
-            return self.value
-        try:
-            val = self.evalImplementation()
-            return val
-        except ValueError as e:
-            self.markInvalid()
-            self.grNode.setToolTip(str(e))
-            self.markDescendantsDirty()
-        except Exception as e:
-            self.markInvalid()
-            self.grNode.setToolTip(str(e))
-            dumpException(e)
+        :param scene: Parent node of the socket.
+        :type scene: Scene
+        """
 
-    def evalImplementation(self):
-        string_input = self.content.edit.text()
-        self.value = float(string_input)
-        self.markDirty(False)
-        self.markInvalid(False)
-        self.markDescendantsInvalid(False)
-        self.markDescendantsDirty()
-        self.grNode.setToolTip("")
-        self.evalChildren()
-        print("%s::__eval()" % self.__class__.__name__, "self.value = ", self.value)
-        return self.value
+        super().__init__(scene=scene,
+                         inputs_init_list=[(0, "In", 1, 0.0, False)],
+                         outputs_init_list=[(0, "Out", 0, 0.0, True)],
+                         width=150, height=110)
 
-    def evalOperation(self):
-        pass
+    @staticmethod
+    def eval_operation(sockets_input_data: list) -> list:
+        """Returns the number from the input field or socket.
 
-    def onInputChanged(self, socket=None):
-        self.markDirty()
-        self.eval()
-        print("%s::__onInputChanged" % self.__class__.__name__, "self.value = ", self.value)
+        Note:
+            The general sockets_input_data list has the signature
+            [[in_0_0, in_0_1, ..., in_0_N],
+             [in_1_0, in_1_1, ..., in_1_N],
+             ...,
+             [in_N_0, in_N_1, ..., in_N_N]].
 
-    def serialize(self):
-        res = super().serialize()
-        res['op_code'] = self.__class__.op_code
-        return res
+        :param sockets_input_data: Socket input data (signature see above).
+        :type sockets_input_data: list
+        :return: Calculated output data as list with one sublist per output socket, signature .
+        :rtype: list
+        """
 
-    def deserialize(self, data, hashmap={}, restore_id=True):
-        res = super().deserialize(data, hashmap, restore_id)
-        #print("Deserialized Node '%s'" % self.__class__.__name__, "res:", res)
-        return res
+        in1_val = sockets_input_data[0][0]
+        out1_val = [in1_val]
+        result = [out1_val]
+        return result
