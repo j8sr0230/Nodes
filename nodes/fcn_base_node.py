@@ -665,8 +665,9 @@ class FCNNode(Node):
                     other_socket = edge.getOtherSocket(socket)
                     other_socket_node = other_socket.node
                     other_socket_index = other_socket.index
-                    other_socket_value = other_socket_node.eval(other_socket_index)
-                    socket_input_data.append(other_socket_value)
+                    other_socket_value_list = other_socket_node.eval(other_socket_index)
+                    for other_socket_value in other_socket_value_list:
+                        socket_input_data.append(other_socket_value)
             else:
                 # From input data widgets
                 socket_input_widget = socket.grSocket.input_widget
