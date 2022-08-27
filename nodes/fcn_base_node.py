@@ -76,14 +76,14 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
         """
 
         # Socket label setup
-        self.label_widget = QLabel(socket_label)
+        self.label_widget: QLabel = QLabel(socket_label)
         if self.socket.is_input:
             self.label_widget.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         else:
             self.label_widget.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
         # Socket input widget setup
-        self.input_widget = self.__class__.Socket_Input_Widget_Classes[socket_input_index]()
+        self.input_widget: QWidget = self.__class__.Socket_Input_Widget_Classes[socket_input_index]()
         if socket_input_index == 0:  # Empty
             pass
 
@@ -118,8 +118,8 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
 
         if self.socket.hasAnyEdge() and len(self.socket.edges) == 1:
             # If socket is connected with just one edge
-            connected_node = self.socket.node.getInput(self.socket.index)
-            connected_output_index = self.socket.edges[0].getOtherSocket(self.socket).index
+            connected_node: Node = self.socket.node.getInput(self.socket.index)
+            connected_output_index: int = self.socket.edges[0].getOtherSocket(self.socket).index
 
             if isinstance(self.input_widget, QLineEdit):
                 self.input_widget.setText(str(np.array(connected_node.eval(connected_output_index)).flat[0]))
@@ -196,9 +196,9 @@ class FCNSocket(Socket):
         """
 
         super().__init__(node, index, position, socket_type, multi_edges, count_on_this_node_side, is_input)
-        self.socket_label = socket_label
-        self.socket_input_index = socket_input_index
-        self.socket_default_value = socket_default_value
+        self.socket_label: str = socket_label
+        self.socket_input_index: int = socket_input_index
+        self.socket_default_value: object = socket_default_value
         self.grSocket.init_inner_widgets(self.socket_label, self.socket_input_index, self.socket_default_value)
 
 
@@ -234,12 +234,12 @@ class FCNGraphicsNode(QDMGraphicsNode):
         """
 
         super().initSizes()
-        self.width = 250
-        self.height = 230
-        self.edge_roundness = 6
-        self.edge_padding = 10
-        self.title_horizontal_padding = 8
-        self.title_vertical_padding = 10
+        self.width: int = 250
+        self.height: int = 230
+        self.edge_roundness: int = 6
+        self.edge_padding: int = 10
+        self.title_horizontal_padding: int = 8
+        self.title_vertical_padding: int = 10
 
     def initAssets(self):
         """Initialises the status icons of the node.
@@ -249,8 +249,8 @@ class FCNGraphicsNode(QDMGraphicsNode):
         """
 
         super().initAssets()
-        path = os.path.join(os.path.abspath(__file__), "../..", "icons", "status_icons.png")
-        self.icons = QImage(path)
+        path: str = os.path.join(os.path.abspath(__file__), "../..", "icons", "status_icons.png")
+        self.icons: QImage = QImage(path)
 
     def paint(self, painter, q_style_option_graphics_item, widget=None):
         """Paints the appropriate status icons on the visual node representation.
@@ -261,17 +261,13 @@ class FCNGraphicsNode(QDMGraphicsNode):
        """
         super().paint(painter, q_style_option_graphics_item, widget)
 
-        offset = 24.0
+        offset: float = 24.0
         if self.node.isDirty():
-            offset = 0.0
+            offset: float = 0.0
         if self.node.isInvalid():
-            offset = 48.0
+            offset: float = 48.0
 
-        painter.drawImage(
-            QRectF(-10, -10, 24.0, 24.0),
-            self.icons,
-            QRectF(offset, 0, 24.0, 24.0)
-        )
+        painter.drawImage(QRectF(-10, -10, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0))
 
 
 class FCNNodeContent(QDMNodeContentWidget):
@@ -304,7 +300,7 @@ class FCNNodeContent(QDMNodeContentWidget):
        """
 
         self.hide()  # Hack or recalculating content geometry before updating socket position
-        self.layout = QFormLayout(self)
+        self.layout: QFormLayout = QFormLayout(self)
         self.setLayout(self.layout)
 
     def fill_content_layout(self):
@@ -321,10 +317,10 @@ class FCNNodeContent(QDMNodeContentWidget):
             initiation of the node with its sockets.
        """
 
-        self.input_labels = []
-        self.input_widgets = []
-        self.output_labels = []
-        self.output_widgets = []
+        self.input_labels: list = []
+        self.input_widgets: list = []
+        self.output_labels: list = []
+        self.output_widgets: list = []
 
         for socket in self.node.inputs:
             self.input_labels.append(socket.grSocket.label_widget)
@@ -380,7 +376,7 @@ class FCNNodeContent(QDMNodeContentWidget):
         res = super().deserialize(data, hashmap)
         try:
             for idx, widget in enumerate(self.input_widgets):
-                value = data["widget" + str(idx)]
+                value: str = data["widget" + str(idx)]
                 if isinstance(widget, QLineEdit):
                     widget.setText(value)
                 elif isinstance(widget, QSlider):
@@ -400,7 +396,7 @@ class FCNNode(Node):
      either in class variables or attributes. This concerns not only the visual representation (ui) of the node in the
      node editor scene including node content and sockets, but also the complete evaluation logic.
 
-     General instance independent data are stored in class variables. These are:
+     General instance independent data is stored in class variables. These are:
      - icon (str): Path to the node image, displayed in the node list box (QListWidget).
      - op_code (int): Unique index of the node, used to register the node in the app, referring to fcn_conf.py.
      - op_title (str): Title of the node, display in the node header.
@@ -460,16 +456,16 @@ class FCNNode(Node):
 
         if inputs_init_list is None:
             # Default inputs_init_list as example implementation
-            inputs_init_list = [(0, "Format", 3, ["Value", "Percent"], True),
-                                (0, "Min", 1, 0, True), (0, "Max", 1, 100, True),
-                                (0, "Val", 2, 50, True)]
+            inputs_init_list: list = [(0, "Format", 3, ["Value", "Percent"], True),
+                                      (0, "Min", 1, 0, True), (0, "Max", 1, 100, True),
+                                      (0, "Val", 2, 50, True)]
 
         if outputs_init_list is None:
             # Default outputs_init_list as example implementation
-            outputs_init_list = [(0, "Range", 0, 0, True), (0, "Val", 0, 0, True)]
+            outputs_init_list: list = [(0, "Range", 0, 0, True), (0, "Val", 0, 0, True)]
 
-        self.inputs_init_list = inputs_init_list
-        self.output_init_list = outputs_init_list
+        self.inputs_init_list: list = inputs_init_list
+        self.output_init_list: list = outputs_init_list
 
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
 
@@ -531,11 +527,11 @@ class FCNNode(Node):
         if hasattr(self.content, "input_labels"):
             # If sockets have already been initiated
             if position == LEFT_BOTTOM:
-                elem = self.content.input_labels[index]
+                elem: QWidget = self.content.input_labels[index]
                 y = self.grNode.title_vertical_padding + self.grNode.title_height + elem.geometry().topLeft().y() + \
                     (elem.geometry().height() // 2)
             elif position == RIGHT_BOTTOM:
-                elem = self.content.output_labels[index]
+                elem: QWidget = self.content.output_labels[index]
                 y = self.grNode.title_vertical_padding + self.grNode.title_height + elem.geometry().topLeft().y() + \
                     (elem.geometry().height() // 2)
 
@@ -553,8 +549,8 @@ class FCNNode(Node):
        """
 
         super().initSettings()
-        self.input_socket_position = LEFT_BOTTOM
-        self.output_socket_position = RIGHT_BOTTOM
+        self.input_socket_position: int = LEFT_BOTTOM
+        self.output_socket_position: int = RIGHT_BOTTOM
 
     def initSockets(self, inputs: list, outputs: list, reset: bool = True):
         """Create the input and output sockets of the node.
@@ -577,15 +573,15 @@ class FCNNode(Node):
             # Clear old sockets
             if hasattr(self, 'inputs') and hasattr(self, 'outputs'):
                 # Remove visual sockets from scene
-                for socket in (self.inputs+self.outputs):
+                for socket in (self.inputs + self.outputs):
                     self.scene.grScene.removeItem(socket.grSocket)
-                self.inputs = []
-                self.outputs = []
+                self.inputs: list = []
+                self.outputs: list = []
 
         # Create new sockets
-        counter = 0
+        counter: int = 0
         for item in inputs:
-            socket = self.__class__.Socket_class(
+            socket: FCNSocket = self.__class__.Socket_class(
                 node=self, index=counter, position=self.input_socket_position,
                 socket_type=item[0], multi_edges=item[4],
                 count_on_this_node_side=len(inputs), is_input=True, socket_label=item[1], socket_input_index=item[2],
@@ -596,7 +592,7 @@ class FCNNode(Node):
 
         counter = 0
         for item in outputs:
-            socket = self.__class__.Socket_class(
+            socket: FCNSocket = self.__class__.Socket_class(
                 node=self, index=counter, position=self.output_socket_position,
                 socket_type=item[0], multi_edges=item[4],
                 count_on_this_node_side=len(outputs), is_input=False, socket_label=item[1], socket_input_index=item[2],
@@ -605,7 +601,7 @@ class FCNNode(Node):
             counter += 1
             self.outputs.append(socket)
 
-    def eval(self, index: int = 0) -> object:
+    def eval(self, index: int = 0) -> list:
         """Top level evaluation method of the node.
 
         A node evaluates the values for the output sockets based on the input socket values and the processing logic of
@@ -626,7 +622,7 @@ class FCNNode(Node):
             return self.data[index]
         try:
             # Run new evaluation and return the desired output socket (index)
-            socket_output_data = self.eval_preparation()
+            socket_output_data: list = self.eval_preparation()
             return socket_output_data[index]
         except ValueError as e:
             self.markInvalid()
@@ -655,25 +651,25 @@ class FCNNode(Node):
         self.update_content_status()  # Update node content widgets
 
         # Build input data structure
-        sockets_input_data = []  # Container for input data
+        sockets_input_data: list = []  # Container for input data
         for socket in self.inputs:
-            socket_input_data = []
+            socket_input_data: list = []
 
             if socket.hasAnyEdge():
                 # From connected nodes
                 for edge in socket.edges:
-                    other_socket = edge.getOtherSocket(socket)
-                    other_socket_node = other_socket.node
-                    other_socket_index = other_socket.index
-                    other_socket_value_list = other_socket_node.eval(other_socket_index)
+                    other_socket: Socket = edge.getOtherSocket(socket)
+                    other_socket_node: Node = other_socket.node
+                    other_socket_index: int = other_socket.index
+                    other_socket_value_list: list = other_socket_node.eval(other_socket_index)
                     for other_socket_value in other_socket_value_list:
                         socket_input_data.append(other_socket_value)
             else:
                 # From input data widgets
-                socket_input_widget = socket.grSocket.input_widget
+                socket_input_widget: QWidget = socket.grSocket.input_widget
                 if socket_input_widget is not None:
                     if isinstance(socket_input_widget, QLineEdit):
-                        input_value = float(socket_input_widget.text())
+                        input_value: float = float(socket_input_widget.text())
                         socket_input_data.append(input_value)
 
                     elif isinstance(socket_input_widget, QSlider):
@@ -685,13 +681,13 @@ class FCNNode(Node):
                         socket_input_data.append(input_value)
 
                     elif isinstance(socket_input_widget, QComboBox):
-                        input_value = socket_input_widget.currentIndex()
+                        input_value: int = socket_input_widget.currentIndex()
                         socket_input_data.append(input_value)
 
             sockets_input_data.append(socket_input_data)
 
-        sockets_output_data = self.eval_operation(sockets_input_data)  # Calculate socket output
-        self.data = sockets_output_data
+        sockets_output_data: list = self.eval_operation(sockets_input_data)  # Calculate socket output
+        self.data: list = sockets_output_data
         self.markDirty(False)
         self.markInvalid(False)
         self.grNode.setToolTip(str(self.data))
@@ -716,19 +712,19 @@ class FCNNode(Node):
         """
 
         # Example implementation
-        op_code = sockets_input_data[0][0]
-        min_val = sockets_input_data[1][0]
-        max_val = sockets_input_data[2][0]
-        cur_val = sockets_input_data[3][0]
+        op_code: int = sockets_input_data[0][0]
+        min_val: int = sockets_input_data[1][0]
+        max_val: int = sockets_input_data[2][0]
+        cur_val: int = sockets_input_data[3][0]
 
-        out1_val = [min_val, max_val]
+        out1_val: list = [min_val, max_val]
 
-        max_val_trans = max_val - min_val
-        cur_val_trans = cur_val - min_val
+        max_val_trans: int = max_val - min_val
+        cur_val_trans: int = cur_val - min_val
         if op_code == 0:
-            out2_val = sockets_input_data[3][0]
+            out2_val: int = sockets_input_data[3][0]
         else:
-            out2_val = (100 * cur_val_trans) / max_val_trans
+            out2_val: float = (100 * cur_val_trans) / max_val_trans
 
         return [out1_val, out2_val]
 

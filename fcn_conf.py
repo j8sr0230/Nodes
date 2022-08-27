@@ -1,6 +1,7 @@
 LISTBOX_MIMETYPE = "application/x-item"
 
 OP_NODE_NUM_IN = 1
+OP_NODE_NUM_SLD = 2
 
 FC_NODES = {
 }
