@@ -25,7 +25,9 @@ import numpy as np
 from qtpy.QtGui import QImage
 from qtpy.QtCore import QRectF, Qt
 from qtpy.QtWidgets import QWidget, QFormLayout, QLabel, QLineEdit, QSlider, QComboBox
+from nodeeditor.node_scene import Scene
 from nodeeditor.node_node import Node
+from nodeeditor.node_edge import Edge
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.node_socket import Socket, LEFT_BOTTOM, RIGHT_BOTTOM
@@ -421,7 +423,7 @@ class FCNNode(Node):
     """
 
     icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
-    #  op_code: int = OP_NODE_BASE
+    op_code: int = -1
     op_title: str = "FCN Node"
     content_label_objname: str = "fcn_node_bg"
 
@@ -436,7 +438,7 @@ class FCNNode(Node):
     input_socket_position: int
     output_socket_position: int
 
-    def __init__(self, scene: 'Scene', inputs_init_list: list = None, outputs_init_list: list = None,
+    def __init__(self, scene: Scene, inputs_init_list: list = None, outputs_init_list: list = None,
                  width: int = 250, height: int = 230):
         """Constructor of the FCNNode class.
 
@@ -743,7 +745,7 @@ class FCNNode(Node):
         if DEBUG:
             print("%s::__onInputChanged" % self.__class__.__name__, "self.data = ", self.data)
 
-    def onEdgeConnectionChanged(self, new_edge: 'Edge'):
+    def onEdgeConnectionChanged(self, new_edge: Edge):
         """Callback method for connection changed events.
 
         After a new connection, the content of the socket widgets may change. The necessary update of the content

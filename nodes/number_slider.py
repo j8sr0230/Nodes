@@ -3,9 +3,10 @@ from decimal import Decimal
 from math import fabs, floor
 
 from qtpy.QtWidgets import QWidget, QLineEdit, QSlider
+from nodeeditor.node_node import Node
 
 from fcn_conf import register_node, OP_NODE_NUM_SLD
-from nodes.fcn_base_node import FCNNode
+from nodes.fcn_base_node import FCNNode, FCNSocket
 
 
 DEBUG = False
@@ -79,7 +80,7 @@ class NumberSlider(FCNNode):
                 # From connected nodes
                 for edge in socket.edges:
                     other_socket: FCNSocket = edge.getOtherSocket(socket)
-                    other_socket_node: FCNNode = other_socket.node
+                    other_socket_node: Node = other_socket.node
                     other_socket_index: int = other_socket.index
                     other_socket_value_list: list = other_socket_node.eval(other_socket_index)
                     for other_socket_value in other_socket_value_list:
