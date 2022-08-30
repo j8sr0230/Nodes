@@ -743,7 +743,7 @@ class FCNNode(Node):
         else:
             out2_val: float = (100 * cur_val_trans) / max_val_trans
 
-        return [out1_val, out2_val]
+        return [out1_val, [out2_val]]
 
     def onInputChanged(self, socket: Socket):
         """Callback method for input changed events.
