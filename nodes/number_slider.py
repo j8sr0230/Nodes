@@ -1,6 +1,5 @@
 import os
-from decimal import Decimal
-from math import fabs, floor
+from math import floor
 
 from qtpy.QtWidgets import QWidget, QLineEdit, QSlider
 from nodeeditor.node_node import Node
@@ -49,8 +48,7 @@ class NumberSlider(FCNNode):
         """
 
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Min", 1, 0, False), (0, "Max", 1, 100, False),
-                                           (0, "Val", 2, 50, False)],
+                         inputs_init_list=[(0, "Min", 1, 0, False), (0, "Max", 1, 10, False), (0, "Val", 2, 5, False)],
                          outputs_init_list=[(0, "Out", 0, 0.0, True)],
                          width=250, height=160)
 
@@ -69,12 +67,17 @@ class NumberSlider(FCNNode):
         :rtype: list
         """
 
+        # TODO: Eval just once by saving results in socket and pulling them into eval method (i. e. update_sockets())
         self.update_content_status()  # Update node content widgets
 
         # Build input data structure
+        has_slider = False
         sockets_input_data: list = []  # Container for input data
         for socket in self.inputs:
             socket_input_data: list = []
+
+            if isinstance(socket.grSocket.input_widget, QSlider):
+                has_slider = True
 
             if socket.hasAnyEdge():
                 # From connected nodes
@@ -94,21 +97,23 @@ class NumberSlider(FCNNode):
                         socket_input_data.append(input_value)
 
                     elif isinstance(socket_input_widget, QSlider):
-                        # Complex widget property manipulation during runtime
-                        slider_min: str = self.content.input_widgets[0].text()
-                        slider_max: str = self.content.input_widgets[1].text()
-
-                        d_min: Decimal = Decimal(slider_min)
-                        exp_min = fabs(d_min.as_tuple().exponent)
-                        factor = 10**exp_min
-
-                        socket_input_widget.setRange(floor(float(slider_min) * factor),
-                                                     floor(float(slider_max) * factor))
-
-                        input_value = socket_input_widget.value() / factor
+                        input_value = socket_input_widget.value()
                         socket_input_data.append(input_value)
 
             sockets_input_data.append(socket_input_data)
+
+        if has_slider is True:
+            # Widget property update during runtime, which is not covered by update_content_status,
+            # i.e. inputs from other sockets.
+            slider_min: float = sockets_input_data[0][0]
+            slider_max: float = sockets_input_data[1][0]
+
+            slider_widget = self.content.input_widgets[2]
+
+            slider_widget.blockSignals(True)  # Prevents signal loop
+            slider_widget.setRange(floor(slider_min), floor(slider_max))
+            slider_widget.setValue(sockets_input_data[2][0])
+            slider_widget.blockSignals(False)  # Reset signals
 
         sockets_output_data: list = self.eval_operation(sockets_input_data)  # Calculate socket output
         self.data: list = sockets_output_data

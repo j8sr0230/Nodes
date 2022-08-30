@@ -20,6 +20,7 @@ node editor base framework.
 import os
 from collections import OrderedDict
 from typing import Union
+from math import floor
 
 import numpy as np
 from qtpy.QtGui import QImage
@@ -34,7 +35,7 @@ from nodeeditor.node_socket import Socket, LEFT_BOTTOM, RIGHT_BOTTOM
 from nodeeditor.node_graphics_socket import QDMGraphicsSocket
 from nodeeditor.utils import dumpException
 
-#  from fcn_conf import register_node, OP_NODE_BASE
+from fcn_conf import register_node, OP_NODE_BASE
 
 
 DEBUG = False
@@ -390,7 +391,7 @@ class FCNNodeContent(QDMNodeContentWidget):
         return res
 
 
-#  @register_node(OP_NODE_BASE)
+@register_node(OP_NODE_BASE)
 class FCNNode(Node):
     """Data model class for a node in FreeCAD Nodes (fc_nodes).
 
@@ -423,8 +424,8 @@ class FCNNode(Node):
     """
 
     icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
-    op_code: int = -1
-    op_title: str = "FCN Node"
+    op_code: int = OP_NODE_BASE
+    op_title: str = "FCN Base Node"
     content_label_objname: str = "fcn_node_bg"
 
     GraphicsNode_class: FCNGraphicsNode = FCNGraphicsNode
@@ -650,12 +651,17 @@ class FCNNode(Node):
         :rtype: list
         """
 
+        # TODO: Eval just once by saving results in socket and pulling them into eval method (i. e. update_sockets())
         self.update_content_status()  # Update node content widgets
 
         # Build input data structure
+        has_slider = False
         sockets_input_data: list = []  # Container for input data
         for socket in self.inputs:
             socket_input_data: list = []
+
+            if isinstance(socket.grSocket.input_widget, QSlider):
+                has_slider = True
 
             if socket.hasAnyEdge():
                 # From connected nodes
@@ -675,10 +681,6 @@ class FCNNode(Node):
                         socket_input_data.append(input_value)
 
                     elif isinstance(socket_input_widget, QSlider):
-                        # Complex widget property manipulation during runtime
-                        socket_input_widget.setRange(int(self.content.input_widgets[1].text()),
-                                                     int(self.content.input_widgets[2].text()))
-
                         input_value = int(socket_input_widget.value())
                         socket_input_data.append(input_value)
 
@@ -687,6 +689,19 @@ class FCNNode(Node):
                         socket_input_data.append(input_value)
 
             sockets_input_data.append(socket_input_data)
+
+        if has_slider is True:
+            # Widget property update during runtime, which is not covered by update_content_status,
+            # i.e. inputs from other sockets.
+            slider_min: float = sockets_input_data[1][0]
+            slider_max: float = sockets_input_data[2][0]
+
+            slider_widget = self.content.input_widgets[3]
+
+            slider_widget.blockSignals(True)  # Prevents signal loop
+            slider_widget.setRange(floor(slider_min), floor(slider_max))
+            slider_widget.setValue(sockets_input_data[3][0])
+            slider_widget.blockSignals(False)  # Reset signals
 
         sockets_output_data: list = self.eval_operation(sockets_input_data)  # Calculate socket output
         self.data: list = sockets_output_data
