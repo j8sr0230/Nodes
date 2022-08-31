@@ -10,8 +10,7 @@ class NumberInput(FCNNode):
     icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
     op_code: int = OP_NODE_NUM_IN
     op_title: str = "Number Input"
-    content_label_objname: str = ""
-
+    content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,

@@ -721,6 +721,14 @@ class FCNNode(Node):
         structure passed in through the method parameter socket_input_data and returns the calculation result as a list,
         with one sublist per output socket.
 
+        Note:
+            The general sockets_input_data list has the signature
+            [[s0_e0, s0_e1, ..., s0_eN],
+             [s1_e0, s1_e1, ..., s1_eN],
+             ...,
+             [sN_e0, sN_e1, ..., sN_eN]],
+             where s stands for input socket and e for connected edge.
+
         :param sockets_input_data: Socket input data.
         :type sockets_input_data: list
         :return: Calculated output data as list with one sublist per output socket.
