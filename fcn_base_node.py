@@ -748,8 +748,8 @@ class FCNNode(Node):
     def onInputChanged(self, socket: Socket):
         """Callback method for input changed events.
 
-        Each data input (i.e. a text change in a socket input widget) requires a recalculation of the node. Re-
-        evaluation is triggered by this callback methode.
+        Each data input (i.e. a text change in a socket input widget) requires a recalculation of the node.
+        Re-evaluation is triggered by this callback methode.
 
         :param socket: Socket trigger of the input change (not implemented yet).
         :type socket: Socket
