@@ -1,7 +1,7 @@
 import os
 
 from fcn_conf import register_node, OP_NODE_NUM_IN
-from nodes.fcn_base_node import FCNNode
+from fcn_base_node import FCNNode
 
 
 @register_node(OP_NODE_NUM_IN)
@@ -39,8 +39,7 @@ class NumberInput(FCNNode):
         """
 
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "In", 1, 0.0, False)],
-                         outputs_init_list=[(0, "Out", 0, 0.0, True)],
+                         inputs_init_list=[(0, "In", 1, 0.0, False)], outputs_init_list=[(0, "Out", 0, 0.0, True)],
                          width=150, height=110)
 
     @staticmethod
@@ -49,10 +48,11 @@ class NumberInput(FCNNode):
 
         Note:
             The general sockets_input_data list has the signature
-            [[in_0_0, in_0_1, ..., in_0_N],
-             [in_1_0, in_1_1, ..., in_1_N],
+            [[s0_e0, s0_e1, ..., s0_eN],
+             [s1_e0, s1_e1, ..., s1_eN],
              ...,
-             [in_N_0, in_N_1, ..., in_N_N]].
+             [sN_e0, sN_e1, ..., sN_eN]],
+             where s stands for input socket and e for connected edge.
 
         :param sockets_input_data: Socket input data (signature see above).
         :type sockets_input_data: list

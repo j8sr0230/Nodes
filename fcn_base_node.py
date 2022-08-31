@@ -8,8 +8,9 @@ Website: https://github.com/j8sr0230/fc_nodes
 This module contains all necessary classes to create custom nodes for the visual modeling environment FreeCAD Nodes
 (fc_nodes). It contains the classes:
 - FCNGraphicsSocket (socket visualization) and FCNSocket (socket model),
-- FCNGraphicsNode (node visualization) and FCNNode (node model) and
-- FCNContent (node content visualization)
+- FCNContent (node content visualization) and
+- FCNGraphicsNode (node visualization) and FCNNode (node model).
+
 for the complete graphical and logical implementation of individual nodes.
 
 It uses significantly the modules QtPy as abstraction layer for PyQt5 and PySide2 (https://pypi.org/project/QtPy, MIT
@@ -34,8 +35,6 @@ from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.node_socket import Socket, LEFT_BOTTOM, RIGHT_BOTTOM
 from nodeeditor.node_graphics_socket import QDMGraphicsSocket
 from nodeeditor.utils import dumpException
-
-from fcn_conf import register_node, OP_NODE_BASE
 
 
 DEBUG = False
@@ -96,9 +95,9 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
 
         elif socket_input_index == 2:  # QSlider
             self.input_widget.setOrientation(Qt.Horizontal)
-            self.input_widget.setMinimum(0)
-            self.input_widget.setMaximum(100)
-            self.input_widget.setValue(int(socket_default_values))
+            self.input_widget.setMinimum(floor(socket_default_values[0]))
+            self.input_widget.setMaximum(floor(socket_default_values[1]))
+            self.input_widget.setValue(floor(socket_default_values[2]))
             self.input_widget.valueChanged.connect(self.socket.node.onInputChanged)
 
         elif socket_input_index == 3:  # QComboBox
@@ -112,44 +111,41 @@ class FCNGraphicsSocket(QDMGraphicsSocket):
         Socket input/display widgets work in two directions. If no node is connected to the socket, they serve for quick
         manipulation of the respective socket input value, i.e. the serve as an input field. However, if one a node is
         connected to the socket, they will show the input value passed through that node. If multiple nodes are
-        connected to the socket, the input widget is hidden. This method evaluates the connected node and displays the
-        corresponding value in the input/display widget.
-
-        Note:
-            The update_widget_value method is limited to sockets with one connection.
-        """
-
-        if self.socket.hasAnyEdge() and len(self.socket.edges) == 1:
-            # If socket is connected with just one edge
-            connected_node: Node = self.socket.node.getInput(self.socket.index)
-            connected_output_index: int = self.socket.edges[0].getOtherSocket(self.socket).index
-
-            if isinstance(self.input_widget, QLineEdit):
-                self.input_widget.setText(str(np.array(connected_node.eval(connected_output_index)).flat[0]))
-            elif isinstance(self.input_widget, QSlider):
-                self.input_widget.setValue(int(np.array(connected_node.eval(connected_output_index)).flat[0]))
-            elif isinstance(self.input_widget, QComboBox):
-                self.input_widget.setCurrentIndex(int(np.array(connected_node.eval(connected_output_index)).flat[0]))
-
-    def update_widget_status(self):
-        """Updates the input widget state.
-
-        In addition to the update_widget_value method, the input/display widget of a connected socket is enabled,
-        disabled, shown and hidden by the update_widget_status method.
+        connected to the socket, the input widget will show an arrow. This method evaluates the connected node and
+        displays the corresponding value in the input/display widget.
         """
 
         if self.socket.hasAnyEdge():
             if len(self.socket.edges) == 1:
-                # If socket is connected to one node
-                self.input_widget.show()
-                self.input_widget.setDisabled(True)
-                self.update_widget_value()
+                # If socket is connected with just one edge
+                connected_node: Node = self.socket.node.getInput(self.socket.index)
+                connected_output_index: int = self.socket.edges[0].getOtherSocket(self.socket).index
+
+                if isinstance(self.input_widget, QLineEdit):
+                    self.input_widget.setText(str(np.array(connected_node.eval(connected_output_index)).flat[0]))
+                elif isinstance(self.input_widget, QSlider):
+                    self.input_widget.setValue(int(np.array(connected_node.eval(connected_output_index)).flat[0]))
+                elif isinstance(self.input_widget, QComboBox):
+                    self.input_widget.setCurrentIndex(
+                        int(np.array(connected_node.eval(connected_output_index)).flat[0])
+                    )
             else:
-                # Socket has more than one connection
-                self.input_widget.hide()
+                if isinstance(self.input_widget, QLineEdit):
+                    self.input_widget.setText("->")
+
+    def update_widget_status(self):
+        """Updates the input widget state.
+
+        In addition to the update_widget_value method, the input/display widget of a connected socket is enabled or
+        disabled by the update_widget_status method.
+        """
+
+        if self.socket.hasAnyEdge():
+            # If socket is connected
+            self.input_widget.setDisabled(True)
+            self.update_widget_value()
+
         else:
-            # No node connected to socket
-            self.input_widget.show()
             self.input_widget.setDisabled(False)
 
 
@@ -252,7 +248,7 @@ class FCNGraphicsNode(QDMGraphicsNode):
         """
 
         super().initAssets()
-        path: str = os.path.join(os.path.abspath(__file__), "../..", "icons", "status_icons.png")
+        path: str = os.path.join(os.path.abspath(__file__), "..", "icons", "status_icons.png")
         self.icons: QImage = QImage(path)
 
     def paint(self, painter, q_style_option_graphics_item, widget=None):
@@ -337,6 +333,28 @@ class FCNNodeContent(QDMNodeContentWidget):
 
         self.show()  # Hack or recalculating content geometry before updating socket position
 
+    def update_content_ui(self, sockets_input_data: list) -> None:
+        """Updates the node content ui.
+
+        The node content ui may have to adapt to the socket input data. The method update_content_ui contains the ui
+        logic of the node content. It is called by the eval_preparation method of the node after the collection of the
+        socket inputs and before the calculation of the output values and allows the manipulation of the content widgets
+        at runtime.
+
+        Note:
+            The general sockets_input_data list has the signature
+            [[s0_e0, s0_e1, ..., s0_eN],
+             [s1_e0, s1_e1, ..., s1_eN],
+             ...,
+             [sN_e0, sN_e1, ..., sN_eN]],
+             where s stands for input socket and e for connected edge.
+
+        :param sockets_input_data: Socket input data (signature see above).
+        :type sockets_input_data: list
+        """
+
+        pass
+
     def serialize(self) -> OrderedDict:
         """Serialises the node content to human-readable json file.
 
@@ -346,6 +364,7 @@ class FCNNodeContent(QDMNodeContentWidget):
         :return: Serialised date as human-readable json file.
         :rtype: OrderedDict
         """
+
         res = super().serialize()
 
         for idx, widget in enumerate(self.input_widgets):
@@ -391,7 +410,6 @@ class FCNNodeContent(QDMNodeContentWidget):
         return res
 
 
-@register_node(OP_NODE_BASE)
 class FCNNode(Node):
     """Data model class for a node in FreeCAD Nodes (fc_nodes).
 
@@ -423,13 +441,13 @@ class FCNNode(Node):
         the socket positions are calculated by the content layout based on the input and output widgets of the sockets.
     """
 
-    icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
-    op_code: int = OP_NODE_BASE
-    op_title: str = "FCN Base Node"
-    content_label_objname: str = "fcn_node_bg"
+    icon: str = ""
+    op_code: int = -1
+    op_title: str = ""
+    content_label_objname: str = ""
 
     GraphicsNode_class: FCNGraphicsNode = FCNGraphicsNode
-    NodeContent_class: FCNNodeContent = FCNNodeContent
+    NodeContent_class: QDMNodeContentWidget = FCNNodeContent
     Socket_class: Socket = FCNSocket
 
     inputs_init_list: list
@@ -442,6 +460,15 @@ class FCNNode(Node):
     def __init__(self, scene: Scene, inputs_init_list: list = None, outputs_init_list: list = None,
                  width: int = 250, height: int = 230):
         """Constructor of the FCNNode class.
+
+        Note:
+            Example inputs_init_list:
+            inputs_init_list: list = [(0, "Format", 3, ["Value", "Percent"], True),
+                                      (0, "Min", 1, 0, True), (0, "Max", 1, 100, True),
+                                      (0, "Val", 2, [0, 100, 50], True)]
+
+            Example outputs_init_list:
+            outputs_init_list: list = [(0, "Range", 0, 0, True), (0, "Val", 0, 0, True)]
 
         :param scene: Parent node of the socket.
         :type scene: Scene
@@ -457,15 +484,15 @@ class FCNNode(Node):
         :type height: int
         """
 
-        if inputs_init_list is None:
-            # Default inputs_init_list as example implementation
-            inputs_init_list: list = [(0, "Format", 3, ["Value", "Percent"], True),
-                                      (0, "Min", 1, 0, True), (0, "Max", 1, 100, True),
-                                      (0, "Val", 2, 50, True)]
-
-        if outputs_init_list is None:
-            # Default outputs_init_list as example implementation
-            outputs_init_list: list = [(0, "Range", 0, 0, True), (0, "Val", 0, 0, True)]
+        # if inputs_init_list is None:
+        #     # Default inputs_init_list as example implementation
+        #     inputs_init_list: list = [(0, "Format", 3, ["Value", "Percent"], True),
+        #                               (0, "Min", 1, 0, True), (0, "Max", 1, 100, True),
+        #                               (0, "Val", 2, 50, True)]
+        #
+        # if outputs_init_list is None:
+        #     # Default outputs_init_list as example implementation
+        #     outputs_init_list: list = [(0, "Range", 0, 0, True), (0, "Val", 0, 0, True)]
 
         self.inputs_init_list: list = inputs_init_list
         self.output_init_list: list = outputs_init_list
@@ -651,17 +678,12 @@ class FCNNode(Node):
         :rtype: list
         """
 
-        # TODO: Eval just once by saving results in socket and pulling them into eval method (i. e. update_sockets())
         self.update_content_status()  # Update node content widgets
 
         # Build input data structure
-        has_slider = False
         sockets_input_data: list = []  # Container for input data
         for socket in self.inputs:
             socket_input_data: list = []
-
-            if isinstance(socket.grSocket.input_widget, QSlider):
-                has_slider = True
 
             if socket.hasAnyEdge():
                 # From connected nodes
@@ -690,20 +712,9 @@ class FCNNode(Node):
 
             sockets_input_data.append(socket_input_data)
 
-        if has_slider is True:
-            # Widget property update during runtime, which is not covered by update_content_status,
-            # i.e. inputs from other sockets.
-            slider_min: float = sockets_input_data[1][0]
-            slider_max: float = sockets_input_data[2][0]
-
-            slider_widget = self.content.input_widgets[3]
-
-            slider_widget.blockSignals(True)  # Prevents signal loop
-            slider_widget.setRange(floor(slider_min), floor(slider_max))
-            slider_widget.setValue(sockets_input_data[3][0])
-            slider_widget.blockSignals(False)  # Reset signals
-
+        self.content.update_content_ui(sockets_input_data)  # Update node content ui
         sockets_output_data: list = self.eval_operation(sockets_input_data)  # Calculate socket output
+
         self.data: list = sockets_output_data
         self.markDirty(False)
         self.markInvalid(False)
@@ -728,22 +739,24 @@ class FCNNode(Node):
         :rtype: list
         """
 
+        # TODO: Delete comments after the corresponding node has been implemented.
         # Example implementation
-        op_code: int = sockets_input_data[0][0]
-        min_val: int = sockets_input_data[1][0]
-        max_val: int = sockets_input_data[2][0]
-        cur_val: int = sockets_input_data[3][0]
+        # op_code: int = sockets_input_data[0][0]
+        # min_val: int = sockets_input_data[1][0]
+        # max_val: int = sockets_input_data[2][0]
+        # cur_val: int = sockets_input_data[3][0]
+        #
+        # out1_val: list = [min_val, max_val]
+        #
+        # max_val_trans: int = max_val - min_val
+        # cur_val_trans: int = cur_val - min_val
+        # if op_code == 0:
+        #     out2_val: int = sockets_input_data[3][0]
+        # else:
+        #     out2_val: float = (100 * cur_val_trans) / max_val_trans
 
-        out1_val: list = [min_val, max_val]
-
-        max_val_trans: int = max_val - min_val
-        cur_val_trans: int = cur_val - min_val
-        if op_code == 0:
-            out2_val: int = sockets_input_data[3][0]
-        else:
-            out2_val: float = (100 * cur_val_trans) / max_val_trans
-
-        return [out1_val, [out2_val]]
+        # return [out1_val, [out2_val]]
+        return [[0], [0]]
 
     def onInputChanged(self, socket: Socket):
         """Callback method for input changed events.
@@ -759,23 +772,6 @@ class FCNNode(Node):
         self.eval()
         if DEBUG:
             print("%s::__onInputChanged" % self.__class__.__name__, "self.data = ", self.data)
-
-    def onEdgeConnectionChanged(self, new_edge: Edge):
-        """Callback method for connection changed events.
-
-        After a new connection, the content of the socket widgets may change. The necessary update of the content
-        layout and the new positioning of the sockets and edges is handled by this callback.
-
-        :param new_edge: Reference to the changed edge.
-        :type new_edge: Edge
-        """
-
-        super().onEdgeConnectionChanged(new_edge)
-        self.update_content_status()
-        self.content.hide()  # Hack or recalculating content geometry before updating socket position
-        self.content.show()  # Hack (see above comment)
-        self.place_sockets()  # Replace socket positions
-        self.updateConnectedEdges()  # Update edge position
 
     def serialize(self) -> OrderedDict:
         """Serialises the node to human-readable json file.
