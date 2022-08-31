@@ -298,6 +298,7 @@ class FCNNodeContent(QDMNodeContentWidget):
 
         self.hide()  # Hack or recalculating content geometry before updating socket position
         self.layout: QFormLayout = QFormLayout(self)
+        self.layout.setObjectName(self.node.content_label_objname)
         self.setLayout(self.layout)
 
     def fill_content_layout(self):
