@@ -6,10 +6,10 @@ from nodeeditor.node_node import Node
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 
 from fcn_conf import register_node, OP_NODE_NUM_SLD
-from fcn_base_node import FCNNode, FCNSocket, FCNNodeContent
+from fcn_base_node import FCNNode, FCNSocket, FCNNodeContentView
 
 
-class NumberSliderContent(FCNNodeContent):
+class NumberSliderContentView(FCNNodeContentView):
     def update_content_ui(self, sockets_input_data: list) -> None:
         slider_min: float = sockets_input_data[0][0]
         slider_max: float = sockets_input_data[1][0]
@@ -30,7 +30,7 @@ class NumberSlider(FCNNode):
     op_title: str = "Number Slider"
     content_label_objname: str = "fcn_node_bg"
 
-    NodeContent_class: QDMNodeContentWidget = NumberSliderContent
+    NodeContent_class: QDMNodeContentWidget = NumberSliderContentView
 
     def __init__(self, scene):
         super().__init__(scene=scene,
@@ -42,7 +42,6 @@ class NumberSlider(FCNNode):
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:
         sld_val: float = sockets_input_data[2][0]
-
         out_val: list = [sld_val]
         result: list = [out_val]
         return result
