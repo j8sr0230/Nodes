@@ -20,6 +20,7 @@ import os
 from collections import OrderedDict
 from typing import Union
 from math import floor
+from decimal import Decimal
 
 import numpy as np
 from qtpy.QtGui import QImage
@@ -117,7 +118,8 @@ class FCNSocketView(QDMGraphicsSocket):
                 connected_output_index: int = self.socket.edges[0].getOtherSocket(self.socket).index
 
                 if isinstance(self.input_widget, QLineEdit):
-                    self.input_widget.setText(str(np.array(connected_node.eval(connected_output_index)).flat[0]))
+                    str_num: str = str(np.array(connected_node.eval(connected_output_index)).flat[0])
+                    self.input_widget.setText('%.2E' % Decimal(str_num))  # Display in scientific notation
                 elif isinstance(self.input_widget, QSlider):
                     self.input_widget.setValue(int(np.array(connected_node.eval(connected_output_index)).flat[0]))
                 elif isinstance(self.input_widget, QComboBox):
@@ -726,24 +728,6 @@ class FCNNode(Node):
         :return: Calculated output data as a list with one sublist per output socket.
         :rtype: list
         """
-
-        # TODO: Delete comments after the corresponding node has been implemented.
-        # Example implementation
-        # op_code: int = sockets_input_data[0][0]
-        # min_val: int = sockets_input_data[1][0]
-        # max_val: int = sockets_input_data[2][0]
-        # cur_val: int = sockets_input_data[3][0]
-        #
-        # out1_val: list = [min_val, max_val]
-        #
-        # max_val_trans: int = max_val - min_val
-        # cur_val_trans: int = cur_val - min_val
-        # if op_code == 0:
-        #     out2_val: int = sockets_input_data[3][0]
-        # else:
-        #     out2_val: float = (100 * cur_val_trans) / max_val_trans
-
-        # return [out1_val, [out2_val]]
 
         # Default implementation
         return [[0], [0]]

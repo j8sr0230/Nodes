@@ -14,8 +14,8 @@ class NumberInput(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "In", 1, 0.0, False)], outputs_init_list=[(0, "Out", 0, 0.0, True)],
-                         width=150, height=110)
+                         inputs_init_list=[(0, "In", 1, 0, False)], outputs_init_list=[(0, "Out", 0, 0, True)],
+                         width=150, height=120)
 
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:

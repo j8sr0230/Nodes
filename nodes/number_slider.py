@@ -37,7 +37,7 @@ class NumberSlider(FCNNode):
                          inputs_init_list=[(0, "Min", 1, 0, False), (0, "Max", 1, 100, False),
                                            (0, "Val", 2, (0, 100, 50), False)],
                          outputs_init_list=[(0, "Out", 0, 0.0, True)],
-                         width=250, height=160)
+                         width=250, height=180)
 
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:
