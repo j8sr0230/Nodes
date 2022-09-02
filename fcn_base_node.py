@@ -31,7 +31,7 @@ from nodeeditor.node_node import Node
 from nodeeditor.node_edge import Edge
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_content_widget import QDMNodeContentWidget
-from nodeeditor.node_socket import Socket, LEFT_BOTTOM, RIGHT_BOTTOM
+from nodeeditor.node_socket import Socket, LEFT_BOTTOM, RIGHT_BOTTOM, LEFT_TOP, RIGHT_TOP, LEFT_CENTER, RIGHT_CENTER
 from nodeeditor.node_graphics_socket import QDMGraphicsSocket
 from nodeeditor.utils import dumpException
 
@@ -348,8 +348,10 @@ class FCNNodeView(QDMGraphicsNode):
     necessary geometric information needed, to display a node in the scene.
 
     Attributes:
-        width (int): Width of the node.
-        height (int): Height of the node.
+        width (int): Current width of the node.
+        height (int): Current height of the node.
+        collapsed_height (int): Height of the collapsed node.
+        default_height (int): Default (uncollapsed) height of the node.
         edge_roundness (int): Roundness of the node corners.
         edge_padding (int): Padding between node and node content.
         title_horizontal_padding (int): Horizontal padding between node and node title.
@@ -359,6 +361,8 @@ class FCNNodeView(QDMGraphicsNode):
 
     width: int
     height: int
+    collapsed_height: int
+    default_height: int
     edge_roundness: int
     edge_padding: int
     title_horizontal_padding: int
@@ -374,6 +378,8 @@ class FCNNodeView(QDMGraphicsNode):
         super().initSizes()
         self.width: int = 250
         self.height: int = 230
+        self.default_height: int = self.height
+        self.collapsed_height: int = 50
         self.edge_roundness: int = 6
         self.edge_padding: int = 10
         self.title_horizontal_padding: int = 8
@@ -433,6 +439,8 @@ class FCNNode(Node):
         output_data_cache (list): Cache storage for the result of the node evaluation.
         input_socket_position (int): Initial position of the input sockets, referring to node_sockets.py.
         output_socket_position (int): Initial position of the output sockets, referring to node_sockets.py.
+        is_collapsed (bool): Is the node collapsed?
+        socket_spacing (int): Vertical distance between individual socket circles.
 
      Note:
         If input_socket_position is set to LEFT_BOTTOM and output_socket_position is set to RIGHT_BOTTOM,
@@ -454,6 +462,8 @@ class FCNNode(Node):
     output_data_cache: list
     input_socket_position: int
     output_socket_position: int
+    is_collapsed: bool
+    socket_spacing: int
 
     def __init__(self, scene: Scene, inputs_init_list: list = None, outputs_init_list: list = None,
                  width: int = 250, height: int = 230):
@@ -491,13 +501,16 @@ class FCNNode(Node):
         # sockets. Therefore, the sockets must already be present in the data model of the node.
         self.content.fill_content_layout()
 
-        # Reset node size, adjust content layout and recalculate socket position.
+        # Set node size, adjust content layout and recalculate socket position.
         self.grNode.height = height
+        self.grNode.default_height = height
         self.grNode.width = width
         self.content.setFixedHeight(self.grNode.height - self.grNode.title_vertical_padding -
                                     self.grNode.edge_padding - self.grNode.title_height)
         self.content.setFixedWidth(self.grNode.width - 2 * self.grNode.edge_padding)
         self.place_sockets()  # Update socket positions
+        self.is_collapsed = False
+        self.socket_spacing = 22
 
         self.output_data_cache = list()  # Internal output_data cache
         self.markDirty()  # Set node flag to dirty
@@ -522,6 +535,39 @@ class FCNNode(Node):
         for socket in self.outputs:
             socket.setSocketPosition()
 
+    def toggle_collapsed(self):
+        """Toggles node size between default and collapsed size.
+
+        Nodes can be collapsed to a smaller size to improve the clarity of a node graph. This function switches between
+        the normal and collapsed size.
+        """
+        if not self.is_collapsed:
+            # Collapse node
+            self.content.hide()
+            self.is_collapsed = True
+            self.grNode.height = self.grNode.collapsed_height
+
+            self.socket_spacing = 10
+            for socket in self.inputs:
+                socket.position = LEFT_CENTER
+            for socket in self.outputs:
+                socket.position = RIGHT_CENTER
+
+        else:
+            # Reset node to uncollapsed
+            self.content.show()
+            self.is_collapsed = False
+            self.grNode.height = self.grNode.default_height
+
+            self.socket_spacing = 22
+            for socket in self.inputs:
+                socket.position = LEFT_BOTTOM
+            for socket in self.outputs:
+                socket.position = RIGHT_BOTTOM
+
+        self.place_sockets()  # Update socket positions
+        self.updateConnectedEdges()
+
     def getSocketPosition(self, index: int, position: int, num_out_of: int = 1) -> [int, int]:
         """Calculates the position of an individual socket within the node geometry.
 
@@ -543,14 +589,20 @@ class FCNNode(Node):
 
         if hasattr(self.content, "input_labels"):
             # If input labels have already been initiated, adjust the y coordinate according the label position.
-            if position == LEFT_BOTTOM:
+            if position in (LEFT_BOTTOM, RIGHT_BOTTOM):
                 elem: QWidget = self.content.input_labels[index]
                 y = self.grNode.title_vertical_padding + self.grNode.title_height + elem.geometry().topLeft().y() + \
                     (elem.geometry().height() // 2)
-            elif position == RIGHT_BOTTOM:
-                elem: QWidget = self.content.output_labels[index]
-                y = self.grNode.title_vertical_padding + self.grNode.title_height + elem.geometry().topLeft().y() + \
-                    (elem.geometry().height() // 2)
+
+            elif position in (LEFT_CENTER, RIGHT_CENTER):
+                num_sockets = num_out_of
+                node_height = self.grNode.height
+                top_offset = self.grNode.title_vertical_padding
+                available_height = node_height
+
+                total_height_of_all_sockets = (num_sockets - 1) * self.socket_spacing + 6
+                new_top = available_height - total_height_of_all_sockets
+                y = new_top/2 + top_offset + index * self.socket_spacing
 
         return [x, y]
 
@@ -747,6 +799,32 @@ class FCNNode(Node):
         if DEBUG:
             print("%s::__onInputChanged" % self.__class__.__name__, "self.output_data_cache = ", self.output_data_cache)
 
+    def onDoubleClicked(self, event: 'QGraphicsSceneMouseEvent') -> None:
+        """Callback method for double click events.
+
+        A double click toggles the node size between default and collapsed size.
+
+        :param event: Double click event triggered by the QGraphicsScene instance.
+        :type event: QGraphicsSceneMouseEvent
+        """
+        self.toggle_collapsed()
+
+    def onDeserialized(self, data: dict):
+        self.is_collapsed: str = data["collapsed"]
+        print(self.is_collapsed)
+
+        if self.is_collapsed is True:
+            # Collapse node
+            self.content.hide()
+            self.grNode.height = self.grNode.collapsed_height
+            self.socket_spacing = 10
+            for socket in self.inputs:
+                socket.position = LEFT_CENTER
+            for socket in self.outputs:
+                socket.position = RIGHT_CENTER
+            self.place_sockets()  # Update socket positions
+            self.updateConnectedEdges()
+
     def serialize(self) -> OrderedDict:
         """Serialises the node to human-readable json file.
 
@@ -759,6 +837,7 @@ class FCNNode(Node):
 
         res = super().serialize()
         res['op_code'] = self.__class__.op_code
+        res['collapsed'] = self.is_collapsed
         return res
 
     def deserialize(self, data: dict, hashmap=None, restore_id: bool = True, *args, **kwargs) -> bool:
@@ -781,6 +860,7 @@ class FCNNode(Node):
         if hashmap is None:
             hashmap = {}
         res = super().deserialize(data, hashmap, restore_id)
+
         if DEBUG:
             print("Deserialized Node '%s'" % self.__class__.__name__, "res:", res)
         return res
