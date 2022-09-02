@@ -485,7 +485,7 @@ class FCNNode(Node):
     socket_spacing: int
 
     def __init__(self, scene: Scene, inputs_init_list: list = None, outputs_init_list: list = None,
-                 width: int = 250, height: int = 230):
+                 width: int = 250):
         """Constructor of the FCNNode class.
 
         Note:
@@ -507,8 +507,6 @@ class FCNNode(Node):
         :type outputs_init_list: list
         :param width: Width of the node.
         :type width: int
-        :param height: Height of the node.
-        :type height: int
         """
 
         self.inputs_init_list: list = inputs_init_list
@@ -521,6 +519,10 @@ class FCNNode(Node):
         self.content.fill_content_layout()
 
         # Set node size, adjust content layout and recalculate socket position.
+        height = 45 * (len(inputs_init_list) + len(outputs_init_list))
+        if len(inputs_init_list) + len(outputs_init_list) < 3:
+            # Less than 3 sockets
+            height += 30
         self.grNode.height = height
         self.grNode.default_height = height
         self.grNode.width = width

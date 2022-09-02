@@ -43,7 +43,7 @@ class ScalarMath(FCNNode):
                                            (0, "a", 1, 1, False),
                                            (0, "b", 1, 10, False)],
                          outputs_init_list=[(0, "Res", 0, 11, True)],
-                         width=150, height=180)
+                         width=150)
 
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:

@@ -57,22 +57,11 @@ class SampleNode(FCNNode):
         #                             - (Min, Max, Step) for QLineEdit
         #                             - List for QComboBox
         # multi_edge (bool): True, to allow multi edge connection from/to this socket.
-        inputs: list = [
-                       (0, "In 1", 1, 0, False),
-                       (0, "In 2", 1, 0, True),
-                       ]
+        inputs: list = [(0, "In 1", 1, 0, False),(0, "In 2", 1, 0, True)]
+        outputs: list = [(0, "Out 1", 0, 0, True), (0, "Out 2", 0, 0, True)]
+        width: int = 150
 
-        outputs: list = [
-                        (0, "Out 1", 0, 0, True),
-                        (0, "Out 2", 0, 0, True),
-                        ]
-
-        width = 150
-        height = 40 * (len(inputs) + len(outputs))
-
-        super().__init__(scene=scene,
-                         inputs_init_list=inputs, outputs_init_list=outputs,
-                         width=width, height=height)
+        super().__init__(scene=scene, inputs_init_list=inputs, outputs_init_list=outputs, width=width)
 
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:
