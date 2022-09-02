@@ -32,7 +32,7 @@ class FCNodesWorkbench(Workbench):
 
     MenuText = "FCNodes"
     ToolTip = QT_TRANSLATE_NOOP("FCNodes", "A visual scripting environment")
-    Icon = locator.icon('fcnodes.svg')
+    Icon = locator.icon('fcn_wb_icon.svg')
 
     def Initialize(self):
         # FC needs lazzy import at this point

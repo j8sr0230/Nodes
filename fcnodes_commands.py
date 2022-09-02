@@ -36,7 +36,7 @@ class FCNodes_CommandShow():
 
 
     def GetResources(self):
-        return {'Pixmap': locator.icon('fcnodes.svg'),
+        return {'Pixmap': locator.icon('fcn_wb_icon.svg'),
                 'MenuText': QT_TRANSLATE_NOOP("FCNodes_Show", "Show FCNodes window"),
                 'ToolTip': QT_TRANSLATE_NOOP("FCNodes_Show", "Show FCNodes window")}
 
