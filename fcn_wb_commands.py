@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  fcnodes_commands.py
+#  fcn_wb_commands.py
 #
-#  Copyright 2022 Florian Foinant-Willig <ffw@2f2v.fr>
+#  Copyright (c) 2022 Florian Foinant-Willig <ffw@2f2v.fr>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 ###################################################################################
 import FreeCADGui
 
-import fcnodes_locator as locator
+import fcn_locator as locator
 
 
 def QT_TRANSLATE_NOOP(scope, text):

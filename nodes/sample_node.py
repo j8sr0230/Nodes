@@ -3,7 +3,7 @@ import os
 from fcn_conf import register_node, OP_NODE_FREE_ID
 from fcn_base_node import FCNNode
 
-import fcnodes_locator as locator
+import fcn_locator as locator
 
 
 @register_node(OP_NODE_FREE_ID)

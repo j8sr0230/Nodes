@@ -3,7 +3,7 @@
 #
 #  InitGui.py
 #
-#  Copyright 2022 Florian Foinant-Willig <ffw@2f2v.fr>
+#  Copyright (c) 2022 Florian Foinant-Willig <ffw@2f2v.fr>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 
 class FCNodesWorkbench(Workbench):
 
-    import fcnodes_locator as locator
+    import fcn_locator as locator
 
     def QT_TRANSLATE_NOOP(scope, text):
         return text
@@ -45,7 +45,7 @@ class FCNodesWorkbench(Workbench):
         self.container.setCentralWidget(ne_wnd)
 
         # command list
-        import fcnodes_commands
+        import fcn_wb_commands
         self.commandList = ["FCNodes_Show"]
         self.appendToolbar("FCNodes", self.commandList)   # creates a new toolbar
         self.appendMenu("FCNodes", self.commandList)      # creates a new menu

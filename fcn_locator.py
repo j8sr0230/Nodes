@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  fcnodes_locator.py
+#  fcn_locator.py
 #
-#  Copyright 2021 Florian Foinant-Willig <ffw@2f2v.fr>
+#  Copyright (c) 2021 Florian Foinant-Willig <ffw@2f2v.fr>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
