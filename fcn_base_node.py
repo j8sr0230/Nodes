@@ -281,6 +281,7 @@ class FCNNodeContentView(QDMNodeContentWidget):
             self.layout.addRow(socket.grSocket.input_widget, socket.grSocket.label_widget)
 
         self.show()  # Hack for recalculating content geometry before updating socket position.
+        print("Init node content:", self.node.is_collapsed)
 
     def update_content_ui(self, sockets_input_data: list) -> None:
         """Updates the node content ui.
@@ -533,7 +534,9 @@ class FCNNode(Node):
         self.content.setFixedHeight(self.grNode.height - self.grNode.title_vertical_padding -
                                     self.grNode.edge_padding - self.grNode.title_height)
         self.content.setFixedWidth(self.grNode.width - 2 * self.grNode.edge_padding)
-        self.collapse_node(self.is_collapsed)  # Restore collapsed state
+
+        print("Init node:", self.is_collapsed)
+        #self.collapse_node(self.is_collapsed)  # Restore collapsed state
 
         # Update socket position and spacing
         self.place_sockets()
@@ -891,6 +894,7 @@ class FCNNode(Node):
             hashmap = {}
         res = super().deserialize(data, hashmap, restore_id)
         self.is_collapsed = bool(data['collapsed'])
+        print("Deserialize node:", self.is_collapsed)
 
         if DEBUG:
             print("Deserialized Node '%s'" % self.__class__.__name__, "res:", res)
