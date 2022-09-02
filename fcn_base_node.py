@@ -608,8 +608,13 @@ class FCNNode(Node):
 
         if hasattr(self.content, "input_labels"):
             # If input labels have already been initiated, adjust the y coordinate according the label position.
-            if position in (LEFT_BOTTOM, RIGHT_BOTTOM):
+            if position == LEFT_BOTTOM:
                 elem: QWidget = self.content.input_labels[index]
+                y = self.grNode.title_vertical_padding + self.grNode.title_height + elem.geometry().topLeft().y() + \
+                    (elem.geometry().height() // 2)
+
+            elif position == RIGHT_BOTTOM:
+                elem: QWidget = self.content.output_labels[index]
                 y = self.grNode.title_vertical_padding + self.grNode.title_height + elem.geometry().topLeft().y() + \
                     (elem.geometry().height() // 2)
 
