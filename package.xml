@@ -8,15 +8,16 @@
   <license file="LICENSE">LGPLv2.1</license>
   <url type="repository" branch="main">https://github.com/j8sr0230/fc_nodes</url>
   <url type="issues" branch="main">https://github.com/j8sr0230/fc_nodes/issues</url>
-  <icon>icons/fcn_default.png</icon>
+  <icon>icons/fcnodes.svg</icon>
 
   <content>
     <workbench>
       <name>fc_nodes</name>
-      <description></description>
-      <classname></classname>
-      <subdirectory>fc_nodes</subdirectory>
-      <icon>icons/fcn_default.png</icon>
+      <version>0.1.0</version>
+      <description>A visual scripting environment</description>
+      <classname>InitGui</classname>
+      <subdirectory>./</subdirectory>
+      <icon>icons/fcnodes.svg</icon>
       <tag>nodes</tag>
       <tag>node-editor</tag>
       <tag>scripting</tag>
