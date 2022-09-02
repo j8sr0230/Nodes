@@ -5,13 +5,12 @@ from fcn_base_node import FCNNode
 
 import fcnodes_locator as locator
 
-NODE_ID = OP_NODE_FREE_ID
 
-@register_node(NODE_ID)
+@register_node(OP_NODE_FREE_ID)
 class A_Node(FCNNode):
 
     icon: str = locator.icon("fcn_default.png")
-    op_code: int = NODE_ID
+    op_code: int = OP_NODE_FREE_ID
     op_title: str = "A Node"
     content_label_objname: str = "fcn_node_bg"
 
