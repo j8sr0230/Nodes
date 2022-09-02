@@ -4,6 +4,8 @@ OP_NODE_NUM_IN = 1
 OP_NODE_NUM_SLD = 2
 OP_NODE_SCALAR_MATH = 3
 
+OP_NODE_FREE_ID = 4
+
 FC_NODES = {
 }
 
@@ -26,6 +28,7 @@ def register_node_now(op_code, class_reference):
             op_code, FC_NODES[op_code]
         ))
     FC_NODES[op_code] = class_reference
+    OP_NODE_FREE_ID = max(OP_NODE_FREE_ID, op_code + 1)
 
 
 def register_node(op_code):
