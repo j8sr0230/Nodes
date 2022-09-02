@@ -35,7 +35,7 @@ class FCNodesWorkbench(Workbench):
     Icon = locator.icon('fcn_wb_icon.svg')
 
     def Initialize(self):
-        # FC needs lazzy import at this point
+        # FC needs lazy import at this point
         from PySide2.QtWidgets import QMainWindow
         from fcn_window import FCNWindow
 
@@ -56,5 +56,6 @@ class FCNodesWorkbench(Workbench):
 
     def GetClassName(self):
         return "Gui::PythonWorkbench"
+
 
 Gui.addWorkbench(FCNodesWorkbench())

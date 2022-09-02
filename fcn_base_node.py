@@ -512,27 +512,34 @@ class FCNNode(Node):
         self.inputs_init_list: list = inputs_init_list
         self.output_init_list: list = outputs_init_list
 
+        # Init before parent initialisation, so that it can be overwritten during deserialization.
+        self.is_collapsed = False
+
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
 
         # Fill content after parent (and socket) initialisation, because the fill_content_layout method loops over all
         # sockets. Therefore, the sockets must already be present in the data model of the node.
         self.content.fill_content_layout()
 
-        # Set node size, adjust content layout and recalculate socket position.
+        # Set node size and adjust content layout.
         height = 45 * (len(inputs_init_list) + len(outputs_init_list))
         if len(inputs_init_list) + len(outputs_init_list) < 3:
             # Less than 3 sockets
             height += 30
+
         self.grNode.height = height
         self.grNode.default_height = height
         self.grNode.width = width
         self.content.setFixedHeight(self.grNode.height - self.grNode.title_vertical_padding -
                                     self.grNode.edge_padding - self.grNode.title_height)
         self.content.setFixedWidth(self.grNode.width - 2 * self.grNode.edge_padding)
-        self.place_sockets()  # Update socket positions
-        self.is_collapsed = False
+        self.collapse_node(self.is_collapsed)  # Restore collapsed state
+
+        # Update socket position and spacing
+        self.place_sockets()
         self.socket_spacing = 22
 
+        # Initialise evaluation
         self.output_data_cache = list()  # Internal output_data cache
         self.markDirty()  # Set node flag to dirty
         self.eval()  # Start initial evaluation
@@ -556,16 +563,19 @@ class FCNNode(Node):
         for socket in self.outputs:
             socket.setSocketPosition()
 
-    def toggle_collapsed(self):
+    def collapse_node(self, collapse: bool = False):
         """Toggles node size between default and collapsed size.
 
         Nodes can be collapsed to a smaller size to improve the clarity of a node graph. This function switches between
         the normal and collapsed size.
+
+        :param collapse: Shall the node be collapsed?
+        :type collapse: bool
         """
-        if not self.is_collapsed:
+        if collapse:
             # Collapse node
-            self.content.hide()
             self.is_collapsed = True
+            self.content.hide()
             self.grNode.height = self.grNode.collapsed_height
 
             self.socket_spacing = 10
@@ -576,8 +586,8 @@ class FCNNode(Node):
 
         else:
             # Reset node to uncollapsed
-            self.content.show()
             self.is_collapsed = False
+            self.content.show()
             self.grNode.height = self.grNode.default_height
 
             self.socket_spacing = 22
@@ -833,23 +843,17 @@ class FCNNode(Node):
         :param event: Double click event triggered by the QGraphicsScene instance.
         :type event: QGraphicsSceneMouseEvent
         """
-        self.toggle_collapsed()
+        if self.is_collapsed:
+            self.collapse_node(False)
+        else:
+            self.collapse_node(True)
 
     def onDeserialized(self, data: dict):
-        self.is_collapsed: str = data["collapsed"]
-        print(self.is_collapsed)
+        """Event manually called when this node was deserialized. Currently called when node is deserialized from scene
+        Passing data containing the data which have been deserialized.
+        """
 
-        if self.is_collapsed is True:
-            # Collapse node
-            self.content.hide()
-            self.grNode.height = self.grNode.collapsed_height
-            self.socket_spacing = 10
-            for socket in self.inputs:
-                socket.position = LEFT_CENTER
-            for socket in self.outputs:
-                socket.position = RIGHT_CENTER
-            self.place_sockets()  # Update socket positions
-            self.updateConnectedEdges()
+        pass
 
     def serialize(self) -> OrderedDict:
         """Serialises the node to human-readable json file.
@@ -886,6 +890,7 @@ class FCNNode(Node):
         if hashmap is None:
             hashmap = {}
         res = super().deserialize(data, hashmap, restore_id)
+        self.is_collapsed = bool(data['collapsed'])
 
         if DEBUG:
             print("Deserialized Node '%s'" % self.__class__.__name__, "res:", res)

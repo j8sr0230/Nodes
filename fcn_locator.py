@@ -31,12 +31,14 @@ RESOURCES_PATH = os.path.join(PATH, 'resources')
 ICONS_PATH = os.path.join(PATH, 'icons')
 TRANSLATIONS_PATH = os.path.join(PATH, 'translations')
 
+
 def icon(filename):
     return os.path.join(ICONS_PATH, filename)
+
 
 def resource(filename):
     return os.path.join(RESOURCES_PATH, filename)
 
+
 def getFCNodesWorkbench():
     return FreeCADGui.getWorkbench('FCNodesWorkbench')
-
