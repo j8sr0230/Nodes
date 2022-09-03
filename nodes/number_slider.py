@@ -29,7 +29,7 @@ from qtpy.QtWidgets import QWidget, QLineEdit, QSlider
 from nodeeditor.node_node import Node
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 
-from fcn_conf import register_node, OP_NODE_FREE_ID
+from fcn_conf import register_node
 from fcn_base_node import FCNNode, FCNSocket, FCNNodeContentView
 
 
@@ -46,11 +46,10 @@ class NumberSliderContentView(FCNNodeContentView):
         slider_widget.blockSignals(False)  # Reset signals
 
 
-@register_node(OP_NODE_FREE_ID)
+@register_node
 class NumberSlider(FCNNode):
 
     icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
-    op_code: int = OP_NODE_FREE_ID
     op_title: str = "Number Slider"
     content_label_objname: str = "fcn_node_bg"
 
