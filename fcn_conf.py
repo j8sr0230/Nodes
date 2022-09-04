@@ -21,7 +21,7 @@ def register_node(class_reference):
     global OP_NODE_FREE_ID
     class_reference.op_code = OP_NODE_FREE_ID
     FC_NODES[OP_NODE_FREE_ID] = class_reference
-    OP_NODE_FREE_ID = max(OP_NODE_FREE_ID, op_code + 1)
+    OP_NODE_FREE_ID += 1
 
 
 def get_class_from_opcode(op_code):
