@@ -24,15 +24,14 @@
 ###################################################################################
 import os
 
-from fcn_conf import register_node, OP_NODE_FREE_ID
+from fcn_conf import register_node
 from fcn_base_node import FCNNode
 
 
-@register_node(OP_NODE_FREE_ID)
+@register_node
 class NumberInput(FCNNode):
 
     icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
-    op_code: int = OP_NODE_FREE_ID
     op_title: str = "Number Input"
     content_label_objname: str = "fcn_node_bg"
 

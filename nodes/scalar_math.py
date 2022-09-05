@@ -25,15 +25,14 @@
 import os
 from math import log
 
-from fcn_conf import register_node, OP_NODE_FREE_ID
+from fcn_conf import register_node
 from fcn_base_node import FCNNode
 
 
-@register_node(OP_NODE_FREE_ID)
+@register_node
 class ScalarMath(FCNNode):
 
     icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
-    op_code: int = OP_NODE_FREE_ID
     op_title: str = "Scalar Math"
     content_label_objname: str = "fcn_node_bg"
 

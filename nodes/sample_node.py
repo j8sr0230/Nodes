@@ -24,17 +24,16 @@
 ###################################################################################
 import os
 
-from fcn_conf import register_node, OP_NODE_FREE_ID
+from fcn_conf import register_node
 from fcn_base_node import FCNNode
 
 import fcn_locator as locator
 
 
-@register_node(OP_NODE_FREE_ID)
+@register_node
 class SampleNode(FCNNode):
 
     icon: str = locator.icon("fcn_default.png")
-    op_code: int = OP_NODE_FREE_ID
     op_title: str = "Sample Node"
     content_label_objname: str = "fcn_node_bg"
 
