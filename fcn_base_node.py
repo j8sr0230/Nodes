@@ -458,6 +458,7 @@ class FCNNode(Node):
         input_socket_position (int): Initial position of the input sockets, referring to node_sockets.py.
         output_socket_position (int): Initial position of the output sockets, referring to node_sockets.py.
         socket_spacing (int): Vertical distance between individual socket circles.
+        default_title (str): Stores the default title of the node for resetting purpose.
 
      Note:
         If input_socket_position is set to LEFT_BOTTOM and output_socket_position is set to RIGHT_BOTTOM,
@@ -480,6 +481,7 @@ class FCNNode(Node):
     input_socket_position: int
     output_socket_position: int
     socket_spacing: int
+    default_title: str
 
     def __init__(self, scene: Scene, inputs_init_list: list = None, outputs_init_list: list = None,
                  width: int = 250):
@@ -531,6 +533,8 @@ class FCNNode(Node):
         # Update socket position and spacing
         self.place_sockets()
         self.socket_spacing = 22
+
+        self.default_title = self.title
 
         # Initialise evaluation
         self.output_data_cache = list()  # Internal output_data cache
@@ -742,6 +746,11 @@ class FCNNode(Node):
         """
 
         self.update_content_status()  # Update node content widgets
+
+        if self.content.isHidden():
+            # Hack: Updates the node title
+            self.collapse_node(False)
+            self.collapse_node(True)
 
         # Build input data structure
         sockets_input_data: list = []  # Container for input data

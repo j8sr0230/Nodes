@@ -62,6 +62,14 @@ class NumberSlider(FCNNode):
                          outputs_init_list=[(0, "Out", 0, 0.0, True)],
                          width=250)
 
+    def collapse_node(self, collapse: bool = False):
+        super().collapse_node(collapse)
+
+        if collapse is True:
+            self.title = str(self.content.input_widgets[2].value())
+        else:
+            self.title = self.default_title
+
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:
         sld_val: float = sockets_input_data[2][0]

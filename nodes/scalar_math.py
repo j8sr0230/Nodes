@@ -44,6 +44,14 @@ class ScalarMath(FCNNode):
                          outputs_init_list=[(0, "Res", 0, 11, True)],
                          width=150)
 
+    def collapse_node(self, collapse: bool = False):
+        super().collapse_node(collapse)
+
+        if collapse is True:
+            self.title = self.content.input_widgets[0].currentText()
+        else:
+            self.title = self.default_title
+
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:
         # Inputs
