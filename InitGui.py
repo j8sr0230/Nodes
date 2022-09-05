@@ -36,13 +36,11 @@ class FCNodesWorkbench(Workbench):
 
     def Initialize(self):
         # FC needs lazy import at this point
-        from PySide2.QtWidgets import QMainWindow
         from fcn_window import FCNWindow
 
         # Prepare the window
-        ne_wnd = FCNWindow()
-        self.container = QMainWindow(parent=FreeCADGui.getMainWindow())
-        self.container.setCentralWidget(ne_wnd)
+        node_editor_wnd = FCNWindow()
+        FreeCAD.fc_nodes_window = node_editor_wnd
 
         # command list
         import fcn_wb_commands
