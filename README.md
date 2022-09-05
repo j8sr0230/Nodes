@@ -28,13 +28,9 @@ the unzipped `fc_nodes-main` folder and restart FreeCAD.
 Now you can run the file `main.py` as a FreeCAD macro.
 
 ## Usage
-# FCNNode features
-Tutorials coming soon!
+### FCNNode features
 ![FCNNode features](https://github.com/j8sr0230/fc_nodes/blob/main/img/fcn_base_node_features.gif)
-
-
-
-
+Tutorials coming soon!
 
 ## License
 
