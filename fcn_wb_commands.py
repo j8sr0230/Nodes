@@ -34,7 +34,6 @@ def QT_TRANSLATE_NOOP(scope, text):
 class FCNodes_CommandShow():
     """Show FCNodes window"""
 
-
     def GetResources(self):
         return {'Pixmap': locator.icon('fcn_wb_icon.svg'),
                 'MenuText': QT_TRANSLATE_NOOP("FCNodes_Show", "Show FCNodes window"),
