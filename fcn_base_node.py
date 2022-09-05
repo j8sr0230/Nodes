@@ -279,9 +279,7 @@ class FCNNodeContentView(QDMNodeContentWidget):
             self.output_labels.append(socket.grSocket.input_widget)
             self.output_widgets.append(socket.grSocket.label_widget)
             self.layout.addRow(socket.grSocket.input_widget, socket.grSocket.label_widget)
-
         self.show()  # Hack for recalculating content geometry before updating socket position.
-        print("Init node content:", self.node.is_collapsed)
 
     def update_content_ui(self, sockets_input_data: list) -> None:
         """Updates the node content ui.
@@ -459,7 +457,6 @@ class FCNNode(Node):
         output_data_cache (list): Cache storage for the result of the node evaluation.
         input_socket_position (int): Initial position of the input sockets, referring to node_sockets.py.
         output_socket_position (int): Initial position of the output sockets, referring to node_sockets.py.
-        is_collapsed (bool): Is the node collapsed?
         socket_spacing (int): Vertical distance between individual socket circles.
 
      Note:
@@ -482,7 +479,6 @@ class FCNNode(Node):
     output_data_cache: list
     input_socket_position: int
     output_socket_position: int
-    is_collapsed: bool
     socket_spacing: int
 
     def __init__(self, scene: Scene, inputs_init_list: list = None, outputs_init_list: list = None,
@@ -513,9 +509,6 @@ class FCNNode(Node):
         self.inputs_init_list: list = inputs_init_list
         self.output_init_list: list = outputs_init_list
 
-        # Init before parent initialisation, so that it can be overwritten during deserialization.
-        self.is_collapsed = False
-
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
 
         # Fill content after parent (and socket) initialisation, because the fill_content_layout method loops over all
@@ -534,9 +527,6 @@ class FCNNode(Node):
         self.content.setFixedHeight(self.grNode.height - self.grNode.title_vertical_padding -
                                     self.grNode.edge_padding - self.grNode.title_height)
         self.content.setFixedWidth(self.grNode.width - 2 * self.grNode.edge_padding)
-
-        print("Init node:", self.is_collapsed)
-        #self.collapse_node(self.is_collapsed)  # Restore collapsed state
 
         # Update socket position and spacing
         self.place_sockets()
@@ -567,17 +557,18 @@ class FCNNode(Node):
             socket.setSocketPosition()
 
     def collapse_node(self, collapse: bool = False):
-        """Toggles node size between default and collapsed size.
+        """Toggles node state between default and collapsed.
 
         Nodes can be collapsed to a smaller size to improve the clarity of a node graph. This function switches between
-        the normal and collapsed size.
+        the normal and collapsed node size, by showing or hiding the node content and adjusting the corresponding
+        socket and edge positions.
 
-        :param collapse: Shall the node be collapsed?
+        :param collapse: Shall the node collapse (True or False)?
         :type collapse: bool
         """
-        if collapse:
+
+        if collapse is True:
             # Collapse node
-            self.is_collapsed = True
             self.content.hide()
             self.grNode.height = self.grNode.collapsed_height
 
@@ -589,7 +580,6 @@ class FCNNode(Node):
 
         else:
             # Reset node to uncollapsed
-            self.is_collapsed = False
             self.content.show()
             self.grNode.height = self.grNode.default_height
 
@@ -846,7 +836,8 @@ class FCNNode(Node):
         :param event: Double click event triggered by the QGraphicsScene instance.
         :type event: QGraphicsSceneMouseEvent
         """
-        if self.is_collapsed:
+
+        if self.content.isHidden():
             self.collapse_node(False)
         else:
             self.collapse_node(True)
@@ -856,7 +847,7 @@ class FCNNode(Node):
         Passing data containing the data which have been deserialized.
         """
 
-        pass
+        self.collapse_node(bool(data['is_collapsed']))
 
     def serialize(self) -> OrderedDict:
         """Serialises the node to human-readable json file.
@@ -870,7 +861,7 @@ class FCNNode(Node):
 
         res = super().serialize()
         res['op_code'] = self.__class__.op_code
-        res['collapsed'] = self.is_collapsed
+        res['is_collapsed'] = self.content.isHidden()
         return res
 
     def deserialize(self, data: dict, hashmap=None, restore_id: bool = True, *args, **kwargs) -> bool:
@@ -893,8 +884,6 @@ class FCNNode(Node):
         if hashmap is None:
             hashmap = {}
         res = super().deserialize(data, hashmap, restore_id)
-        self.is_collapsed = bool(data['collapsed'])
-        print("Deserialize node:", self.is_collapsed)
 
         if DEBUG:
             print("Deserialized Node '%s'" % self.__class__.__name__, "res:", res)

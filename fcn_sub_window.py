@@ -53,10 +53,6 @@ class FCNSubWindow(NodeEditorWidget):
                 if hasattr(node, "update_content_status"):
                     # If implemented
                     node.update_content_status()
-                    node.content.hide()  # Hack or recalculating content geometry before updating socket position
-                    node.content.show()  # Hack (see above comment)
-                    node.place_sockets()  # Replace socket positions
-                    node.updateConnectedEdges()  # Update edge position
             return True
         return False
 
