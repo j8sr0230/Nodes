@@ -24,7 +24,8 @@
 ###################################################################################
 import sys
 
-from qtpy.QtWidgets import QApplication, QMainWindow
+from qtpy.QtWidgets import QApplication
+import FreeCAD
 import FreeCADGui
 
 from fcn_window import FCNWindow
@@ -33,10 +34,9 @@ from fcn_window import FCNWindow
 if __name__ == '__main__':
     if hasattr(FreeCADGui, "getMainWindow"):
         # Start app embedded in FreeCAD
-        container = QMainWindow(parent=FreeCADGui.getMainWindow())
-        ne_wnd = FCNWindow()
-        container.setCentralWidget(ne_wnd)
-        container.show()
+        node_editor_wnd = FCNWindow()
+        FreeCAD.fc_nodes_window = node_editor_wnd
+        node_editor_wnd.show()
     else:
         # Start app in standalone mode
         app = QApplication(sys.argv)

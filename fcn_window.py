@@ -91,28 +91,28 @@ class FCNWindow(NodeEditorWindow):
             self.writeSettings()
             event.accept()
             # hacky fix for PyQt 5.14.x
-            import sys
-            sys.exit(0)
+            # import sys
+            # sys.exit(0)
 
     def createActions(self):
         super().createActions()
-        self.act_close = QAction("Cl&ose", self, statusTip="Close the active window",
+        self.act_close = QAction("Close", self, statusTip="Close the active window",
                                  triggered=self.mdi_area.closeActiveSubWindow)
-        self.act_close_all = QAction("Close &All", self, statusTip="Close all the windows",
+        self.act_close_all = QAction("Close All", self, statusTip="Close all the windows",
                                      triggered=self.mdi_area.closeAllSubWindows)
-        self.act_tile = QAction("&Tile", self, statusTip="Tile the windows",
+        self.act_tile = QAction("Tile", self, statusTip="Tile the windows",
                                 triggered=self.mdi_area.tileSubWindows)
-        self.act_cascade = QAction("&Cascade", self, statusTip="Cascade the windows",
+        self.act_cascade = QAction("Cascade", self, statusTip="Cascade the windows",
                                    triggered=self.mdi_area.cascadeSubWindows)
-        self.act_next = QAction("Ne&xt", self, shortcut=QKeySequence.NextChild,
+        self.act_next = QAction("Next", self, shortcut=QKeySequence.NextChild,
                                 statusTip="Move the focus to the next window",
                                 triggered=self.mdi_area.activateNextSubWindow)
-        self.act_previous = QAction("Pre&vious", self, shortcut=QKeySequence.PreviousChild,
+        self.act_previous = QAction("Previous", self, shortcut=QKeySequence.PreviousChild,
                                     statusTip="Move the focus to the previous window",
                                     triggered=self.mdi_area.activatePreviousSubWindow)
         self.act_separator = QAction(self)
         self.act_separator.setSeparator(True)
-        self.act_about = QAction("&About", self, statusTip="Show the application's About box", triggered=self.about)
+        self.act_about = QAction("About", self, statusTip="Show the application's About box", triggered=self.about)
 
     def getCurrentNodeEditorWidget(self):
         """ we're returning NodeEditorWidget here... """
