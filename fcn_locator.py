@@ -30,6 +30,7 @@ PATH = os.path.dirname(__file__)
 RESOURCES_PATH = os.path.join(PATH, 'resources')
 ICONS_PATH = os.path.join(PATH, 'icons')
 TRANSLATIONS_PATH = os.path.join(PATH, 'translations')
+NODES_PATH = os.path.join(PATH, 'nodes')
 
 
 def icon(filename):
