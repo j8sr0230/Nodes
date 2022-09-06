@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  scalar_math.py
+#  basic_math.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -23,24 +23,24 @@
 #
 ###################################################################################
 import os
-from math import log
+import numpy as np
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 
 
 @register_node
-class ScalarMath(FCNNode):
+class BasicMath(FCNNode):
 
     icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
-    op_title: str = "Scalar Math"
+    op_title: str = "Basic Math"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Op", 3, ["a+b", "a-b", "a*b", "a/b", "a^b", "log_b(a)", ], False),
-                                           (0, "a", 1, 1, False),
-                                           (0, "b", 1, 10, False)],
+                         inputs_init_list=[(0, "Op", 3, ["a+b", "a-b", "a*b", "a/b", "a^b", ], False),
+                                           (0, "a", 1, 1, True),
+                                           (0, "b", 1, 10, True)],
                          outputs_init_list=[(0, "Res", 0, 11, True)],
                          width=150)
 
@@ -48,7 +48,7 @@ class ScalarMath(FCNNode):
         super().collapse_node(collapse)
 
         if collapse is True:
-            self.title = self.content.input_widgets[0].currentText()
+            self.title = "Math: " + self.content.input_widgets[0].currentText()
         else:
             self.title = self.default_title
 
@@ -56,22 +56,20 @@ class ScalarMath(FCNNode):
     def eval_operation(sockets_input_data: list) -> list:
         # Inputs
         op_code: int = sockets_input_data[0][0]
-        a: float = sockets_input_data[1][0]
-        b: float = sockets_input_data[2][0]
+        a_array = np.array(sockets_input_data[1])
+        b_array = np.array(sockets_input_data[2])
 
         # Outputs
         if op_code == 0:  # Add
-            return [[a + b]]
+            res = [a_array + b_array]
         elif op_code == 1:  # Sub
-            return [[a - b]]
+            res = [a_array - b_array]
         elif op_code == 2:  # Mul
-            return [[a * b]]
+            res = [a_array * b_array]
         elif op_code == 3:  # Div
-            return [[a / b]]
+            res = [a_array / b_array]
         elif op_code == 4:  # Pow
-            return [[a ** b]]
-        elif op_code == 5:  # Log
-            return [[log(a, b)]]
-
+            res = [a_array ** b_array]
         else:
             raise ValueError("Unknown operation (Op)")
+        return res

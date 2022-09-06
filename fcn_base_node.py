@@ -136,8 +136,19 @@ class FCNSocketView(QDMGraphicsSocket):
                 connected_output_index: int = self.socket.edges[0].getOtherSocket(self.socket).index
 
                 if isinstance(self.input_widget, QLineEdit):
-                    str_num: str = str(np.array(connected_node.eval(connected_output_index)).flat[0])
-                    self.input_widget.setText('%.2E' % Decimal(str_num))  # Display in scientific notation
+                    input_object = connected_node.eval(connected_output_index)
+                    if len(input_object) == 1:
+                        # List with on element
+                        socket_input: object = input_object[0]
+                        if isinstance(socket_input, np.ndarray):
+                            self.input_widget.setText("<list>")
+                        else:
+                            # Display in scientific notation
+                            self.input_widget.setText("%.2E" % Decimal(str(socket_input)))
+
+                    else:
+                        self.input_widget.setText("<list>")
+
                 elif isinstance(self.input_widget, QSlider):
                     self.input_widget.setValue(int(np.array(connected_node.eval(connected_output_index)).flat[0]))
                 elif isinstance(self.input_widget, QComboBox):
@@ -147,7 +158,7 @@ class FCNSocketView(QDMGraphicsSocket):
             else:
                 # Multiple edges at one socket
                 if isinstance(self.input_widget, QLineEdit):
-                    self.input_widget.setText("=o")
+                    self.input_widget.setText("<multi>")
 
     def update_widget_status(self):
         """Updates the input widget state.
@@ -725,6 +736,10 @@ class FCNNode(Node):
             output_data: list = self.eval_primer()
             return output_data[index]
         except ValueError as e:
+            self.markInvalid()
+            self.grNode.setToolTip(str(e))
+            self.markDescendantsDirty()
+        except TypeError as e:
             self.markInvalid()
             self.grNode.setToolTip(str(e))
             self.markDescendantsDirty()
