@@ -144,7 +144,7 @@ class FCNSocketView(QDMGraphicsSocket):
                             self.input_widget.setText("<list>")
                         else:
                             # Display in scientific notation
-                            self.input_widget.setText("%.2E" % Decimal(str(socket_input)))
+                            self.input_widget.setText("%.2E" % Decimal(str(np.array(socket_input).flatten()[0])))
 
                     else:
                         self.input_widget.setText("<list>")
