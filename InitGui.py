@@ -39,8 +39,7 @@ class FCNodesWorkbench(Workbench):
         from fcn_window import FCNWindow
 
         # Prepare the window
-        node_editor_wnd = FCNWindow()
-        FreeCAD.fc_nodes_window = node_editor_wnd
+        self.window = FCNWindow()
 
         # command list
         import fcn_wb_commands
