@@ -24,13 +24,13 @@
 ###################################################################################
 import os
 from math import floor
+from decimal import Decimal
 
-from qtpy.QtWidgets import QWidget, QLineEdit, QSlider
-from nodeeditor.node_node import Node
+from qtpy.QtWidgets import QSlider
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 
 from fcn_conf import register_node
-from fcn_base_node import FCNNode, FCNSocket, FCNNodeContentView
+from fcn_base_node import FCNNode, FCNNodeContentView
 
 
 class NumberSliderContentView(FCNNodeContentView):
@@ -60,13 +60,13 @@ class NumberSlider(FCNNode):
                          inputs_init_list=[(0, "Min", 1, 0, False), (0, "Max", 1, 100, False),
                                            (0, "Val", 2, (0, 100, 50), False)],
                          outputs_init_list=[(0, "Out", 0, 0.0, True)],
-                         width=250)
+                         width=150)
 
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)
 
         if collapse is True:
-            self.title = str(self.content.input_widgets[2].value())
+            self.title = 'Sld In: %.2E' % Decimal(str(self.content.input_widgets[2].value()))
         else:
             self.title = self.default_title
 

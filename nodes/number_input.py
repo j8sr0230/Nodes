@@ -23,6 +23,7 @@
 #
 ###################################################################################
 import os
+from decimal import Decimal
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
@@ -44,7 +45,7 @@ class NumberInput(FCNNode):
         super().collapse_node(collapse)
 
         if collapse is True:
-            self.title = self.content.input_widgets[0].text()
+            self.title = 'Num In: %.2E' % Decimal(self.content.input_widgets[0].text())
         else:
             self.title = self.default_title
 

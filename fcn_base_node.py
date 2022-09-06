@@ -47,10 +47,9 @@ from qtpy.QtCore import QRectF, Qt
 from qtpy.QtWidgets import QWidget, QFormLayout, QLabel, QLineEdit, QSlider, QComboBox
 from nodeeditor.node_scene import Scene
 from nodeeditor.node_node import Node
-from nodeeditor.node_edge import Edge
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_content_widget import QDMNodeContentWidget
-from nodeeditor.node_socket import Socket, LEFT_BOTTOM, RIGHT_BOTTOM, LEFT_TOP, RIGHT_TOP, LEFT_CENTER, RIGHT_CENTER
+from nodeeditor.node_socket import Socket, LEFT_BOTTOM, RIGHT_BOTTOM, LEFT_CENTER, RIGHT_CENTER
 from nodeeditor.node_graphics_socket import QDMGraphicsSocket
 from nodeeditor.utils import dumpException
 
@@ -749,7 +748,6 @@ class FCNNode(Node):
 
         if self.content.isHidden():
             # Hack: Updates the node title
-            self.collapse_node(False)
             self.collapse_node(True)
 
         # Build input data structure
@@ -837,7 +835,7 @@ class FCNNode(Node):
         if DEBUG:
             print("%s::__onInputChanged" % self.__class__.__name__, "self.output_data_cache = ", self.output_data_cache)
 
-    def onDoubleClicked(self, event: 'QGraphicsSceneMouseEvent') -> None:
+    def onDoubleClicked(self, event) -> None:
         """Callback method for double click events.
 
         A double click toggles the node size between default and collapsed size.
