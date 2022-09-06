@@ -66,13 +66,16 @@ class NumberSlider(FCNNode):
         super().collapse_node(collapse)
 
         if collapse is True:
-            self.title = 'Sld In: %.2E' % Decimal(str(self.content.input_widgets[2].value()))
+            self.title = 'In: %.2E' % Decimal(str(self.content.input_widgets[2].value()))
         else:
             self.title = self.default_title
 
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:
-        sld_val: float = sockets_input_data[2][0]
-        out_val: list = [sld_val]
+        min_val: int = sockets_input_data[0][0]
+        max_val: int = sockets_input_data[1][0]
+        clamped_val: float = max(min(sockets_input_data[2][0], max_val), min_val)
+
+        out_val: list = [clamped_val]
         result: list = [out_val]
         return result

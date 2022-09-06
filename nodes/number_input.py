@@ -45,7 +45,7 @@ class NumberInput(FCNNode):
         super().collapse_node(collapse)
 
         if collapse is True:
-            self.title = 'Num In: %.2E' % Decimal(self.content.input_widgets[0].text())
+            self.title = 'In: %.2E' % Decimal(self.content.input_widgets[0].text())
         else:
             self.title = self.default_title
 
