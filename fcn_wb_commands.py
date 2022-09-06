@@ -40,7 +40,7 @@ class FCNodes_CommandShow():
                 'ToolTip': QT_TRANSLATE_NOOP("FCNodes_Show", "Show FCNodes window")}
 
     def Activated(self):
-        locator.getFCNodesWorkbench().container.show()
+        locator.getFCNodesWorkbench().window.show()
 
     def IsActive(self):
         return True
