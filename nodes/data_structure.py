@@ -55,7 +55,6 @@ class DataStructure(FCNNode):
         # Inputs
         op_code: int = sockets_input_data[0][0]
         in_array = np.array(sockets_input_data[1])
-        print(in_array)
 
         # Outputs
         if op_code == 0:  # Graft
