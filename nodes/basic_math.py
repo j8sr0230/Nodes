@@ -61,15 +61,16 @@ class BasicMath(FCNNode):
 
         # Outputs
         if op_code == 0:  # Add
-            res = [a_array + b_array]
+            res = a_array + b_array
         elif op_code == 1:  # Sub
-            res = [a_array - b_array]
+            res = a_array - b_array
         elif op_code == 2:  # Mul
-            res = [a_array * b_array]
+            res = a_array * b_array
         elif op_code == 3:  # Div
-            res = [a_array / b_array]
+            res = a_array / b_array
         elif op_code == 4:  # Pow
-            res = [a_array ** b_array]
+            res = a_array ** b_array
         else:
             raise ValueError("Unknown operation (Op)")
-        return res
+
+        return [np.array(res).tolist()]

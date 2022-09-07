@@ -35,8 +35,8 @@ from fcn_base_node import FCNNode, FCNNodeContentView
 
 class NumberSliderContentView(FCNNodeContentView):
     def update_content_ui(self, sockets_input_data: list) -> None:
-        slider_min: float = sockets_input_data[0][0]
-        slider_max: float = sockets_input_data[1][0]
+        slider_min: float = float(sockets_input_data[0][0])
+        slider_max: float = float(sockets_input_data[1][0])
         slider_widget: QSlider = self.input_widgets[2]
 
         # Updates slider value according to the input values
@@ -72,10 +72,8 @@ class NumberSlider(FCNNode):
 
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:
-        min_val: int = sockets_input_data[0][0]
-        max_val: int = sockets_input_data[1][0]
-        clamped_val: float = max(min(sockets_input_data[2][0], max_val), min_val)
+        min_val: float = float(sockets_input_data[0][0])
+        max_val: float = float(sockets_input_data[1][0])
+        clamped_val: float = max(min(sockets_input_data[2][0], int(max_val)), int(min_val))
 
-        out_val: list = [clamped_val]
-        result: list = [out_val]
-        return result
+        return [[clamped_val]]

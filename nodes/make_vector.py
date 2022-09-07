@@ -46,24 +46,13 @@ class MakeVector(FCNNode):
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:
         # Inputs
-        x_array = np.array(sockets_input_data[0])
-        y_array = np.array(sockets_input_data[1])
-        z_array = np.array(sockets_input_data[2])
+        x_in = np.array(sockets_input_data[0], dtype=object)
+        y_in = np.array(sockets_input_data[1], dtype=object)
+        z_in = np.array(sockets_input_data[2], dtype=object)
 
-        x_vector = x_array * np.array([1, 0, 0])
-        y_vector = y_array * np.array([0, 1, 0])
-        z_vector = z_array * np.array([0, 0, 1])
+        x_vector = x_in * np.array([1, 0, 0])
+        y_vector = y_in * np.array([0, 1, 0])
+        z_vector = z_in * np.array([0, 0, 1])
 
-        matrix = x_vector + y_vector + z_vector
-        matrix_shape = matrix.shape
-        print(matrix_shape)
-        vector_list_shape = (np.prod(matrix_shape[:-1]), 3)
-        vector_list = matrix.flatten().reshape(vector_list_shape)
-
-        res = []
-        for vec in vector_list:
-            res.append(Vector(vec))
-
-        res = np.matrix(res, dtype=Vector)
-        print(res.shape)
-        return res
+        res = x_vector + y_vector + z_vector
+        return [[np.array(res).tolist()]]

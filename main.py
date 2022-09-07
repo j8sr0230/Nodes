@@ -25,10 +25,15 @@
 import sys
 
 from qtpy.QtWidgets import QApplication
+from qtpy.QtCore import Qt
 import FreeCAD
 import FreeCADGui
 
 from fcn_window import FCNWindow
+
+
+QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)  # Enable high dpi scaling
+QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)  # Use high dpi icons
 
 
 if __name__ == '__main__':

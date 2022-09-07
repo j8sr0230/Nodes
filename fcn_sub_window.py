@@ -40,8 +40,8 @@ class FCNSubWindow(NodeEditorWidget):
     def do_eval_outputs(self):
         # eval all output nodes
         for node in self.scene.nodes:
-            if node.__class__.__name__ == "NumberOutputNode":
-                node.eval()
+            node.markDirty()
+            node.eval()
 
     def on_history_restored(self):
         self.do_eval_outputs()

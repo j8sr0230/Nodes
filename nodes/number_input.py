@@ -55,7 +55,5 @@ class NumberInput(FCNNode):
 
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:
-        in_val: float = sockets_input_data[0][0]
-        out_val: list = [in_val]
-        result: list = [out_val]
-        return result
+        in_val: float = float(sockets_input_data[0][0])
+        return [[in_val]]

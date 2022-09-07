@@ -56,7 +56,7 @@ class SampleNode(FCNNode):
         #                             - (Min, Max, Step) for QLineEdit
         #                             - List for QComboBox
         # multi_edge (bool): True, to allow multi edge connection from/to this socket.
-        inputs: list = [(0, "In 1", 1, 0, False),(0, "In 2", 1, 0, True)]
+        inputs: list = [(0, "In 1", 1, 0, False), (0, "In 2", 1, 0, True)]
         outputs: list = [(0, "Out 1", 0, 0, True), (0, "Out 2", 0, 0, True)]
         width: int = 150
 
@@ -85,18 +85,17 @@ class SampleNode(FCNNode):
         """
 
         # Retrieve inputs data from the first connected edge of the first socket.
-        first_in_val: float = sockets_input_data[0][0]
+        first_in_val: float = float(sockets_input_data[0][0])
 
         # Retrieve inputs data from all connected edges of the second socket
         # (second index is the edge in multi_edge case).
         second_in_val: list = []
         for edge_value in sockets_input_data[1]:
-            second_in_val.append(edge_value)  # Add all values
+            second_in_val.append(float(edge_value))  # Add all values
 
         # Compute output data
         first_out_val: list = [first_in_val + second_in_val[0]]
         second_out_val: list = [first_in_val - second_in_val[0]]
 
         # Return output data as a list with one sublist per output socket.
-        result: list = [first_out_val, second_out_val]
-        return result
+        return [first_out_val, second_out_val]

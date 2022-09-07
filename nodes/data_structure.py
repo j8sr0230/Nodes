@@ -38,8 +38,8 @@ class DataStructure(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Op", 3, ["Graft", "Flat", ], False), (0, "In", 1, 0, True)],
-                         outputs_init_list=[(0, "Out", 0, 0, True)],
+                         inputs_init_list=[(0, "Op", 3, ["Graft", "Flat", ], False), (6, "In", 1, 0, True)],
+                         outputs_init_list=[(6, "Out", 0, 0, True)],
                          width=150)
 
     def collapse_node(self, collapse: bool = False):
@@ -54,13 +54,13 @@ class DataStructure(FCNNode):
     def eval_operation(sockets_input_data: list) -> list:
         # Inputs
         op_code: int = sockets_input_data[0][0]
-        in_array = np.array(sockets_input_data[1])
+        in_array = sockets_input_data[1]
 
         # Outputs
         if op_code == 0:  # Graft
             res = [[val] for val in in_array]
         elif op_code == 1:  # Flat
-            res = [in_array.flatten()]
+            res = np.array(in_array).flatten().tolist()
         else:
             raise ValueError("Unknown operation (Op)")
         return [res]

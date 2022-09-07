@@ -134,27 +134,29 @@ class FCNSocketView(QDMGraphicsSocket):
                 # If one edge is connected to the socket
                 connected_node: Node = self.socket.node.getInput(self.socket.index)
                 connected_output_index: int = self.socket.edges[0].getOtherSocket(self.socket).index
+                input_list = connected_node.eval(connected_output_index)
 
                 if isinstance(self.input_widget, QLineEdit):
-                    input_object = connected_node.eval(connected_output_index)
-                    if len(input_object) == 1:
-                        # List with on element
-                        socket_input: object = input_object[0]
-                        if isinstance(socket_input, np.ndarray):
+                    if len(input_list) == 1:
+                        # List with on element (maybe another list)
+                        if isinstance(input_list[0], int) or isinstance(input_list[0], float):
+                            self.input_widget.setText("%.2E" % Decimal(str(input_list[0])))
+                        elif isinstance(input_list[0], str):
+                            self.input_widget.setText(input_list[0])
+                        elif isinstance(input_list[0], list):
                             self.input_widget.setText("<list>")
                         else:
-                            # Display in scientific notation
-                            self.input_widget.setText("%.2E" % Decimal(str(np.array(socket_input).flatten()[0])))
-
+                            self.input_widget.setText("<unknown>")
                     else:
                         self.input_widget.setText("<list>")
 
                 elif isinstance(self.input_widget, QSlider):
-                    self.input_widget.setValue(int(np.array(connected_node.eval(connected_output_index)).flat[0]))
+                    if isinstance(input_list[0], int) or isinstance(input_list[0], float):
+                        self.input_widget.setValue(int(input_list[0]))
+
                 elif isinstance(self.input_widget, QComboBox):
-                    self.input_widget.setCurrentIndex(
-                        int(np.array(connected_node.eval(connected_output_index)).flat[0])
-                    )
+                    if isinstance(input_list[0], int):
+                        self.input_widget.setCurrentIndex(input_list[0])
             else:
                 # Multiple edges at one socket
                 if isinstance(self.input_widget, QLineEdit):
@@ -522,17 +524,15 @@ class FCNNode(Node):
         self.output_init_list: list = outputs_init_list
 
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
+        self.default_title = self.title
 
         # Fill content after parent (and socket) initialisation, because the fill_content_layout method loops over all
         # sockets. Therefore, the sockets must already be present in the data model of the node.
         self.content.fill_content_layout()
 
         # Set node size and adjust content layout.
-        height = 45 * (len(inputs_init_list) + len(outputs_init_list))
-        if len(inputs_init_list) + len(outputs_init_list) < 3:
-            # Less than 3 sockets
-            height += 30
-
+        height = (self.content.layout.totalMinimumSize().height() + self.grNode.title_height +
+                  2*self.grNode.edge_padding)
         self.grNode.height = height
         self.grNode.default_height = height
         self.grNode.width = width
@@ -543,8 +543,6 @@ class FCNNode(Node):
         # Update socket position and spacing
         self.place_sockets()
         self.socket_spacing = 22
-
-        self.default_title = self.title
 
         # Initialise evaluation
         self.output_data_cache = list()  # Internal output_data cache
@@ -769,7 +767,6 @@ class FCNNode(Node):
         sockets_input_data: list = []  # Container for input data
         for socket in self.inputs:
             socket_input_data: list = []
-
             if socket.hasAnyEdge():
                 # From connected nodes
                 for edge in socket.edges:
@@ -784,11 +781,14 @@ class FCNNode(Node):
                 socket_input_widget: QWidget = socket.grSocket.input_widget
                 if socket_input_widget is not None:
                     if isinstance(socket_input_widget, QLineEdit):
-                        input_value: float = float(socket_input_widget.text())
-                        socket_input_data.append(input_value)
+                        input_str: str = socket_input_widget.text()
+                        try:
+                            socket_input_data.append(float(input_str))
+                        except ValueError:  # as e:
+                            socket_input_data.append(input_str)
 
                     elif isinstance(socket_input_widget, QSlider):
-                        input_value = int(socket_input_widget.value())
+                        input_value: int = socket_input_widget.value()
                         socket_input_data.append(input_value)
 
                     elif isinstance(socket_input_widget, QComboBox):
