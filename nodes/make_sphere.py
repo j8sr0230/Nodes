@@ -49,7 +49,7 @@ class ObjectInput(FCNNode):
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:
         sphere_radius: float = float(sockets_input_data[0][0])
-        position_list: ndarray = np.array(sockets_input_data[1]).flatten()
+        position_list: list = sockets_input_data[1]
 
         sphere_list = []
         for pos in position_list:
