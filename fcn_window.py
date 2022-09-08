@@ -24,9 +24,9 @@ from fcn_conf import FC_NODES
 Edge.registerEdgeValidator(edge_cannot_connect_two_outputs_or_two_inputs)
 Edge.registerEdgeValidator(edge_cannot_connect_input_and_output_of_same_node)
 
-# local validator to use string type
 from fnmatch import fnmatch
 
+# local validator to use string type
 def edge_cannot_connect_input_and_output_of_different_type(input: 'FCNSocket', output: 'FCNSocket'):
     for out_type in output.socket_str_type:
         if fnmatch(input.socket_str_type, out_type):
