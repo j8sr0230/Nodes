@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  object_input.py
+#  set_shape.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -26,44 +26,35 @@ import os
 from decimal import Decimal
 
 from FreeCAD import ActiveDocument
+from Part import makeCompound
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 
 
 @register_node
-class ObjectInput(FCNNode):
+class SetShape(FCNNode):
 
     icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
-    op_title: str = "Object Input"
+    op_title: str = "Set Shape"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(3, "In", 1, "Object label", True)],
+                         inputs_init_list=[(4, "Obj", 0, 0, True), (5, "Shp", 0, "0", False)],
                          outputs_init_list=[(4, "Obj", 0, 0, True)],
                          width=150)
 
-    def collapse_node(self, collapse: bool = False):
-        super().collapse_node(collapse)
-
-        if collapse is True:
-            self.title = 'Obj: ' + self.content.input_widgets[0].text()
-        else:
-            self.title = self.default_title
-
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:
-        label_list: list = sockets_input_data[0]
-        obj_list: list = []
+        obj_list: list = sockets_input_data[0]
+        compound: Compound = makeCompound(sockets_input_data[1])
 
         if not (ActiveDocument is None):
-            for label in label_list:
-                obj = ActiveDocument.getObjectsByLabel(label)
-                if len(obj) == 1:
-                    obj_list.append(obj[0])
-                else:
-                    raise ValueError('Unknown object')
+            for obj in obj_list:
+                obj.Shape = compound
+
+            ActiveDocument.recompute()
         else:
             raise Exception('No active document')
 

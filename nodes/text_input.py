@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  object_input.py
+#  text_input.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -25,46 +25,32 @@
 import os
 from decimal import Decimal
 
-from FreeCAD import ActiveDocument
-
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 
 
 @register_node
-class ObjectInput(FCNNode):
+class TextInput(FCNNode):
 
     icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
-    op_title: str = "Object Input"
+    op_title: str = "Text Input"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(3, "In", 1, "Object label", True)],
-                         outputs_init_list=[(4, "Obj", 0, 0, True)],
+                         inputs_init_list=[(3, "In", 1, "Enter text", False)],
+                         outputs_init_list=[(3, "Out", 0, 0, True)],
                          width=150)
 
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)
 
         if collapse is True:
-            self.title = 'Obj: ' + self.content.input_widgets[0].text()
+            self.title = 'In: ' + self.content.input_widgets[0].text()
         else:
             self.title = self.default_title
 
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:
-        label_list: list = sockets_input_data[0]
-        obj_list: list = []
-
-        if not (ActiveDocument is None):
-            for label in label_list:
-                obj = ActiveDocument.getObjectsByLabel(label)
-                if len(obj) == 1:
-                    obj_list.append(obj[0])
-                else:
-                    raise ValueError('Unknown object')
-        else:
-            raise Exception('No active document')
-
-        return [obj_list]
+        in_val: str = sockets_input_data[0][0]
+        return [[in_val]]

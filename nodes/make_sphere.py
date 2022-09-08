@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  object_input.py
+#  make_sphere.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -25,7 +25,9 @@
 import os
 from decimal import Decimal
 
-from FreeCAD import ActiveDocument
+import numpy as np
+from FreeCAD import Vector
+from Part import makeSphere
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
@@ -35,36 +37,23 @@ from fcn_base_node import FCNNode
 class ObjectInput(FCNNode):
 
     icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
-    op_title: str = "Object Input"
+    op_title: str = "Make Sphere"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(3, "In", 1, "Object label", True)],
-                         outputs_init_list=[(4, "Obj", 0, 0, True)],
+                         inputs_init_list=[(0, "R", 1, "10.0", False), (1, "Pos", 0, 0, True)],
+                         outputs_init_list=[(5, "Shp", 0, 0, True)],
                          width=150)
-
-    def collapse_node(self, collapse: bool = False):
-        super().collapse_node(collapse)
-
-        if collapse is True:
-            self.title = 'Obj: ' + self.content.input_widgets[0].text()
-        else:
-            self.title = self.default_title
 
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:
-        label_list: list = sockets_input_data[0]
-        obj_list: list = []
+        sphere_radius: float = float(sockets_input_data[0][0])
+        position_list: ndarray = np.array(sockets_input_data[1]).flatten()
 
-        if not (ActiveDocument is None):
-            for label in label_list:
-                obj = ActiveDocument.getObjectsByLabel(label)
-                if len(obj) == 1:
-                    obj_list.append(obj[0])
-                else:
-                    raise ValueError('Unknown object')
-        else:
-            raise Exception('No active document')
+        sphere_list = []
+        for pos in position_list:
+            sphere = makeSphere(sphere_radius, Vector(pos))
+            sphere_list.append(sphere)
 
-        return [obj_list]
+        return [sphere_list]
