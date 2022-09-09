@@ -38,7 +38,7 @@ class NumberInput(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "In", 1, 0, False)], outputs_init_list=[(0, "Out", 0, 0, True)],
+                         inputs_init_list=[(0, "In", 1, 0, False)], outputs_init_list=[(0, "Out", 0, 0, True, 'float')],
                          width=150)
 
     def collapse_node(self, collapse: bool = False):

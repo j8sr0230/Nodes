@@ -197,7 +197,8 @@ class FCNSocket(Socket):
 
     def __init__(self, node: Node, index: int = 0, position: int = LEFT_BOTTOM, socket_type: int = 1,
                  multi_edges: bool = True, count_on_this_node_side: int = 1, is_input: bool = False,
-                 socket_label: str = "", socket_input_index: int = 0, socket_default_value: object = 0):
+                 socket_label: str = "", socket_input_index: int = 0, socket_default_value: object = 0,
+                 socket_str_type: str = "*"):
         """Constructor of the FCNSocketView class.
 
         :param node: Parent node of the socket.
@@ -206,7 +207,7 @@ class FCNSocket(Socket):
         :type index: int
         :param position: Initial position of the socket, referring to node_sockets.py.
         :type position: int
-        :param socket_type: Type (color) the socket.
+        :param socket_type: Color the socket.
         :type socket_type: int
         :param multi_edges: Can this socket handle multiple edges input?
         :type multi_edges: bool
@@ -221,12 +222,15 @@ class FCNSocket(Socket):
         :type socket_input_index: int
         :param socket_default_value: Default value of the socket input widget.
         :type socket_default_value: Union[str, int, float, list]
+        :param socket_str_type: Type the socket.
+        :type socket_str_type: str
         """
 
         super().__init__(node, index, position, socket_type, multi_edges, count_on_this_node_side, is_input)
         self.socket_label: str = socket_label
         self.socket_input_index: int = socket_input_index
         self.socket_default_value: object = socket_default_value
+        self.socket_str_type: list = socket_str_type
         self.grSocket.init_inner_widgets(self.socket_label, self.socket_input_index, self.socket_default_value)
 
 
@@ -690,22 +694,30 @@ class FCNNode(Node):
         # Create new sockets
         counter: int = 0
         for item in inputs:
+            if len(item) > 5:
+                socket_str_type = item[5]
+            else:
+                socket_str_type: list = ['*']
             socket: FCNSocket = self.__class__.Socket_class(
                 node=self, index=counter, position=self.input_socket_position,
                 socket_type=item[0], multi_edges=item[4],
                 count_on_this_node_side=len(inputs), is_input=True, socket_label=item[1], socket_input_index=item[2],
-                socket_default_value=item[3]
+                socket_default_value=item[3], socket_str_type=socket_str_type
             )
             counter += 1
             self.inputs.append(socket)
 
         counter = 0
         for item in outputs:
+            if len(item) > 5:
+                socket_str_type = item[5]
+            else:
+                socket_str_type: str = '*'
             socket: FCNSocket = self.__class__.Socket_class(
                 node=self, index=counter, position=self.output_socket_position,
                 socket_type=item[0], multi_edges=item[4],
                 count_on_this_node_side=len(outputs), is_input=False, socket_label=item[1], socket_input_index=item[2],
-                socket_default_value=item[3]
+                socket_default_value=item[3], socket_str_type=socket_str_type
             )
             counter += 1
             self.outputs.append(socket)
