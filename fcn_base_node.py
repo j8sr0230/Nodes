@@ -53,6 +53,7 @@ from nodeeditor.node_socket import Socket, LEFT_BOTTOM, RIGHT_BOTTOM, LEFT_CENTE
 from nodeeditor.node_graphics_socket import QDMGraphicsSocket
 from nodeeditor.utils import dumpException
 
+import fcn_locator as locator
 
 DEBUG = False
 
@@ -427,7 +428,7 @@ class FCNNodeView(QDMGraphicsNode):
         """
 
         super().initAssets()
-        path: str = os.path.join(os.path.abspath(__file__), "..", "icons", "fcn_status_icon.png")
+        path: str = locator.icon("fcn_status_icon.png")
         self.icons: QImage = QImage(path)
 
     def paint(self, painter, q_style_option_graphics_item, widget=None):

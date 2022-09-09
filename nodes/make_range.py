@@ -28,12 +28,13 @@ from FreeCAD import Vector
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
+from fcn_locator import icon
 
 
 @register_node
 class MakeRange(FCNNode):
 
-    icon: str = os.path.join(os.path.abspath(__file__), "..", "..", "icons", "fcn_default.png")
+    icon: str = icon("fcn_default.png")
     op_title: str = "Make Range"
     content_label_objname: str = "fcn_node_bg"
 
