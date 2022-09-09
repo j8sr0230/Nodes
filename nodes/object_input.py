@@ -25,7 +25,7 @@
 import os
 from decimal import Decimal
 
-from FreeCAD import ActiveDocument
+import FreeCAD
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
@@ -57,9 +57,9 @@ class ObjectInput(FCNNode):
         label_list: list = sockets_input_data[0]
         obj_list: list = []
 
-        if not (ActiveDocument is None):
+        if not (FreeCAD.ActiveDocument is None):
             for label in label_list:
-                obj = ActiveDocument.getObjectsByLabel(label)
+                obj = FreeCAD.ActiveDocument.getObjectsByLabel(label)
                 if len(obj) == 1:
                     obj_list.append(obj[0])
                 else:
