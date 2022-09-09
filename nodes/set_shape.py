@@ -25,7 +25,7 @@
 import os
 from decimal import Decimal
 
-from FreeCAD import ActiveDocument
+import FreeCAD
 from Part import makeCompound
 
 from fcn_conf import register_node
@@ -51,11 +51,11 @@ class SetShape(FCNNode):
         obj_list: list = sockets_input_data[0]
         compound: Compound = makeCompound(sockets_input_data[1])
 
-        if not (ActiveDocument is None):
+        if not (FreeCAD.ActiveDocument is None):
             for obj in obj_list:
                 obj.Shape = compound
 
-            ActiveDocument.recompute()
+            FreeCAD.ActiveDocument.recompute()
         else:
             raise Exception('No active document')
 
