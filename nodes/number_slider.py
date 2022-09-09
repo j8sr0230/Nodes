@@ -58,7 +58,8 @@ class NumberSlider(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Min", 1, 0, False, ['float', 'int']), (0, "Max", 1, 100, False, ['float', 'int']),
+                         inputs_init_list=[(0, "Min", 1, 0, False, ['float', 'int']),
+                                           (0, "Max", 1, 100, False, ['float', 'int']),
                                            (0, "Val", 2, (0, 100, 50), False)],
                          outputs_init_list=[(0, "Out", 0, 0.0, True, 'float')],
                          width=150)

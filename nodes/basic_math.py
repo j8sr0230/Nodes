@@ -40,8 +40,8 @@ class BasicMath(FCNNode):
     def __init__(self, scene):
         super().__init__(scene=scene,
                          inputs_init_list=[(0, "Op", 3, ["a+b", "a-b", "a*b", "a/b", "a^b", ], False, ['int']),
-                                           (0, "a", 1, 1, True, ['float','int']),
-                                           (0, "b", 1, 10, True, ['float','int'])],
+                                           (0, "a", 1, 1, True, ['float', 'int']),
+                                           (0, "b", 1, 10, True, ['float', 'int'])],
                          outputs_init_list=[(0, "Res", 0, 11, True, 'float')],
                          width=150)
 
