@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  text_input.py
+#  python_node.py
 #
-#  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
+#  Copyright (c) 2022 Florian Foinant-Willig <ffw@2f2v.fr>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
