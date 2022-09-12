@@ -49,10 +49,17 @@ class ClockNode(FCNNode):
 
     def timer_callback(self):
         self.markInvalid()
-        self.eval()
+        try:
+            self.eval()
+        except:
+            self.timer.stop()
 
     def eval_operation(self, sockets_input_data: list) -> list:
         period: float = float(sockets_input_data[0][0]) * 1000
         if (self.timer.interval != period):
             self.timer.setInterval(period)
+
+        if not self.timer.isActive():
+            self.timer.start()
+
         return [[1]]
