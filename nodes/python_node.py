@@ -34,7 +34,7 @@ from nodeeditor.node_socket import LEFT_BOTTOM, RIGHT_BOTTOM, LEFT_CENTER, RIGHT
 @register_node
 class PythonNode(FCNNode):
 
-    icon: str = icon("fcn_default.png")
+    icon: str = icon("python-logo-only.png")
     op_title: str = "Python"
     content_label_objname: str = "fcn_node_bg"
 
