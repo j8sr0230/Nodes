@@ -22,14 +22,10 @@
 #
 #
 ###################################################################################
-import os
-from decimal import Decimal
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-
-from nodeeditor.node_socket import LEFT_BOTTOM, RIGHT_BOTTOM, LEFT_CENTER, RIGHT_CENTER
 
 @register_node
 class PythonNode(FCNNode):
@@ -40,9 +36,9 @@ class PythonNode(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(3, "Code", 4, "#enter python code\noutput_data=input_data", False),
+                         inputs_init_list=[(3, "Code", 4, "#enter python code\noutput_data=input_data", False, ['string']),
                                             (0, "In", 0, "", True)],
-                         outputs_init_list=[(3, "Out", 0, 0, True)],
+                         outputs_init_list=[(0, "Out", 0, 0, True)],
                          width=250)
 
     @staticmethod
