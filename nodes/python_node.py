@@ -30,7 +30,7 @@ from fcn_locator import icon
 @register_node
 class PythonNode(FCNNode):
 
-    icon: str = icon("python-logo-only.png")
+    icon: str = icon("python_logo.png")
     op_title: str = "Python"
     content_label_objname: str = "fcn_node_bg"
 
