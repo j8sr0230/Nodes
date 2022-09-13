@@ -22,11 +22,8 @@
 #
 #
 ###################################################################################
-import os
-from decimal import Decimal
-
 import FreeCAD
-from Part import makeCompound
+import Part
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
@@ -42,14 +39,15 @@ class SetShape(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(4, "Obj", 0, 0, True), (5, "Shp", 0, "0", False)],
-                         outputs_init_list=[(4, "Obj", 0, 0, True)],
+                         inputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", )),
+                                           (5, "Shp", 0, "0", False, ("Shape", ))],
+                         outputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", ))],
                          width=150)
 
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:
         obj_list: list = sockets_input_data[0]
-        compound: Compound = makeCompound(sockets_input_data[1])
+        compound = Part.makeCompound(sockets_input_data[1])
 
         if not (FreeCAD.ActiveDocument is None):
             for obj in obj_list:

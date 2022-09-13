@@ -22,7 +22,6 @@
 #
 #
 ###################################################################################
-import os
 from math import floor
 from decimal import Decimal
 
@@ -58,10 +57,10 @@ class NumberSlider(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Min", 1, 0, False, ['float', 'int']),
-                                           (0, "Max", 1, 100, False, ['float', 'int']),
-                                           (0, "Val", 2, (0, 100, 50), False)],
-                         outputs_init_list=[(0, "Out", 0, 0.0, True, 'float')],
+                         inputs_init_list=[(0, "Min", 1, 0, False, ("float", "int")),
+                                           (0, "Max", 1, 100, False, ("float", "int")),
+                                           (0, "Val", 2, (0, 100, 50), False, ("int", ))],
+                         outputs_init_list=[(0, "Out", 0, 0.0, True, ("int", ))],
                          width=150)
 
     def collapse_node(self, collapse: bool = False):

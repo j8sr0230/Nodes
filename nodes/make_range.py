@@ -40,9 +40,10 @@ class MakeRange(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Start", 1, 0, False), (0, "Stop", 1, 10, False),
-                                           (0, "Step", 1, 1, False)],
-                         outputs_init_list=[(0, "Out", 0, 0, True)],
+                         inputs_init_list=[(0, "Start", 1, 0, False, ('int', 'float')),
+                                           (0, "Stop", 1, 10, False, ('int', 'float')),
+                                           (0, "Step", 1, 1, False, ('int', 'float'))],
+                         outputs_init_list=[(0, "Out", 0, 0, True, ('int', 'float'))],
                          width=150)
 
     @staticmethod

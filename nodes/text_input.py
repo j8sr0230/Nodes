@@ -22,9 +22,6 @@
 #
 #
 ###################################################################################
-import os
-from decimal import Decimal
-
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
@@ -39,8 +36,8 @@ class TextInput(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(3, "In", 1, "Enter text", False)],
-                         outputs_init_list=[(3, "Out", 0, 0, True)],
+                         inputs_init_list=[(3, "In", 1, "Enter text", False, ("str", ))],
+                         outputs_init_list=[(3, "Out", 0, 0, True, ("str", ))],
                          width=150)
 
     def collapse_node(self, collapse: bool = False):
