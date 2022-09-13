@@ -40,9 +40,10 @@ from typing import Union
 from math import floor
 from decimal import Decimal
 
-from qtpy.QtGui import QImage
+import numpy as np
+from qtpy.QtGui import QImage, QTextOption
 from qtpy.QtCore import QRectF, Qt
-from qtpy.QtWidgets import QWidget, QFormLayout, QLabel, QLineEdit, QSlider, QComboBox
+from qtpy.QtWidgets import QWidget, QFormLayout, QLabel, QLineEdit, QSlider, QComboBox, QPlainTextEdit
 from nodeeditor.node_scene import Scene
 from nodeeditor.node_node import Node
 from nodeeditor.node_graphics_node import QDMGraphicsNode
@@ -70,7 +71,7 @@ class FCNSocketView(QDMGraphicsSocket):
         input_widget (QWidget): Visual socket input element.
     """
 
-    Socket_Input_Widget_Classes: list = [QLabel, QLineEdit, QSlider, QComboBox]
+    Socket_Input_Widget_Classes: list = [QLabel, QLineEdit, QSlider, QComboBox, QPlainTextEdit]
 
     label_widget: QLabel
     input_widget: QWidget
@@ -118,6 +119,11 @@ class FCNSocketView(QDMGraphicsSocket):
                 self.input_widget.addItem(text)
             self.input_widget.currentIndexChanged.connect(self.socket.node.onInputChanged)
 
+        elif socket_input_index == 4: # QPlainTextEdit
+            self.input_widget.setPlainText(str(socket_default_values))
+            self.input_widget.textChanged.connect(lambda:self.socket.node.onInputChanged(self.input_widget.toPlainText()))
+            self.input_widget.setWordWrapMode(QTextOption.NoWrap)
+
     def update_widget_value(self):
         """Updates the value shown by the socket input widget.
 
@@ -156,6 +162,13 @@ class FCNSocketView(QDMGraphicsSocket):
                 elif isinstance(self.input_widget, QComboBox):
                     if isinstance(input_list[0], int):
                         self.input_widget.setCurrentIndex(input_list[0])
+
+                elif isinstance(self.input_widget, QPlainTextEdit):
+                    if len(input_list) == 1:
+                        self.input_widget.setPlainText(str(input_list[0]))
+                    else:
+                        self.input_widget.setPlainText('\n'.join(input_list[0]))
+
             else:
                 # Multiple edges at one socket
                 if isinstance(self.input_widget, QLineEdit):
@@ -810,6 +823,10 @@ class FCNNode(Node):
 
                     elif isinstance(socket_input_widget, QComboBox):
                         input_value: int = socket_input_widget.currentIndex()
+                        socket_input_data.append(input_value)
+
+                    elif isinstance(socket_input_widget, QPlainTextEdit):
+                        input_value: str = socket_input_widget.toPlainText()
                         socket_input_data.append(input_value)
 
             sockets_input_data.append(socket_input_data)
