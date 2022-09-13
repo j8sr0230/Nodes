@@ -119,9 +119,10 @@ class FCNSocketView(QDMGraphicsSocket):
                 self.input_widget.addItem(text)
             self.input_widget.currentIndexChanged.connect(self.socket.node.onInputChanged)
 
-        elif socket_input_index == 4: # QPlainTextEdit
+        elif socket_input_index == 4:  # QPlainTextEdit
             self.input_widget.setPlainText(str(socket_default_values))
-            self.input_widget.textChanged.connect(lambda:self.socket.node.onInputChanged(self.input_widget.toPlainText()))
+            self.input_widget.textChanged.connect(lambda: self.socket.node.onInputChanged(
+                self.input_widget.toPlainText()))
             self.input_widget.setWordWrapMode(QTextOption.NoWrap)
 
     def update_widget_value(self):
