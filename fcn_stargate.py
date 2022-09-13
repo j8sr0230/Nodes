@@ -22,8 +22,8 @@
 #
 #
 ###################################################################################
+TELEPORTER_FREE_ID = 1
 
-TELEPORTER_FREE_ID=1
 
 class _Stargate:
     knownTeleporters: dict = {}
@@ -56,7 +56,9 @@ class _Stargate:
         except:
             return False
 
+
 stargate = _Stargate()
+
 
 class Teleporter:
     def __init__(self, input, output, id):

@@ -28,6 +28,7 @@ from fcn_base_node import FCNNode
 from fcn_locator import icon
 from fcn_stargate import stargate
 
+
 @register_node
 class TeleporterInNode(FCNNode):
 
@@ -41,7 +42,7 @@ class TeleporterInNode(FCNNode):
         super().__init__(scene=scene,
                          inputs_init_list=[(0, "Id", 1, self.id, False), (0, "In", 0, 0, True)],
                          outputs_init_list=[(0, "Id", 0, self.id, True)],
-                         width=250)
+                         width=150)
 
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)
