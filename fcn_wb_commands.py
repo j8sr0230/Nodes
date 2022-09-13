@@ -31,18 +31,22 @@ def QT_TRANSLATE_NOOP(scope, text):
     return text
 
 
-class FCNodes_CommandShow():
+class FCNodes_CommandShow:
     """Show FCNodes window"""
 
-    def GetResources(self):
+    @staticmethod
+    def GetResources():
         return {'Pixmap': locator.icon('fcn_wb_icon.svg'),
                 'MenuText': QT_TRANSLATE_NOOP("FCNodes_Show", "Show FCNodes window"),
                 'ToolTip': QT_TRANSLATE_NOOP("FCNodes_Show", "Show FCNodes window")}
 
-    def Activated(self):
+    @staticmethod
+    def Activated():
         locator.getFCNodesWorkbench().window.show()
 
-    def IsActive(self):
+    @staticmethod
+    def IsActive():
         return True
+
 
 FreeCADGui.addCommand('FCNodes_Show', FCNodes_CommandShow())

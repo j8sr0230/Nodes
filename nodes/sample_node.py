@@ -22,8 +22,6 @@
 #
 #
 ###################################################################################
-import os
-
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 
@@ -56,8 +54,9 @@ class SampleNode(FCNNode):
         #                             - (Min, Max, Step) for QLineEdit
         #                             - List for QComboBox
         # multi_edge (bool): True, to allow multi edge connection from/to this socket.
-        inputs: list = [(0, "In 1", 1, 0, False), (0, "In 2", 1, 0, True)]
-        outputs: list = [(0, "Out 1", 0, 0, True), (0, "Out 2", 0, 0, True)]
+        # socket_str_type(tuple): Allowed socket types as string (use "*" as wild card).
+        inputs: list = [(0, "In 1", 1, 0, False, ("int", "float")), (0, "In 2", 1, 0, True, ("int",  "float"))]
+        outputs: list = [(0, "Out 1", 0, 0, True, ("int", "float")), (0, "Out 2", 0, 0, True, ("int", "float"))]
         width: int = 150
 
         super().__init__(scene=scene, inputs_init_list=inputs, outputs_init_list=outputs, width=width)

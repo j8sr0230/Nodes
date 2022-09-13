@@ -22,9 +22,6 @@
 #
 #
 ###################################################################################
-import os
-from decimal import Decimal
-
 import FreeCAD
 
 from fcn_conf import register_node
@@ -41,8 +38,8 @@ class ObjectInput(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(3, "In", 1, "Object label", True)],
-                         outputs_init_list=[(4, "Obj", 0, 0, True)],
+                         inputs_init_list=[(3, "In", 1, "Object label", True, ("str", ))],
+                         outputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", ))],
                          width=150)
 
     def collapse_node(self, collapse: bool = False):

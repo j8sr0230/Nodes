@@ -40,8 +40,10 @@ class MakeVector(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "X", 1, 1.0, True), (0, "Y", 1, 0.0, True), (0, "Z", 1, 0.0, True)],
-                         outputs_init_list=[(1, "Vec", 0, 0, True)],
+                         inputs_init_list=[(0, "X", 1, 1.0, True, ("int", "float")),
+                                           (0, "Y", 1, 0.0, True, ("int", "float")),
+                                           (0, "Z", 1, 0.0, True, ("int", "float"))],
+                         outputs_init_list=[(1, "Vec", 0, 0, True, ("int", "float"))],
                          width=150)
 
     @staticmethod

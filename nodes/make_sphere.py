@@ -22,12 +22,8 @@
 #
 #
 ###################################################################################
-import os
-from decimal import Decimal
-
-import numpy as np
 from FreeCAD import Vector
-from Part import makeSphere
+import Part
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
@@ -43,8 +39,9 @@ class ObjectInput(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "R", 1, "10.0", False), (1, "Pos", 0, 0, True)],
-                         outputs_init_list=[(5, "Shp", 0, 0, True)],
+                         inputs_init_list=[(0, "R", 1, "10.0", False, ("int", "float")),
+                                           (1, "Pos", 0, 0, True, ("int", "float"))],
+                         outputs_init_list=[(5, "Shp", 0, 0, True, ("Shape", ))],
                          width=150)
 
     @staticmethod
@@ -54,7 +51,7 @@ class ObjectInput(FCNNode):
 
         sphere_list = []
         for pos in position_list:
-            sphere = makeSphere(sphere_radius, Vector(pos))
+            sphere = Part.makeSphere(sphere_radius, Vector(pos))
             sphere_list.append(sphere)
 
         return [sphere_list]

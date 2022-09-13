@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  text_input.py
+#  teleporter_in.py
 #
-#  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
+#  Copyright (c) 2022 Florian Foinant-Willig <ffw@2f2v.fr>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -22,33 +22,53 @@
 #
 #
 ###################################################################################
+
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-
+from fcn_stargate import stargate
 
 @register_node
-class TextInput(FCNNode):
+class TeleporterInNode(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Text Input"
+    op_title: str = "Teleporter In"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
+        self.id = stargate.addTeleporter(input=self)
+
         super().__init__(scene=scene,
-                         inputs_init_list=[(3, "In", 1, "Enter text", False, ("str", ))],
-                         outputs_init_list=[(3, "Out", 0, 0, True, ("str", ))],
-                         width=150)
+                         inputs_init_list=[(0, "Id", 1, self.id, False), (0, "In", 0, 0, True)],
+                         outputs_init_list=[(0, "Id", 0, self.id, True)],
+                         width=250)
 
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)
-
         if collapse is True:
-            self.title = 'In: ' + self.content.input_widgets[0].text()
+            self.title = self.default_title + f' <{self.id}>'
         else:
             self.title = self.default_title
 
-    @staticmethod
-    def eval_operation(sockets_input_data: list) -> list:
-        in_val: str = sockets_input_data[0][0]
-        return [[in_val]]
+    def eval_operation(self, sockets_input_data: list) -> list:
+        tele_id = sockets_input_data[0][0]
+
+        teleporter = stargate.getTeleporter(self.id)
+        if tele_id != self.id:
+            new_tele = stargate.getTeleporter(tele_id)
+            if new_tele:
+                new_tele.setInput(self)
+                if teleporter:
+                    teleporter.setInput(None)
+                teleporter = new_tele
+            else:
+                stargate.renameTeleporter(self.id, tele_id)
+            self.id = tele_id
+
+        if teleporter and teleporter.output is not None:
+            # force recompute at second extremity
+            teleporter.output.setData(sockets_input_data[1])
+            teleporter.output.markInvalid()
+            teleporter.output.eval()
+
+        return [self.id]

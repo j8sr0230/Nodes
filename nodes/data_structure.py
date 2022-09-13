@@ -22,8 +22,6 @@
 #
 #
 ###################################################################################
-import os
-from decimal import Decimal
 import numpy as np
 
 from fcn_conf import register_node
@@ -39,8 +37,9 @@ class DataStructure(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Op", 3, ["Graft", "Flat", ], False), (6, "In", 1, 0, True)],
-                         outputs_init_list=[(6, "Out", 0, 0, True)],
+                         inputs_init_list=[(0, "Op", 3, ["Graft", "Flat", ], False, ('int', )),
+                                           (6, "In", 1, 0, True, ('*', ))],
+                         outputs_init_list=[(6, "Out", 0, 0, True, ('*', ))],
                          width=150)
 
     def collapse_node(self, collapse: bool = False):

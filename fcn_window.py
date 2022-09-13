@@ -1,35 +1,34 @@
-import os
 import json
+# from fnmatch import fnmatch
 
 from qtpy.QtGui import QIcon, QKeySequence
 from qtpy.QtWidgets import QApplication, QMdiArea, QWidget, QDockWidget, QAction, QMessageBox, QFileDialog, QMenu
 from qtpy.QtCore import Qt, QSignalMapper
-from nodeeditor.utils import loadStylesheets
 from nodeeditor.node_editor_window import NodeEditorWindow
 from nodeeditor.node_edge import Edge
 from nodeeditor.node_edge_validators import (  # Enabling edge validators
-    edge_validator_debug,
     edge_cannot_connect_two_outputs_or_two_inputs,
     edge_cannot_connect_input_and_output_of_same_node,
-    # edge_cannot_connect_input_and_output_of_different_type
 )
-import qss.nodeeditor_dark_resources  # Images for the dark skin
 
+from fcn_base_node import FCNSocket
 from fcn_sub_window import FCNSubWindow
 from fcn_drag_listbox import QDMDragListbox
 from nodeeditor.utils import dumpException, pp
 from fcn_conf import FC_NODES
 
-# Edge.registerEdgeValidator(edge_validator_debug)
+
 Edge.registerEdgeValidator(edge_cannot_connect_two_outputs_or_two_inputs)
 Edge.registerEdgeValidator(edge_cannot_connect_input_and_output_of_same_node)
 
-from fnmatch import fnmatch
 
-# local validator to use string type
-def edge_cannot_connect_input_and_output_of_different_type(input: 'FCNSocket', output: 'FCNSocket'):
-    for out_type in output.socket_str_type:
-        if fnmatch(input.socket_str_type, out_type):
+# Local validator to use string type
+def edge_cannot_connect_input_and_output_of_different_type(output_socket: FCNSocket, input_socket: FCNSocket, ):
+    for out_type in output_socket.socket_str_type:
+        # if fnmatch(input_socket.socket_str_type, out_type):
+        if (out_type in input_socket.socket_str_type) or \
+                ("*" in input_socket.socket_str_type) or \
+                (out_type == "*"):
             return True
     return False
 
@@ -57,16 +56,10 @@ class FCNWindow(NodeEditorWindow):
     nodes_list_widget: QDMDragListbox
     nodes_dock: QDockWidget
 
+    # noinspection PyUnresolvedReferences
     def initUI(self):
         self.name_company = 'j8sr0230'
         self.name_product = 'FreeCAD Nodes (fc_nodes)'
-
-        # self.stylesheet_filename = os.path.join(os.path.dirname(__file__), "qss/nodeeditor.qss")
-        # loadStylesheets(
-        #     os.path.join(os.path.dirname(__file__), "qss/nodeeditor-dark.qss"),
-        #     self.stylesheet_filename
-        # )
-
         self.empty_icon = QIcon(".")
 
         if DEBUG:
@@ -101,9 +94,6 @@ class FCNWindow(NodeEditorWindow):
         else:
             self.writeSettings()
             event.accept()
-            # hacky fix for PyQt 5.14.x
-            # import sys
-            # sys.exit(0)
 
     def createActions(self):
         super().createActions()
@@ -170,6 +160,7 @@ class FCNWindow(NodeEditorWindow):
                           "from Pavel Křupala. For more information visit the "
                           "<a href='https://github.com/j8sr0230/fc_nodes'>fc_nodes</a> project at github.")
 
+    # noinspection PyUnresolvedReferences
     def createMenus(self):
         super().createMenus()
         self.window_menu = self.menuBar().addMenu("&Window")

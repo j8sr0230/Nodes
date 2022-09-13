@@ -35,7 +35,6 @@ license) and the pyqt-node-editor by Pavel Křupala (https://gitlab.com/pavel.kr
 node editor base framework.
 """
 
-import os
 from collections import OrderedDict
 from typing import Union
 from math import floor
@@ -208,10 +207,10 @@ class FCNSocket(Socket):
     socket_input_index: int
     socket_default_value: Union[str, int, float, list]
 
-    def __init__(self, node: Node, index: int = 0, position: int = LEFT_BOTTOM, socket_type: int = 1,
+    def __init__(self, node: Node, index: int = 0, position: int = LEFT_BOTTOM, socket_color: int = 1,
                  multi_edges: bool = True, count_on_this_node_side: int = 1, is_input: bool = False,
                  socket_label: str = "", socket_input_index: int = 0, socket_default_value: object = 0,
-                 socket_str_type: str = "*"):
+                 socket_str_type: tuple = None):
         """Constructor of the FCNSocketView class.
 
         :param node: Parent node of the socket.
@@ -220,8 +219,8 @@ class FCNSocket(Socket):
         :type index: int
         :param position: Initial position of the socket, referring to node_sockets.py.
         :type position: int
-        :param socket_type: Color the socket.
-        :type socket_type: int
+        :param socket_color: Color the socket.
+        :type socket_color: int
         :param multi_edges: Can this socket handle multiple edges input?
         :type multi_edges: bool
         :param count_on_this_node_side: Total number of sockets on this position.
@@ -236,14 +235,17 @@ class FCNSocket(Socket):
         :param socket_default_value: Default value of the socket input widget.
         :type socket_default_value: Union[str, int, float, list]
         :param socket_str_type: Type the socket.
-        :type socket_str_type: str
+        :type socket_str_type: list
         """
 
-        super().__init__(node, index, position, socket_type, multi_edges, count_on_this_node_side, is_input)
+        super().__init__(node, index, position, socket_color, multi_edges, count_on_this_node_side, is_input)
+
         self.socket_label: str = socket_label
         self.socket_input_index: int = socket_input_index
         self.socket_default_value: object = socket_default_value
-        self.socket_str_type: list = socket_str_type
+        if socket_str_type is None:
+            socket_str_type = ("*", )
+        self.socket_str_type: tuple = socket_str_type
         self.grSocket.init_inner_widgets(self.socket_label, self.socket_input_index, self.socket_default_value)
 
 
@@ -518,12 +520,13 @@ class FCNNode(Node):
 
         Note:
             Example inputs_init_list:
-            inputs_init_list: list = [(0, "Format", 3, ["Value", "Percent"], True),
-                                      (0, "Min", 1, 0, True), (0, "Max", 1, 100, True),
-                                      (0, "Val", 2, [0, 100, 50], True)]
+            inputs_init_list: list = [(0, "Format", 3, ["Value", "Percent"], True, ("int")),
+                                      (0, "Min", 1, 0, True, ("int")), (0, "Max", 1, 100, True, ("int")),
+                                      (0, "Val", 2, [0, 100, 50], True, ("int"))]
 
             Example outputs_init_list:
-            outputs_init_list: list = [(0, "Range", 0, 0, True), (0, "Val", 0, 0, True)]
+            outputs_init_list: list = [(0, "Range", 0, 0, True, ("int", "float")),
+                                       (0, "Val", 0, 0, True, ("int", "float"))]
 
         :param scene: Editor Scene in which the node is to be inserted.
         :type scene: Scene
@@ -710,10 +713,11 @@ class FCNNode(Node):
             if len(item) > 5:
                 socket_str_type = item[5]
             else:
-                socket_str_type: list = ['*']
+                socket_str_type: tuple = ('*', )
+
             socket: FCNSocket = self.__class__.Socket_class(
                 node=self, index=counter, position=self.input_socket_position,
-                socket_type=item[0], multi_edges=item[4],
+                socket_color=item[0], multi_edges=item[4],
                 count_on_this_node_side=len(inputs), is_input=True, socket_label=item[1], socket_input_index=item[2],
                 socket_default_value=item[3], socket_str_type=socket_str_type
             )
@@ -725,10 +729,11 @@ class FCNNode(Node):
             if len(item) > 5:
                 socket_str_type = item[5]
             else:
-                socket_str_type: str = '*'
+                socket_str_type: tuple = ('*', )
+
             socket: FCNSocket = self.__class__.Socket_class(
                 node=self, index=counter, position=self.output_socket_position,
-                socket_type=item[0], multi_edges=item[4],
+                socket_color=item[0], multi_edges=item[4],
                 count_on_this_node_side=len(outputs), is_input=False, socket_label=item[1], socket_input_index=item[2],
                 socket_default_value=item[3], socket_str_type=socket_str_type
             )

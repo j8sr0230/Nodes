@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  text_input.py
+#  next_node.py
 #
-#  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
+#  Copyright (c) 2022 Florian Foinant-Willig <ffw@2f2v.fr>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -24,31 +24,38 @@
 ###################################################################################
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
-from fcn_locator import icon
+
+import fcn_locator as locator
 
 
 @register_node
-class TextInput(FCNNode):
+class NextNode(FCNNode):
 
-    icon: str = icon("fcn_default.png")
-    op_title: str = "Text Input"
+    icon: str = locator.icon("fcn_default.png")
+    op_title: str = "Next"
     content_label_objname: str = "fcn_node_bg"
 
-    def __init__(self, scene):
-        super().__init__(scene=scene,
-                         inputs_init_list=[(3, "In", 1, "Enter text", False, ("str", ))],
-                         outputs_init_list=[(3, "Out", 0, 0, True, ("str", ))],
-                         width=150)
+    def __init__(self, scene: 'Scene'):
+        """Constructor of the SampleNode class.
 
-    def collapse_node(self, collapse: bool = False):
-        super().collapse_node(collapse)
+        :param scene: Editor Scene in which the node is to be inserted.
+        :type scene: Scene
+        """
 
-        if collapse is True:
-            self.title = 'In: ' + self.content.input_widgets[0].text()
-        else:
-            self.title = self.default_title
+        inputs: list = [(6, "List", 1, 0, False), (0, "tick", 0, 0, True)]
+        outputs: list = [(0, "Item", 0, 0, True)]
+        width: int = 150
+        self.index = 0
 
-    @staticmethod
-    def eval_operation(sockets_input_data: list) -> list:
-        in_val: str = sockets_input_data[0][0]
-        return [[in_val]]
+        super().__init__(scene=scene, inputs_init_list=inputs, outputs_init_list=outputs, width=width)
+
+
+    def eval_operation(self, sockets_input_data: list) -> list:
+        inputarray = sockets_input_data[0]
+        if (not isinstance(inputarray, list)):
+            return 0
+
+        self.index +=1
+        if self.index >= len(inputarray):
+            self.index=0
+        return [[inputarray[self.index]]]
