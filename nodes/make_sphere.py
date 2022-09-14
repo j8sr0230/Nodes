@@ -22,6 +22,8 @@
 #
 #
 ###################################################################################
+import sys
+
 from FreeCAD import Vector
 import Part
 
@@ -43,7 +45,9 @@ class MakeSphere(FCNNode):
                                            (1, "Pos", 0, 0, True, ("int", "float"))],
                          outputs_init_list=[(5, "Shp", 0, 0, True, ("Shape", ))],
                          width=150)
+        sys.setrecursionlimit(1000000)
 
+    # Todo: Reimplement recursive function with loop
     def structure_to_vec(self, data_structure: list) -> list:
         if isinstance(data_structure, list) and len(data_structure) == 3 and \
                 all(isinstance(i, float) for i in data_structure):
