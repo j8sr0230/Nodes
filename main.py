@@ -34,7 +34,7 @@ from fcn_window import FCNWindow
 
 QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)  # Enable high dpi scaling
 QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)  # Use high dpi icons
-
+sys.setrecursionlimit(1000)
 
 if __name__ == '__main__':
     if hasattr(FreeCADGui, "getMainWindow"):

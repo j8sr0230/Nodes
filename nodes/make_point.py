@@ -22,8 +22,6 @@
 #
 #
 ###################################################################################
-import sys
-
 from FreeCAD import Vector
 import Part
 
@@ -44,27 +42,27 @@ class MakePoint(FCNNode):
                          inputs_init_list=[(1, "Pos", 0, 0, True, ("int", "float"))],
                          outputs_init_list=[(5, "Shp", 0, 0, True, ("Shape", ))],
                          width=150)
-        sys.setrecursionlimit(1000000)
-
-    # Todo: Reimplement recursive function with loop
-    def structure_to_vec(self, data_structure: list) -> list:
-        if isinstance(data_structure, list) and len(data_structure) == 3 and \
-                all(isinstance(i, float) for i in data_structure):
-            # If data_structure is a vector
-            yield Vector(data_structure)
-        else:
-            # If data is a sub list
-            for sub_structure in data_structure:
-                for elem in self.structure_to_vec(sub_structure):
-                    yield elem
 
     def eval_operation(self, sockets_input_data: list) -> list:
         position_list: list = sockets_input_data[0]
 
         vertex_list = []
-        vector_pos_lis = list(self.structure_to_vec(position_list))
+        vector_pos_lis = list(structure_to_vec(position_list))
         for vec in vector_pos_lis:
             vertex = Part.Point(vec).toShape()
             vertex_list.append(vertex)
 
         return [vertex_list]
+
+
+# Todo: Reimplement recursive function with loop
+def structure_to_vec(data_structure: list) -> list:
+    if isinstance(data_structure, list) and len(data_structure) == 3 and \
+            all(isinstance(i, float) for i in data_structure):
+        # If data_structure is a vector
+        yield Vector(data_structure)
+    else:
+        # If data is a sub list
+        for sub_structure in data_structure:
+            for elem in structure_to_vec(sub_structure):
+                yield elem
