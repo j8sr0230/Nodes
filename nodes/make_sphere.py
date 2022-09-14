@@ -49,22 +49,23 @@ class MakeSphere(FCNNode):
         position_list: list = sockets_input_data[1]
 
         sphere_list = []
-        vector_pos_lis = list(structure_to_vec(position_list))
+        vector_pos_lis = flatten_to_vectors(position_list)
         for vec in vector_pos_lis:
-            sphere = Part.makeSphere(sphere_radius, vec)
+            sphere = Part.makeSphere(sphere_radius, Vector(vec))
             sphere_list.append(sphere)
 
         return [sphere_list]
 
 
-# Todo: Reimplement recursive function with loop
-def structure_to_vec(data_structure: list) -> list:
-    if isinstance(data_structure, list) and len(data_structure) == 3 and \
-            all(isinstance(i, float) for i in data_structure):
-        # If data_structure is a vector
-        yield Vector(data_structure)
-    else:
-        # If data is a sub list
-        for sub_structure in data_structure:
-            for elem in structure_to_vec(sub_structure):
-                yield elem
+def flatten_to_vectors(data_structure: list) -> list:
+    res = []
+    data_struct_copy = data_structure[:]
+
+    while data_struct_copy:
+        entry = data_struct_copy.pop()
+        if isinstance(entry, list):
+            if len(entry) == 3 and all(isinstance(i, float) for i in entry):
+                res.append(entry)
+            data_struct_copy.extend(entry)
+
+    return res

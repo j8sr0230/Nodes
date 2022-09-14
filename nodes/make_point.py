@@ -47,22 +47,24 @@ class MakePoint(FCNNode):
         position_list: list = sockets_input_data[0]
 
         vertex_list = []
-        vector_pos_lis = list(structure_to_vec(position_list))
-        for vec in vector_pos_lis:
-            vertex = Part.Point(vec).toShape()
+        vector_pos_list = flatten_to_vectors(position_list)
+
+        for vec in vector_pos_list:
+            vertex = Part.Point(Vector(vec)).toShape()
             vertex_list.append(vertex)
 
         return [vertex_list]
 
 
-# Todo: Reimplement recursive function with loop
-def structure_to_vec(data_structure: list) -> list:
-    if isinstance(data_structure, list) and len(data_structure) == 3 and \
-            all(isinstance(i, float) for i in data_structure):
-        # If data_structure is a vector
-        yield Vector(data_structure)
-    else:
-        # If data is a sub list
-        for sub_structure in data_structure:
-            for elem in structure_to_vec(sub_structure):
-                yield elem
+def flatten_to_vectors(data_structure: list) -> list:
+    res = []
+    data_struct_copy = data_structure[:]
+
+    while data_struct_copy:
+        entry = data_struct_copy.pop()
+        if isinstance(entry, list):
+            if len(entry) == 3 and all(isinstance(i, float) for i in entry):
+                res.append(entry)
+            data_struct_copy.extend(entry)
+
+    return res
