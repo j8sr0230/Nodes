@@ -362,6 +362,8 @@ class FCNNodeContentView(QDMNodeContentWidget):
                 res["widget" + str(idx)] = str(widget.value())
             elif isinstance(widget, QComboBox):
                 res["widget" + str(idx)] = str(widget.currentIndex())
+            elif isinstance(widget, QPlainTextEdit):
+                res["widget" + str(idx)] = str(widget.toPlainText())
         return res
 
     def deserialize(self, data: dict, hashmap=None, restore_id: bool = True) -> bool:
@@ -386,13 +388,16 @@ class FCNNodeContentView(QDMNodeContentWidget):
         res = super().deserialize(data, hashmap)
         try:
             for idx, widget in enumerate(self.input_widgets):
-                value: str = data["widget" + str(idx)]
-                if isinstance(widget, QLineEdit):
-                    widget.setText(value)
-                elif isinstance(widget, QSlider):
-                    widget.setValue(int(value))
-                elif isinstance(widget, QComboBox):
-                    widget.setCurrentIndex(int(value))
+                if not isinstance(widget, QLabel):
+                    value: str = data["widget" + str(idx)]
+                    if isinstance(widget, QLineEdit):
+                        widget.setText(value)
+                    elif isinstance(widget, QSlider):
+                        widget.setValue(int(value))
+                    elif isinstance(widget, QComboBox):
+                        widget.setCurrentIndex(int(value))
+                    elif isinstance(widget, QPlainTextEdit):
+                        widget.setPlainText(value)
         except Exception as e:
             dumpException(e)
         return res
