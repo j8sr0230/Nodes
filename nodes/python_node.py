@@ -22,10 +22,12 @@
 #
 #
 ###################################################################################
+from qtpy.QtWidgets import QSizePolicy, QTextEdit
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
+
 
 @register_node
 class PythonNode(FCNNode):
@@ -35,19 +37,38 @@ class PythonNode(FCNNode):
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
+        width = 400
         super().__init__(scene=scene,
-                         inputs_init_list=[(3, "Code", 4, "#enter python code\noutput_data=input_data", False, ['string']),
-                                            (0, "In", 0, "", True)],
+                         inputs_init_list=[(3, "Code", 4, "#enter python code\noutput_data=input_data",
+                                            False, ('string', )),
+                                           (0, "In", 0, "", True)],
                          outputs_init_list=[(0, "Out", 0, 0, True)],
-                         width=250)
+                         width=width)
+
+        # Manually set node and content size
+        self.grNode.height = width
+        self.grNode.default_height = width
+        self.grNode.width = width
+        self.content.setFixedHeight(self.grNode.height - self.grNode.title_vertical_padding -
+                                    self.grNode.edge_padding - self.grNode.title_height)
+        self.content.setFixedWidth(self.grNode.width - 2 * self.grNode.edge_padding)
+
+        # Adjust content layout by expanding QTextEdit to maximum
+        text_edit: QTextEdit = self.content.input_widgets[0]
+        text_edit_policy: QSizePolicy = text_edit.sizePolicy()
+        text_edit_policy.setVerticalStretch(QSizePolicy.Expanding)
+        text_edit.setSizePolicy(text_edit_policy)
+
+        text_edit.hide()  # Hack: Updates widget geometry to calculate the correct socket positions.
+        text_edit.show()  # Hack: See above
+
+        # Update socket position
+        self.place_sockets()
 
     @staticmethod
     def eval_operation(sockets_input_data: list) -> list:
         code: str = str(sockets_input_data[0][0])
 
-        namespace = {'input_data':sockets_input_data[1], 'output_data':None}
-        try:
-            exec(code, namespace)
-            return [namespace['output_data']]
-        except:
-            return []
+        namespace = {'input_data': sockets_input_data[1], 'output_data': None}
+        exec(code, namespace)
+        return [namespace['output_data']]

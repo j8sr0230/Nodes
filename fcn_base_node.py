@@ -43,7 +43,7 @@ from decimal import Decimal
 import numpy as np
 from qtpy.QtGui import QImage, QTextOption
 from qtpy.QtCore import QRectF, Qt
-from qtpy.QtWidgets import QWidget, QFormLayout, QLabel, QLineEdit, QSlider, QComboBox, QPlainTextEdit
+from qtpy.QtWidgets import QWidget, QFormLayout, QLabel, QLineEdit, QSlider, QComboBox, QPlainTextEdit, QSizePolicy
 from nodeeditor.node_scene import Scene
 from nodeeditor.node_node import Node
 from nodeeditor.node_graphics_node import QDMGraphicsNode
@@ -93,6 +93,10 @@ class FCNSocketView(QDMGraphicsSocket):
 
         # Socket label setup
         self.label_widget: QLabel = QLabel(socket_label)
+        label_size_policy = self.label_widget.sizePolicy()
+        label_size_policy.setVerticalStretch(QSizePolicy.Fixed)
+        self.label_widget.setSizePolicy(label_size_policy)
+
         if self.socket.is_input:
             self.label_widget.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         else:
@@ -100,6 +104,10 @@ class FCNSocketView(QDMGraphicsSocket):
 
         # Socket input widget setup
         self.input_widget: QWidget = self.__class__.Socket_Input_Widget_Classes[socket_input_index]()
+        input_size_policy = self.input_widget.sizePolicy()
+        input_size_policy.setVerticalStretch(QSizePolicy.Fixed)
+        self.input_widget.setSizePolicy(input_size_policy)
+
         if socket_input_index == 0:  # Empty
             pass
 
