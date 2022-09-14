@@ -61,8 +61,7 @@ class SampleNode(FCNNode):
 
         super().__init__(scene=scene, inputs_init_list=inputs, outputs_init_list=outputs, width=width)
 
-    @staticmethod
-    def eval_operation(sockets_input_data: list) -> list:
+    def eval_operation(self, sockets_input_data: list) -> list:
         """Calculation of the socket outputs.
 
         The eval_operation is responsible or the actual calculation of the socket outputs. It processes the input data

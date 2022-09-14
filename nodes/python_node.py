@@ -65,8 +65,7 @@ class PythonNode(FCNNode):
         # Update socket position
         self.place_sockets()
 
-    @staticmethod
-    def eval_operation(sockets_input_data: list) -> list:
+    def eval_operation(self, sockets_input_data: list) -> list:
         code: str = str(sockets_input_data[0][0])
 
         namespace = {'input_data': sockets_input_data[1], 'output_data': None}

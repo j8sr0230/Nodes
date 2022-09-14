@@ -853,8 +853,7 @@ class FCNNode(Node):
             print("%s::__eval()" % self.__class__.__name__, "self.output_data_cache = ", self.output_data_cache)
         return sockets_output_data
 
-    @staticmethod
-    def eval_operation(sockets_input_data: list) -> list:
+    def eval_operation(self, sockets_input_data: list) -> list:
         """Calculation of the socket outputs.
 
         The eval_operation is responsible or the actual calculation of the socket outputs. It processes the input data

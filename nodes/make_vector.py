@@ -46,8 +46,7 @@ class MakeVector(FCNNode):
                          outputs_init_list=[(1, "Vec", 0, 0, True, ("int", "float"))],
                          width=150)
 
-    @staticmethod
-    def eval_operation(sockets_input_data: list) -> list:
+    def eval_operation(self, sockets_input_data: list) -> list:
         # Inputs
         x_in = np.array(sockets_input_data[0], dtype=object)
         y_in = np.array(sockets_input_data[1], dtype=object)

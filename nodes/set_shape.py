@@ -44,8 +44,7 @@ class SetShape(FCNNode):
                          outputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", ))],
                          width=150)
 
-    @staticmethod
-    def eval_operation(sockets_input_data: list) -> list:
+    def eval_operation(self, sockets_input_data: list) -> list:
         obj_list: list = sockets_input_data[0]
         compound = Part.makeCompound(sockets_input_data[1])
 

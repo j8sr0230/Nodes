@@ -49,7 +49,6 @@ class NextNode(FCNNode):
 
         super().__init__(scene=scene, inputs_init_list=inputs, outputs_init_list=outputs, width=width)
 
-
     def eval_operation(self, sockets_input_data: list) -> list:
         inputarray = sockets_input_data[0]
         if (not isinstance(inputarray, list)):

@@ -52,8 +52,7 @@ class BasicMath(FCNNode):
         else:
             self.title = self.default_title
 
-    @staticmethod
-    def eval_operation(sockets_input_data: list) -> list:
+    def eval_operation(self, sockets_input_data: list) -> list:
         # Inputs
         op_code: int = sockets_input_data[0][0]
         a_array = np.array(sockets_input_data[1])

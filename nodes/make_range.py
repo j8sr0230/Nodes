@@ -46,8 +46,7 @@ class MakeRange(FCNNode):
                          outputs_init_list=[(0, "Out", 0, 0, True, ('int', 'float'))],
                          width=150)
 
-    @staticmethod
-    def eval_operation(sockets_input_data: list) -> list:
+    def eval_operation(self, sockets_input_data: list) -> list:
         # Inputs
         start: float = float(sockets_input_data[0][0])
         stop: float = float(sockets_input_data[1][0])

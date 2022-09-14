@@ -71,8 +71,7 @@ class NumberSlider(FCNNode):
         else:
             self.title = self.default_title
 
-    @staticmethod
-    def eval_operation(sockets_input_data: list) -> list:
+    def eval_operation(self, sockets_input_data: list) -> list:
         min_val: float = float(sockets_input_data[0][0])
         max_val: float = float(sockets_input_data[1][0])
         clamped_val: float = max(min(sockets_input_data[2][0], int(max_val)), int(min_val))

@@ -31,7 +31,7 @@ from fcn_locator import icon
 
 
 @register_node
-class ObjectInput(FCNNode):
+class MakeSphere(FCNNode):
 
     icon: str = icon("fcn_default.png")
     op_title: str = "Make Sphere"
@@ -44,14 +44,25 @@ class ObjectInput(FCNNode):
                          outputs_init_list=[(5, "Shp", 0, 0, True, ("Shape", ))],
                          width=150)
 
-    @staticmethod
-    def eval_operation(sockets_input_data: list) -> list:
+    def structure_to_vec(self, data_structure: list) -> list:
+        if isinstance(data_structure, list) and len(data_structure) == 3 and \
+                all(isinstance(i, float) for i in data_structure):
+            # If data_structure is a vector
+            yield Vector(data_structure)
+        else:
+            # If data is a sub list
+            for sub_structure in data_structure:
+                for elem in self.structure_to_vec(sub_structure):
+                    yield elem
+
+    def eval_operation(self, sockets_input_data: list) -> list:
         sphere_radius: float = float(sockets_input_data[0][0])
         position_list: list = sockets_input_data[1]
 
         sphere_list = []
-        for pos in position_list:
-            sphere = Part.makeSphere(sphere_radius, Vector(pos))
+        vector_pos_lis = list(self.structure_to_vec(position_list))
+        for vec in vector_pos_lis:
+            sphere = Part.makeSphere(sphere_radius, vec)
             sphere_list.append(sphere)
 
         return [sphere_list]
