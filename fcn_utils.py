@@ -28,15 +28,15 @@ def flatten_to_vectors(data_structure: list) -> list:
     """Flattens a vector list of arbitrary depth to a simple list of 3D vectors.
 
     :param data_structure: Editor Scene in which the node is to be inserted.
-    :type data_structure: Scene
+    :type data_structure: list
     :return: Flat list of 3D vectors
     :rtype: list
     """
-    res = []
+    res: list = []
 
-    copy = data_structure[:]
+    copy: list = data_structure[:]
     while copy:
-        entry = copy.pop()
+        entry: list = copy.pop()
         if isinstance(entry, list):
             if len(entry) == 3 and all(isinstance(i, float) for i in entry):
                 res.append(entry)
