@@ -28,6 +28,7 @@ import Part
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
+from fcn_utils import flatten_to_vectors
 
 
 @register_node
@@ -55,17 +56,3 @@ class MakeSphere(FCNNode):
             sphere_list.append(sphere)
 
         return [sphere_list]
-
-
-def flatten_to_vectors(data_structure: list) -> list:
-    res = []
-    data_struct_copy = data_structure[:]
-
-    while data_struct_copy:
-        entry = data_struct_copy.pop()
-        if isinstance(entry, list):
-            if len(entry) == 3 and all(isinstance(i, float) for i in entry):
-                res.append(entry)
-            data_struct_copy.extend(entry)
-
-    return res

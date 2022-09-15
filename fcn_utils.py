@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  main.py
+#  fcn_utils.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,29 +22,24 @@
 #
 #
 ###################################################################################
-import sys
-
-from qtpy.QtWidgets import QApplication
-from qtpy.QtCore import Qt
-import FreeCAD
-import FreeCADGui
-
-from fcn_window import FCNWindow
 
 
-QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)  # Enable high dpi scaling
-QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)  # Use high dpi icons
+def flatten_to_vectors(data_structure: list) -> list:
+    """Flattens a vector list of arbitrary depth to a simple list of 3D vectors.
 
+    :param data_structure: Editor Scene in which the node is to be inserted.
+    :type data_structure: Scene
+    :return: Flat list of 3D vectors
+    :rtype: list
+    """
+    res = []
 
-if __name__ == '__main__':
-    if hasattr(FreeCADGui, "getMainWindow"):
-        # Start app embedded in FreeCAD
-        node_editor_wnd = FCNWindow()
-        FreeCAD.fc_nodes_window = node_editor_wnd
-        node_editor_wnd.show()
-    else:
-        # Start app in standalone mode
-        app = QApplication(sys.argv)
-        wnd = FCNWindow()
-        wnd.show()
-        sys.exit(app.exec_())
+    copy = data_structure[:]
+    while copy:
+        entry = copy.pop()
+        if isinstance(entry, list):
+            if len(entry) == 3 and all(isinstance(i, float) for i in entry):
+                res.append(entry)
+            copy.extend(entry)
+
+    return res

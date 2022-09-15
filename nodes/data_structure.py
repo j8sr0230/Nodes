@@ -27,6 +27,7 @@ import numpy as np
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
+from fcn_utils import flatten_to_vectors
 
 
 @register_node
@@ -37,10 +38,10 @@ class DataStructure(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Op", 3, ["Graft", "Flat", ], False, ('int', )),
-                                           (6, "In", 1, 0, True, ('*', ))],
-                         outputs_init_list=[(6, "Out", 0, 0, True, ('*', ))],
-                         width=150)
+                         inputs_init_list=[(0, 'Op', 3, ['Graft', 'Flat', 'Flat Topo'], False, ('int', )),
+                                           (6, 'In', 1, 0, True, ('*', ))],
+                         outputs_init_list=[(6, 'Out', 0, 0, True, ('*', ))],
+                         width=160)
 
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)
@@ -60,6 +61,8 @@ class DataStructure(FCNNode):
             res = [[val] for val in in_array]
         elif op_code == 1:  # Flat
             res = np.array(in_array).flatten().tolist()
+        elif op_code == 2:  # Flat Topo
+            res = flatten_to_vectors(in_array)
         else:
             raise ValueError("Unknown operation (Op)")
         return [res]
