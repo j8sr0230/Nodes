@@ -1,5 +1,5 @@
 import json
-# from fnmatch import fnmatch
+from fnmatch import fnmatch
 
 from qtpy.QtGui import QIcon, QKeySequence
 from qtpy.QtWidgets import QApplication, QMdiArea, QWidget, QDockWidget, QAction, QMessageBox, QFileDialog, QMenu
@@ -23,12 +23,10 @@ Edge.registerEdgeValidator(edge_cannot_connect_input_and_output_of_same_node)
 
 
 # Local validator to use string type
-def edge_cannot_connect_input_and_output_of_different_type(output_socket: FCNSocket, input_socket: FCNSocket, ):
+def edge_cannot_connect_input_and_output_of_different_type(output_socket: FCNSocket, input_socket: FCNSocket):
     for out_type in output_socket.socket_str_type:
-        # if fnmatch(input_socket.socket_str_type, out_type):
-        if (out_type in input_socket.socket_str_type) or \
-                ("*" in input_socket.socket_str_type) or \
-                (out_type == "*"):
+        check_res = [fnmatch(out_type, in_type) for in_type in input_socket.socket_str_type]
+        if any(check_res):
             return True
     return False
 
