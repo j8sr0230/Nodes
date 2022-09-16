@@ -104,7 +104,9 @@ class SubPatchNode(FCNNode):
         sub_scene = self.sub_patch.scene
         if hasattr(sub_scene, 'inlets'):
             for i, input_data in enumerate(sockets_input_data):
-                sub_scene.inlets[i].setData(input_data[0])
+                sub_scene.inlets[i].setData(input_data)
+                sub_scene.inlets[i].markInvalid()
+                sub_scene.inlets[i].eval()
 
         if hasattr(sub_scene, 'outlets'):
             ret = []
