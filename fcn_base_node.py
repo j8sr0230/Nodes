@@ -776,12 +776,9 @@ class FCNNode(Node):
         try:
             # Run new evaluation and return the desired output socket (index)
             output_data: list = self.eval_primer()
-            return output_data[index]
-        except ValueError as e:
-            self.markInvalid()
-            self.grNode.setToolTip(str(e))
-            self.markDescendantsDirty()
-        except TypeError as e:
+            if output_data:
+                return output_data[index]
+        except (ValueError, TypeError) as e:
             self.markInvalid()
             self.grNode.setToolTip(str(e))
             self.markDescendantsDirty()
