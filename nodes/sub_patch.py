@@ -55,7 +55,7 @@ class SubPatchNode(FCNNode):
             main_window.set_active_sub_window(self.sub_window)
         else:
             self.sub_window = main_window.create_mdi_child(self.sub_patch)
-            self.sub_patch._close_event_listeners = [] # remove event_listener set by create_mdi_child
+            self.sub_patch._close_event_listeners = []
             self.sub_patch.add_close_event_listener(self.onClose)
         self.sub_window.show()
 
@@ -92,9 +92,9 @@ class SubPatchNode(FCNNode):
         pos = self.grNode.pos
         self.remove()
         super().__init__(scene=self.scene,
-                 inputs_init_list=inputs,
-                 outputs_init_list=outputs,
-                 width=150)
+                         inputs_init_list=inputs,
+                         outputs_init_list=outputs,
+                         width=150)
         self.grNode.pos = pos
 
     def eval_operation(self, sockets_input_data: list) -> list:
@@ -103,14 +103,16 @@ class SubPatchNode(FCNNode):
 
         sub_scene = self.sub_patch.scene
         if hasattr(sub_scene, 'inlets'):
+            # sort sockets by vertical placement
+            ordered_inlets = sorted(sub_scene.inlets, key=lambda inlet: inlet.pos.y())
             for i, input_data in enumerate(sockets_input_data):
-                sub_scene.inlets[i].setData(input_data)
-                sub_scene.inlets[i].markInvalid()
-                sub_scene.inlets[i].eval()
+                ordered_inlets[i].setData(input_data)
+                ordered_inlets[i].markInvalid()
+                ordered_inlets[i].eval()
 
         if hasattr(sub_scene, 'outlets'):
             ret = []
-            for outlet in sub_scene.outlets:
+            for outlet in sorted(sub_scene.outlets, key=lambda outlet: outlet.pos.y()):
                 outlet.markInvalid()
                 outlet.eval()
                 ret.append(outlet.data)
