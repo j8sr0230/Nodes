@@ -119,3 +119,20 @@ class SubPatchNode(FCNNode):
             return ret
 
         return None
+
+    def serialize(self):
+        res = super().serialize()
+        res['data'] = self.data
+        return res
+
+    def deserialize(self, data: dict, hashmap=None, restore_id: bool = True, *args, **kwargs):
+        if hashmap is None:
+            hashmap = {}
+        res = super().deserialize(data, hashmap, restore_id)
+        try:
+            self.data = data['data']
+            self.open()
+        except KeyError:
+            self.data = None
+
+        return res
