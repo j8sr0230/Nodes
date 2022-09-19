@@ -88,14 +88,10 @@ class SubPatchNode(FCNNode):
         if hasattr(sub_scene, 'outlets'):
             outputs = [(0, f"Out {i}", 0, 0, True) for i, outlet in enumerate(sub_scene.outlets)]
 
-        # reinit
-        pos = self.grNode.pos
-        self.remove()
-        super().__init__(scene=self.scene,
-                         inputs_init_list=inputs,
-                         outputs_init_list=outputs,
-                         width=150)
-        self.grNode.pos = pos
+        # reinit TODO still doesn't work
+        self.initSockets(inputs, outputs)
+        self.place_sockets()
+        self.updateConnectedEdges()
 
     def eval_operation(self, sockets_input_data: list) -> list:
         if self.sub_patch is None:
