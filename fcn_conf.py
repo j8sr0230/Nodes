@@ -6,7 +6,6 @@ from glob import glob
 import fcn_locator as locator
 
 LISTBOX_MIMETYPE = "application/x-item"
-OP_NODE_FREE_ID = 1
 FC_NODES = {
 }
 DEBUG = False
@@ -26,10 +25,8 @@ class OpCodeNotRegistered(ConfException):
 
 
 def register_node(class_reference):
-    global OP_NODE_FREE_ID
-    class_reference.op_code = OP_NODE_FREE_ID
-    FC_NODES[OP_NODE_FREE_ID] = class_reference
-    OP_NODE_FREE_ID += 1
+    class_reference.op_code = str(class_reference)
+    FC_NODES[class_reference.op_code] = class_reference
 
 
 def get_class_from_opcode(op_code):
@@ -52,8 +49,7 @@ def add_node_from_file(nodes_file_path):
 
 
 def refresh_nodes_list():
-    global OP_NODE_FREE_ID, FC_NODES
-    OP_NODE_FREE_ID = 1
+    global FC_NODES
     FC_NODES = {}
     for directory in NODES_DIR:
         files = [f for f in glob(join(directory, "*.py")) if isfile(f)]

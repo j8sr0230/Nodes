@@ -97,7 +97,7 @@ class FCNSubWindow(NodeEditorWidget):
             data_stream = QDataStream(event_data, QIODevice.ReadOnly)
             pixmap = QPixmap()
             data_stream >> pixmap
-            op_code = data_stream.readInt32()
+            op_code = data_stream.readQString()
             text = data_stream.readQString()
 
             mouse_position = event.pos()
