@@ -446,7 +446,7 @@ class FCNNodeView(QDMGraphicsNode):
         self.collapsed_height: int = 50
         self.edge_roundness: int = 6
         self.edge_padding: int = 10
-        self.title_horizontal_padding: int = 8
+        self.title_horizontal_padding: int = 12
         self.title_vertical_padding: int = 10
 
     def initAssets(self):
@@ -470,14 +470,13 @@ class FCNNodeView(QDMGraphicsNode):
        """
         super().paint(painter, q_style_option_graphics_item, widget)
 
-        offset: float = 24.0
-        if self.node.isDirty():
-            offset: float = 0.0
-        if self.node.isInvalid():
-            offset: float = 48.0
+        painter.drawImage(QRectF(-12, -8, 24, 24), self.main_icon, QRectF(self.main_icon.rect()))
 
-        painter.drawImage(QRectF(self.width-12, -12, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0))
-        painter.drawImage(QRectF(-12, -12, 24.0, 24.0), self.main_icon, QRectF(self.main_icon.rect()))
+        status_icon_placement = QRectF(self.width - 24, 0, 16, 16)
+        if self.node.isDirty():
+            painter.drawImage(status_icon_placement, self.icons, QRectF(0, 0, 24, 24))
+        if self.node.isInvalid():
+            painter.drawImage(status_icon_placement, self.icons, QRectF(48, 0, 24, 24))
 
 
 class FCNNode(Node):
