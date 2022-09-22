@@ -15,7 +15,7 @@ from fcn_base_node import FCNSocket
 from fcn_sub_window import FCNSubWindow
 from fcn_drag_listbox import QDMDragListbox
 from nodeeditor.utils import dumpException, pp
-from fcn_conf import FC_NODES
+from fcn_conf import FC_NODES, refresh_nodes_list
 
 
 Edge.registerEdgeValidator(edge_cannot_connect_two_outputs_or_two_inputs)
@@ -253,6 +253,10 @@ class FCNWindow(NodeEditorWindow):
         self.nodes_dock.setWidget(self.nodes_list_widget)
         self.nodes_dock.setFloating(False)
         self.addDockWidget(Qt.RightDockWidgetArea, self.nodes_dock)
+
+    def refresh_nodes_dock(self):
+        refresh_nodes_list()
+        self.nodes_list_widget.refresh_ui()
 
     def createStatusBar(self):
         self.statusBar().showMessage("Ready")

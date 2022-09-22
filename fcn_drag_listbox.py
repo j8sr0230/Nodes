@@ -17,6 +17,10 @@ class QDMDragListbox(QListWidget):
         self.setDragEnabled(True)
         self.add_my_items()
 
+    def refresh_ui(self):
+        self.clear()
+        self.add_my_items()
+
     def add_my_items(self):
         keys = list(FC_NODES.keys())
         keys.sort()

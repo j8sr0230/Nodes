@@ -10,6 +10,7 @@ OP_NODE_FREE_ID = 1
 FC_NODES = {
 }
 DEBUG = False
+NODES_DIR = [locator.NODES_PATH, ]  # TODO: Add user's nodes directory from workbench pref
 
 
 class ConfException(Exception):
@@ -50,12 +51,14 @@ def add_node_from_file(nodes_file_path):
         print(f'Unable to add node from "{nodes_file_path}": {e}')
 
 
-# TODO: Add user's nodes directory from workbench pref
-NODES_DIR = [locator.NODES_PATH, ]
+def refresh_nodes_list():
+    global OP_NODE_FREE_ID, FC_NODES
+    OP_NODE_FREE_ID = 1
+    FC_NODES = {}
+    for directory in NODES_DIR:
+        files = [f for f in glob(join(directory, "*.py")) if isfile(f)]
+        for file_path in files:
+            add_node_from_file(file_path)
 
-for directory in NODES_DIR:
-    files = [f for f in glob(join(directory, "*.py")) if isfile(f)]
-    for file_path in files:
-        add_node_from_file(file_path)
 
-# TODO: Allow to add node dynamically, needs GUI refresh
+refresh_nodes_list()
