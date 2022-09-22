@@ -431,6 +431,7 @@ class FCNNodeView(QDMGraphicsNode):
     title_horizontal_padding: int
     title_vertical_padding: int
     icons: QImage
+    main_icon: QImage
 
     def initSizes(self):
         """Initialises the size of the visual node.
@@ -449,17 +450,16 @@ class FCNNodeView(QDMGraphicsNode):
         self.title_vertical_padding: int = 10
 
     def initAssets(self):
-        """Initialises the status icons of the node.
+        """Initialises the status icons and the main icon of the node.
 
         Status icons indicate whether a node is valid, invalid or dirty. This method sets the class attribute for the
-        status icons.
+        status icons. The path to the main icon is defined by the icon class variable of the FCNNode class.
         """
 
         super().initAssets()
         path: str = locator.icon("fcn_status_icon.png")
         self.icons: QImage = QImage(path)
-        if hasattr(self, 'node_icon'):
-            self.main_icon: QImage = QImage(self.node_icon)
+        self.main_icon: QImage = QImage(self.node.icon)
 
     def paint(self, painter, q_style_option_graphics_item, widget=None):
         """Paints the appropriate status icons on the visual node representation.
@@ -476,11 +476,8 @@ class FCNNodeView(QDMGraphicsNode):
         if self.node.isInvalid():
             offset: float = 48.0
 
-        painter.drawImage(QRectF(self.width-29, 5, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0))
-        if hasattr(self, 'node_icon'):
-            if not hasattr(self, 'main_icon'):
-                self.main_icon: QImage = QImage(self.node_icon)
-            painter.drawImage(QRectF(-10, -10, 24.0, 24.0), self.main_icon, self.main_icon.rect())
+        painter.drawImage(QRectF(self.width-12, -12, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0))
+        painter.drawImage(QRectF(-12, -12, 24.0, 24.0), self.main_icon, QRectF(self.main_icon.rect()))
 
 
 class FCNNode(Node):
@@ -569,8 +566,6 @@ class FCNNode(Node):
         # Fill content after parent (and socket) initialisation, because the fill_content_layout method loops over all
         # sockets. Therefore, the sockets must already be present in the data model of the node.
         self.content.fill_content_layout()
-
-        self.grNode.node_icon = self.icon
 
         # Set node size and adjust content layout.
         height = (self.content.layout.totalMinimumSize().height() + self.grNode.title_height +
@@ -665,7 +660,7 @@ class FCNNode(Node):
         # Calculates default socket position
         x, y = super().getSocketPosition(index, position, num_out_of)
 
-        if (hasattr(self.content, "input_labels") and index < len(self.content.input_labels)):
+        if hasattr(self.content, "input_labels") and index < len(self.content.input_labels):
             # If input labels have already been initiated, adjust the y coordinate according the label position.
             if position == LEFT_BOTTOM:
                 elem: QWidget = self.content.input_labels[index]
