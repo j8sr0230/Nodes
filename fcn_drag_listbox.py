@@ -48,7 +48,7 @@ class QDMDragListbox(QListWidget):
             item_data = QByteArray()
             data_stream = QDataStream(item_data, QIODevice.WriteOnly)
             data_stream << pixmap
-            data_stream.writeInt32(op_code)
+            data_stream.writeQString(op_code)
             data_stream.writeQString(item.text())
             mime_data = QMimeData()
             mime_data.setData(LISTBOX_MIMETYPE, item_data)
