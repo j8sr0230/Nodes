@@ -37,11 +37,13 @@ class Receiver(FCNNode):
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
-        self.data = []
-        self.data_change_signal = None
+        self.data: list = []
+        self.data_change_signal: signal = None
+        self.signal_id: str = ""
+
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Id", 1, 1, False, ('int', ))],
-                         outputs_init_list=[(0, "Id", 0, 1, True, ('int', )), (6, "Out", 0, 0, True, ('*', ))],
+                         inputs_init_list=[(3, "Id", 1, "1", False, ('str', ))],
+                         outputs_init_list=[(3, "Id", 0, "1", True, ('str', )), (6, "Out", 0, 0, True, ('*', ))],
                          width=150)
 
     def collapse_node(self, collapse: bool = False):
@@ -61,10 +63,14 @@ class Receiver(FCNNode):
         self.eval()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        signal_id = str(int(sockets_input_data[0][0]))
-        if hasattr(self.data_change_signal, "disconnect"):
-            self.data_change_signal.disconnect(self.on_data_change)
-            self.data_change_signal = None
-        self.data_change_signal = signal(signal_id)
-        self.data_change_signal.connect(self.on_data_change)
+        signal_id = sockets_input_data[0][0]
+
+        if self.signal_id != signal_id:
+            if hasattr(self.data_change_signal, "disconnect"):
+                self.data_change_signal.disconnect(self.on_data_change)
+                self.data_change_signal = None
+            self.data_change_signal = signal(signal_id)
+            self.signal_id = signal_id
+            self.data_change_signal.connect(self.on_data_change)
+
         return [[signal_id], self.data]

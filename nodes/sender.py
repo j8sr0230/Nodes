@@ -36,9 +36,12 @@ class Sender(FCNNode):
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
+        self.signal_id: str = ""
+        self.data_change_signal: signal = None
+
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Id", 1, "1", False, ('int', )), (6, "In", 0, 0, True, ('*', ))],
-                         outputs_init_list=[(0, "Id", 0, "1", True, ('int', )), (6, "Out", 0, 0, True, ('*', ))],
+                         inputs_init_list=[(3, "Id", 1, "1", False, ('str', )), (6, "In", 0, 0, True, ('*', ))],
+                         outputs_init_list=[(3, "Id", 0, "1", True, ('str', )), (6, "Out", 0, 0, True, ('*', ))],
                          width=150)
 
     def collapse_node(self, collapse: bool = False):
@@ -53,9 +56,12 @@ class Sender(FCNNode):
             self.title = self.default_title
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        sender_id = str(int(sockets_input_data[0][0]))
+        signal_id = sockets_input_data[0][0]
         input_data = sockets_input_data[1]
-        data_changed = signal(sender_id)
-        data_changed.send(input_data)
 
-        return [[sender_id], input_data]
+        if self.signal_id != signal_id:
+            self.data_change_signal = signal(signal_id)
+            self.signal_id = signal_id
+
+        self.data_change_signal.send(input_data)
+        return [[signal_id], input_data]
