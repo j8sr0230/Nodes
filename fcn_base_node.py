@@ -658,7 +658,7 @@ class FCNNode(Node):
         # Calculates default socket position
         x, y = super().getSocketPosition(index, position, num_out_of)
 
-        if hasattr(self.content, "input_labels") and index < len(self.content.input_labels):
+        if hasattr(self.content, "input_labels"):
             # If input labels have already been initiated, adjust the y coordinate according the label position.
             if position == LEFT_BOTTOM:
                 elem: QWidget = self.content.input_labels[index]
