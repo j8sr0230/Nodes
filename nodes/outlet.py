@@ -26,7 +26,6 @@
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_stargate import stargate
 
 
 @register_node
