@@ -66,6 +66,7 @@ class Receiver(FCNNode):
         signal_id = sockets_input_data[0][0]
 
         if self.signal_id != signal_id:
+            self.data = []
             if hasattr(self.data_change_signal, "disconnect"):
                 self.data_change_signal.disconnect(self.on_data_change)
                 self.data_change_signal = None
