@@ -40,7 +40,6 @@ from typing import Union
 from math import floor
 from decimal import Decimal
 
-import numpy as np
 from qtpy.QtGui import QImage, QTextOption
 from qtpy.QtCore import QRectF, Qt
 from qtpy.QtWidgets import QWidget, QFormLayout, QLabel, QLineEdit, QSlider, QComboBox, QPlainTextEdit, QSizePolicy
