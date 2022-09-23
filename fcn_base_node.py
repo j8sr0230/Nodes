@@ -470,9 +470,8 @@ class FCNNodeView(QDMGraphicsNode):
        """
         super().paint(painter, q_style_option_graphics_item, widget)
 
-        painter.drawImage(QRectF(-12, -8, 24, 24), self.main_icon, QRectF(self.main_icon.rect()))
-
-        status_icon_placement = QRectF(self.width - 24, 0, 16, 16)
+        painter.drawImage(QRectF(-12, -12, 24, 24), self.main_icon, QRectF(self.main_icon.rect()))
+        status_icon_placement = QRectF(self.width-12, -12, 24.0, 24.0)
         if self.node.isDirty():
             painter.drawImage(status_icon_placement, self.icons, QRectF(0, 0, 24, 24))
         if self.node.isInvalid():
