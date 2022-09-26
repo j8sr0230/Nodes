@@ -61,6 +61,6 @@ class NodesStore:
     def refresh_nodes_list():
         NodesStore.nodes = {}
         for directory in NodesStore.directories:
-            files = [f for f in glob(join(directory, "*.py")) if isfile(f)]
+            files = [f for f in glob(join(join(directory, "**"), "*.py"), recursive=True) if isfile(f)]
             for file_path in files:
                 NodesStore.add_node_from_file(file_path)
