@@ -36,20 +36,31 @@ class Sender(FCNNode):
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
+        self.data: list = []
         self.signal_id: str = ""
-        self.data_change_signal: signal = None
+        self.push_data_signal: signal = None
+        self.pull_data_signal: signal = signal("pull")
 
         super().__init__(scene=scene,
                          inputs_init_list=[(3, "Id", 1, "1", False, ('str', )), (6, "In", 0, 0, True, ('*', ))],
                          outputs_init_list=[(3, "Id", 0, "1", True, ('str', )), (6, "Out", 0, 0, True, ('*', ))],
                          width=150)
 
+        self.pull_data_signal.connect(self.on_pull)
+
+    def on_pull(self, sender):
+        try:
+            self.markDirty()
+            self.eval()
+        except Exception as e:
+            print(e, sender)
+
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)
         if collapse is True:
             input_str = self.content.input_widgets[0].text()
             if input_str.isdigit():
-                self.title = 'Sender at %d' % int(self.content.input_widgets[0].text())
+                self.title = 'Sender at <%d>' % int(self.content.input_widgets[0].text())
             else:
                 self.title = 'Sender at ' + self.content.input_widgets[0].text()
         else:
@@ -60,8 +71,10 @@ class Sender(FCNNode):
         input_data = sockets_input_data[1]
 
         if self.signal_id != signal_id:
-            self.data_change_signal = signal(signal_id)
+            # New sender signale id
+            self.push_data_signal = signal(signal_id)
             self.signal_id = signal_id
 
-        self.data_change_signal.send(input_data)
+        self.data = input_data
+        self.push_data_signal.send(input_data)
         return [[signal_id], input_data]
