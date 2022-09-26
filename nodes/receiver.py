@@ -31,15 +31,15 @@ from fcn_locator import icon
 @register_node
 class Receiver(FCNNode):
     data: list
-
     icon: str = icon("fcn_default.png")
     op_title: str = "Receiver"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         self.data: list = []
-        self.data_change_signal: signal = None
         self.signal_id: str = ""
+        self.push_data_signal: signal = None
+        self.pull_data_signal: signal = signal("pull")
 
         super().__init__(scene=scene,
                          inputs_init_list=[(3, "Id", 1, "1", False, ('str', ))],
@@ -51,27 +51,31 @@ class Receiver(FCNNode):
         if collapse is True:
             input_str = self.content.input_widgets[0].text()
             if input_str.isdigit():
-                self.title = 'Receiver at %d' % int(self.content.input_widgets[0].text())
+                self.title = 'Receiver at <%d>' % int(self.content.input_widgets[0].text())
             else:
                 self.title = 'Receiver at ' + self.content.input_widgets[0].text()
         else:
             self.title = self.default_title
 
-    def on_data_change(self, data):
-        self.data = data
-        self.markDirty()
-        self.eval()
+    def on_push(self, data):
+        try:
+            self.data = data
+            self.markDirty()
+            self.eval()
+        except Exception as e:
+            print(e, data)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         signal_id = sockets_input_data[0][0]
 
         if self.signal_id != signal_id:
-            self.data = []
-            if hasattr(self.data_change_signal, "disconnect"):
-                self.data_change_signal.disconnect(self.on_data_change)
-                self.data_change_signal = None
-            self.data_change_signal = signal(signal_id)
+            # New receiver signale id
+            if hasattr(self.push_data_signal, "disconnect"):
+                self.push_data_signal.disconnect(self.on_push)
+                self.push_data_signal = None
+            self.push_data_signal = signal(signal_id)
             self.signal_id = signal_id
-            self.data_change_signal.connect(self.on_data_change)
+            self.push_data_signal.connect(self.on_push)
+            self.pull_data_signal.send(self)
 
         return [[signal_id], self.data]
