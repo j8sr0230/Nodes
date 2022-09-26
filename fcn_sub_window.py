@@ -7,7 +7,7 @@ from nodeeditor.node_edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER, EDGE_TYPE_S
 from nodeeditor.node_graphics_view import MODE_EDGE_DRAG
 from nodeeditor.utils import dumpException
 
-from fcn_conf import FC_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
+from fcn_conf import NodesStore, LISTBOX_MIMETYPE
 
 
 DEBUG = False
@@ -36,7 +36,7 @@ class FCNSubWindow(NodeEditorWidget):
     def get_node_class_from_data(data):
         if 'op_code' not in data:
             return Node
-        return get_class_from_opcode(data['op_code'])
+        return NodesStore.get_class_from_opcode(data['op_code'])
 
     def do_eval_outputs(self):
         # eval all output nodes
@@ -59,18 +59,13 @@ class FCNSubWindow(NodeEditorWidget):
 
     def init_new_node_actions(self):
         self.node_actions = {}
-        keys = list(FC_NODES.keys())
-        keys.sort()
-        for key in keys:
-            node = FC_NODES[key]
+        for key, node in NodesStore.nodes.items():
             self.node_actions[node.op_code] = QAction(QIcon(node.icon), node.op_title)
             self.node_actions[node.op_code].setData(node.op_code)
 
     def init_nodes_context_menu(self):
         context_menu = QMenu(self)
-        keys = list(FC_NODES.keys())
-        keys.sort()
-        for key in keys:
+        for key in NodesStore.nodes:
             context_menu.addAction(self.node_actions[key])
         return context_menu
 
@@ -107,7 +102,7 @@ class FCNSubWindow(NodeEditorWidget):
                 print("GOT DROP: [%d] '%s'" % (op_code, text), "mouse:", mouse_position, "scene:", scene_position)
 
             try:
-                node = get_class_from_opcode(op_code)(self.scene)
+                node = NodesStore.get_class_from_opcode(op_code)(self.scene)
                 node.setPos(scene_position.x(), scene_position.y())
                 self.scene.history.storeHistory("Created node %s" % node.__class__.__name__)
             except Exception as e:

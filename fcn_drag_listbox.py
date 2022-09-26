@@ -3,7 +3,7 @@ from qtpy.QtCore import QSize, Qt, QByteArray, QDataStream, QMimeData, QIODevice
 from qtpy.QtWidgets import QListWidget, QAbstractItemView, QListWidgetItem
 from nodeeditor.utils import dumpException
 
-from fcn_conf import FC_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
+from fcn_conf import NodesStore, LISTBOX_MIMETYPE
 
 
 class QDMDragListbox(QListWidget):
@@ -22,10 +22,8 @@ class QDMDragListbox(QListWidget):
         self.add_my_items()
 
     def add_my_items(self):
-        keys = list(FC_NODES.keys())
-        keys.sort()
-        for key in keys:
-            node = get_class_from_opcode(key)
+        for key in NodesStore.nodes:
+            node = NodesStore.get_class_from_opcode(key)
             self.add_my_item(node.op_title, node.icon, node.op_code)
 
     def add_my_item(self, name, icon=None, op_code=0):
