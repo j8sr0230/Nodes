@@ -29,16 +29,77 @@ from fcn_locator import icon, getFCNodesWorkbench
 
 
 @register_node
+class InletNode(FCNNode):
+
+    icon: str = icon("arrow-right.png")
+    op_title: str = "Inlet"
+    op_category = "Utils"
+    content_label_objname: str = "fcn_node_bg"
+
+    def __init__(self, scene):
+        if hasattr(scene, 'inlets'):
+            scene.inlets.append(self)
+        else:
+            scene.inlets = [self]
+
+        self.data = []
+        super().__init__(scene=scene,
+                         inputs_init_list=[],
+                         outputs_init_list=[(0, "Out", 0, 0, True)],
+                         width=150)
+
+        self.collapse_node(True)
+
+    def setData(self, data):
+        self.data = data
+
+    def eval_operation(self, sockets_input_data: list) -> list:
+        return [self.data]
+
+
+@register_node
+class OutletNode(FCNNode):
+
+    icon: str = icon("arrow-right.png")
+    op_title: str = "Outlet"
+    op_category = "Utils"
+    content_label_objname: str = "fcn_node_bg"
+
+    def __init__(self, scene):
+
+        self.data = None
+        if hasattr(scene, 'outlets'):
+            scene.outlets.append(self)
+        else:
+            scene.outlets = [self]
+
+        super().__init__(scene=scene,
+                         inputs_init_list=[(0, "In", 0, 0, True)],
+                         outputs_init_list=[],
+                         width=150)
+
+        self.collapse_node(True)
+
+
+    def eval_operation(self, sockets_input_data: list) -> list:
+        self.data = sockets_input_data[0]
+        return None
+
+
+@register_node
 class SubPatchNode(FCNNode):
 
     icon: str = icon("fcn_wb_icon.svg")
     op_title: str = "SubPatch"
+    op_category = "Utils"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         self.data = None
         self.sub_patch = None
         self.sub_window = None
+        self.current_inputs = []
+        self.current_outputs = []
 
         super().__init__(scene=scene,
                          inputs_init_list=[],
@@ -60,24 +121,26 @@ class SubPatchNode(FCNNode):
         self.sub_window.show()
 
     def open(self):
-        # lazy import due to import loop if placed in header
-        from fcn_sub_window import FCNSubWindow
-        self.sub_patch = FCNSubWindow()
-        self.sub_patch.fileNew()
-        self.sub_patch.setWindowTitle("SubPatch")
-        self.sub_patch.scene.addHasBeenModifiedListener(self.onChange)
+        if self.sub_patch is None:
+            # lazy import due to import loop if placed in header
+            from fcn_sub_window import FCNSubWindow
+            self.sub_patch = FCNSubWindow()
+            self.sub_patch.fileNew()
+            self.sub_patch.setWindowTitle("SubPatch")
+            self.sub_patch.scene.addHasBeenModifiedListener(self.onChange)
+            self.sub_patch.scene.addDropListener(self.onChange)
 
         if self.data is not None:
             self.sub_patch.scene.deserialize(self.data)
-            self.resetWidgets()
 
-    def onChange(self):
+    def onChange(self, event=None):
         self.resetWidgets()
         self.sub_patch.setWindowTitle("SubPatch")
 
     def onClose(self, sub_window, event):
         self.data = self.sub_patch.scene.serialize()
         self.sub_window = None
+        self.sub_patch = None
 
     def resetWidgets(self):
         sub_scene = self.sub_patch.scene
@@ -88,14 +151,16 @@ class SubPatchNode(FCNNode):
         if hasattr(sub_scene, 'outlets'):
             outputs = [(0, f"Out {i}", 0, 0, True) for i, outlet in enumerate(sub_scene.outlets)]
 
-        # reinit TODO still doesn't work
-        self.initSockets(inputs, outputs)
-        self.place_sockets()
-        self.updateConnectedEdges()
+        if self.current_inputs != inputs or self.current_outputs != outputs:
+            # reinit
+            self.initSockets(inputs, outputs)
+            self.place_sockets()
+            self.updateConnectedEdges()
+            self.current_inputs = inputs
+            self.current_outputs = outputs
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        if self.sub_patch is None:
-            self.open()
+        self.open()
 
         sub_scene = self.sub_patch.scene
         if hasattr(sub_scene, 'inlets'):
