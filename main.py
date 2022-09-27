@@ -26,6 +26,7 @@ import sys
 
 from qtpy.QtWidgets import QApplication
 from qtpy.QtCore import Qt
+
 import FreeCAD
 import FreeCADGui
 

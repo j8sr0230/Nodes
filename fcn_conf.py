@@ -1,15 +1,12 @@
 import importlib.util
 import sys
-from os.path import dirname, basename, isfile, join
+from os.path import dirname, basename, isfile, isdir, join
 from glob import glob
 
 import fcn_locator as locator
 
 LISTBOX_MIMETYPE = "application/x-item"
-FC_NODES = {
-}
 DEBUG = False
-NODES_DIR = [locator.NODES_PATH, ]  # TODO: Add user's nodes directory from workbench pref
 
 
 class ConfException(Exception):
@@ -26,35 +23,44 @@ class OpCodeNotRegistered(ConfException):
 
 def register_node(class_reference):
     class_reference.op_code = str(class_reference)
-    FC_NODES[class_reference.op_code] = class_reference
+    NodesStore.nodes[class_reference.op_code] = class_reference
 
 
-def get_class_from_opcode(op_code):
-    if op_code not in FC_NODES:
-        raise OpCodeNotRegistered("OpCode '%d' is not registered" % op_code)
-    return FC_NODES[op_code]
+class NodesStore:
+    nodes = {}
+    directories = [locator.NODES_PATH, ]
 
+    def __new__(cls):
+        return None
 
-def add_node_from_file(nodes_file_path):
-    module_name = basename(nodes_file_path)[:-3]
-    spec = importlib.util.spec_from_file_location(module_name, nodes_file_path)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[module_name] = module
-    try:
-        spec.loader.exec_module(module)
-        if DEBUG:
-            print(f'New node {module_name}')
-    except Exception as e:
-        print(f'Unable to add node from "{nodes_file_path}": {e}')
+    @staticmethod
+    def add_search_dir(path):
+        if isdir(path) and path not in NodesStore.directories:
+            NodesStore.directories.append(path)
 
+    @staticmethod
+    def get_class_from_opcode(op_code):
+        if op_code not in NodesStore.nodes:
+            raise OpCodeNotRegistered("OpCode '%d' is not registered" % op_code)
+        return NodesStore.nodes[op_code]
 
-def refresh_nodes_list():
-    global FC_NODES
-    FC_NODES = {}
-    for directory in NODES_DIR:
-        files = [f for f in glob(join(directory, "*.py")) if isfile(f)]
-        for file_path in files:
-            add_node_from_file(file_path)
+    @staticmethod
+    def add_node_from_file(nodes_file_path):
+        module_name = basename(nodes_file_path)[:-3]
+        spec = importlib.util.spec_from_file_location(module_name, nodes_file_path)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        try:
+            spec.loader.exec_module(module)
+            if DEBUG:
+                print(f'New node {module_name}')
+        except Exception as e:
+            print(f'Unable to add node from "{nodes_file_path}": {e}')
 
-
-refresh_nodes_list()
+    @staticmethod
+    def refresh_nodes_list():
+        NodesStore.nodes = {}
+        for directory in NodesStore.directories:
+            files = [f for f in glob(join(join(directory, "**"), "*.py"), recursive=True) if isfile(f)]
+            for file_path in files:
+                NodesStore.add_node_from_file(file_path)
