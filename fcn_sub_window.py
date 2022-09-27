@@ -67,13 +67,17 @@ class FCNSubWindow(NodeEditorWidget):
         context_menu: QMenu = QMenu(self)
 
         sub_menus: dict = dict()
-        for key in NodesStore.nodes:
-            node = NodesStore.nodes[key]
+        op_codes = list(NodesStore.nodes.keys())
+        op_codes.sort()
+        for op_code in op_codes:
+            node = NodesStore.nodes[op_code]
             if node.op_category not in sub_menus.keys():
                 sub_menus[node.op_category] = []
-            sub_menus[node.op_category].append(self.node_actions[key])
+            sub_menus[node.op_category].append(self.node_actions[op_code])
 
-        for node_category in sub_menus.keys():
+        node_categories = list(sub_menus.keys())
+        node_categories.sort()
+        for node_category in node_categories:
             menu: QMenu = context_menu.addMenu(node_category)
             menu.addActions(sub_menus[node_category])
 
