@@ -34,6 +34,7 @@ class PythonNode(FCNNode):
 
     icon: str = icon("python_logo.png")
     op_title: str = "Python"
+    op_category = "Experimental"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
