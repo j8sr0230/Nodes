@@ -16,7 +16,8 @@ from nodeeditor.node_edge_validators import (  # Enabling edge validators
 from fcn_base_node import FCNSocket
 from fcn_sub_window import FCNSubWindow
 from fcn_drag_listbox import QDMDragListbox
-from fcn_conf import FC_NODES, refresh_nodes_list
+from nodeeditor.utils import dumpException, pp
+from fcn_conf import NodesStore
 
 
 # Local validator to use string type
@@ -58,9 +59,11 @@ class FCNWindow(NodeEditorWindow):
         self.name_product = 'FreeCAD Nodes (fc_nodes)'
         self.empty_icon = QIcon(".")
 
+        NodesStore.refresh_nodes_list()
+
         if DEBUG:
             print("Registered nodes:")
-            pp(FC_NODES)
+            pp(NodesStore.nodes)
 
         self.mdi_area = QMdiArea()
         self.mdi_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
