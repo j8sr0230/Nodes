@@ -1,6 +1,7 @@
 from qtpy.QtGui import QPixmap, QIcon, QDrag
 from qtpy.QtCore import QSize, Qt, QByteArray, QDataStream, QMimeData, QIODevice, QPoint
 from qtpy.QtWidgets import QListWidget, QAbstractItemView, QListWidgetItem
+
 from nodeeditor.utils import dumpException
 
 from fcn_conf import NodesStore, LISTBOX_MIMETYPE
