@@ -34,6 +34,7 @@ from fcn_utils import flatten_to_vectors
 class DataStructure(FCNNode):
     icon: str = icon("fcn_default.png")
     op_title: str = "Data Structure"
+    op_category = "Lists"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):

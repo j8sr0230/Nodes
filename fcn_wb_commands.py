@@ -50,3 +50,25 @@ class FCNodes_CommandShow:
 
 
 FreeCADGui.addCommand('FCNodes_Show', FCNodes_CommandShow())
+
+
+class FCNodes_CommandRefresh:
+    """Refresh nodes list"""
+
+    @staticmethod
+    def GetResources():
+        return {'Pixmap': locator.icon('fcn_wb_icon.svg'),
+                'MenuText': QT_TRANSLATE_NOOP("FCNodes_Show", "Show FCNodes window"),
+                'ToolTip': QT_TRANSLATE_NOOP("FCNodes_Show", "Show FCNodes window")}
+
+    @staticmethod
+    def Activated():
+        from fcn_conf import NodesStore
+        NodesStore.refresh_nodes_list()
+
+    @staticmethod
+    def IsActive():
+        return True
+
+
+FreeCADGui.addCommand('FCNodes_Refresh', FCNodes_CommandRefresh())

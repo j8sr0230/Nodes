@@ -1,14 +1,14 @@
 from qtpy.QtGui import QIcon, QPixmap
 from qtpy.QtCore import QDataStream, QIODevice, Qt
 from qtpy.QtWidgets import QAction, QGraphicsProxyWidget, QMenu
+
 from nodeeditor.node_node import Node
 from nodeeditor.node_editor_widget import NodeEditorWidget
 from nodeeditor.node_edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER, EDGE_TYPE_SQUARE
 from nodeeditor.node_graphics_view import MODE_EDGE_DRAG
 from nodeeditor.utils import dumpException
 
-from fcn_conf import FC_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
-
+from fcn_conf import NodesStore, LISTBOX_MIMETYPE
 
 DEBUG = False
 DEBUG_CONTEXT = False
@@ -36,7 +36,7 @@ class FCNSubWindow(NodeEditorWidget):
     def get_node_class_from_data(data):
         if 'op_code' not in data:
             return Node
-        return get_class_from_opcode(data['op_code'])
+        return NodesStore.get_class_from_opcode(data['op_code'])
 
     def do_eval_outputs(self):
         # eval all output nodes
@@ -59,19 +59,28 @@ class FCNSubWindow(NodeEditorWidget):
 
     def init_new_node_actions(self):
         self.node_actions = {}
-        keys = list(FC_NODES.keys())
-        keys.sort()
-        for key in keys:
-            node = FC_NODES[key]
+        for key, node in NodesStore.nodes.items():
             self.node_actions[node.op_code] = QAction(QIcon(node.icon), node.op_title)
             self.node_actions[node.op_code].setData(node.op_code)
 
     def init_nodes_context_menu(self):
-        context_menu = QMenu(self)
-        keys = list(FC_NODES.keys())
-        keys.sort()
-        for key in keys:
-            context_menu.addAction(self.node_actions[key])
+        context_menu: QMenu = QMenu(self)
+
+        sub_menus: dict = dict()
+        op_codes = list(NodesStore.nodes.keys())
+        op_codes.sort()
+        for op_code in op_codes:
+            node = NodesStore.nodes[op_code]
+            if node.op_category not in sub_menus.keys():
+                sub_menus[node.op_category] = []
+            sub_menus[node.op_category].append(self.node_actions[op_code])
+
+        node_categories = list(sub_menus.keys())
+        node_categories.sort()
+        for node_category in node_categories:
+            menu: QMenu = context_menu.addMenu(node_category)
+            menu.addActions(sub_menus[node_category])
+
         return context_menu
 
     def setTitle(self):
@@ -107,7 +116,7 @@ class FCNSubWindow(NodeEditorWidget):
                 print("GOT DROP: [%d] '%s'" % (op_code, text), "mouse:", mouse_position, "scene:", scene_position)
 
             try:
-                node = get_class_from_opcode(op_code)(self.scene)
+                node = NodesStore.get_class_from_opcode(op_code)(self.scene)
                 node.setPos(scene_position.x(), scene_position.y())
                 self.scene.history.storeHistory("Created node %s" % node.__class__.__name__)
             except Exception as e:
@@ -219,7 +228,7 @@ class FCNSubWindow(NodeEditorWidget):
         action = context_menu.exec_(self.mapToGlobal(event.pos()))
 
         if action is not None:
-            new_calc_node = get_class_from_opcode(action.data())(self.scene)
+            new_calc_node = NodesStore.get_class_from_opcode(action.data())(self.scene)
             scene_pos = self.scene.getView().mapToScene(event.pos())
             new_calc_node.setPos(scene_pos.x(), scene_pos.y())
             if DEBUG_CONTEXT:

@@ -33,6 +33,7 @@ class SampleNode(FCNNode):
 
     icon: str = locator.icon("fcn_default.png")
     op_title: str = "Sample Node"
+    op_category = "Sample Category"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene: 'Scene'):
