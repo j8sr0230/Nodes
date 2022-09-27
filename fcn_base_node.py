@@ -488,6 +488,7 @@ class FCNNode(Node):
      - icon (str): Path to the node image, displayed in the node list box (QListWidget).
      - op_code (int): Unique index of the node, used to register the node in the app, referring to fcn_conf.py.
      - op_title (str): Title of the node, display in the node header.
+     - op_category (str): Node category used for structuring scenes context menu and node drop box.
      - content_label_objname (str): Label of the content widget, used by qss stylesheets.
      - GraphicsNode_class (QDMGraphicsNode): Name of node ui class.
      - NodeContent_class (QDMNodeContentWidget): Name of node content ui class.
@@ -513,6 +514,7 @@ class FCNNode(Node):
     icon: str = ""
     op_code: int = -1
     op_title: str = ""
+    op_category = "Default"
     content_label_objname: str = ""
 
     GraphicsNode_class: FCNNodeView = FCNNodeView

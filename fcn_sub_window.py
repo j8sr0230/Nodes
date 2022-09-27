@@ -67,11 +67,49 @@ class FCNSubWindow(NodeEditorWidget):
             self.node_actions[node.op_code].setData(node.op_code)
 
     def init_nodes_context_menu(self):
-        context_menu = QMenu(self)
+        sub_menus: set = set()
+
         keys = list(FC_NODES.keys())
         keys.sort()
         for key in keys:
-            context_menu.addAction(self.node_actions[key])
+            node = FC_NODES[key]
+            sub_menus.add(QMenu(node.op_category))
+
+        for key in keys:
+            node = FC_NODES[key]
+            node_cat = node.op_category
+            for sub_menu in sub_menus:
+                if node_cat == sub_menu.title():
+                    sub_menu.addAction(self.node_actions[key])
+                    break
+
+        context_menu = QMenu(self)
+        for sub_menu in sub_menus:
+            context_menu.addMenu(sub_menu)
+
+
+        #     values = actions[node.op_category]
+        #     actions[node.op_category] = actions[node.op_category].append([self.node_actions[key]])
+        #
+        # print(actions)
+        #
+        #
+        #
+        # context_menu = QMenu(self)
+        # for key in categories:
+        #     context_menu.addMenu(node.op_category)
+
+
+        #keys = list(FC_NODES.keys())
+        #keys.sort()
+
+        # for key in keys:
+        #     node = FC_NODES[key]
+        #
+        #     category = context_menu.addMenu(node.op_category)
+            #category.addAction(self.node_actions[key])
+
+            #  context_menu.addAction(self.node_actions[key])
         return context_menu
 
     def setTitle(self):
