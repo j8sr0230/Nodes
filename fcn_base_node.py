@@ -43,6 +43,7 @@ from decimal import Decimal
 from qtpy.QtGui import QImage, QTextOption
 from qtpy.QtCore import QRectF, Qt
 from qtpy.QtWidgets import QWidget, QFormLayout, QLabel, QLineEdit, QSlider, QComboBox, QPlainTextEdit, QSizePolicy
+
 from nodeeditor.node_scene import Scene
 from nodeeditor.node_node import Node
 from nodeeditor.node_graphics_node import QDMGraphicsNode
