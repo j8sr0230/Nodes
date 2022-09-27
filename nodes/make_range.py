@@ -36,6 +36,7 @@ class MakeRange(FCNNode):
 
     icon: str = icon("fcn_default.png")
     op_title: str = "Make Range"
+    op_category = "Math"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):

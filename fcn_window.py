@@ -4,8 +4,10 @@ from fnmatch import fnmatch
 from qtpy.QtGui import QIcon, QKeySequence
 from qtpy.QtWidgets import QApplication, QMdiArea, QWidget, QDockWidget, QAction, QMessageBox, QFileDialog, QMenu
 from qtpy.QtCore import Qt, QSignalMapper
+
 from nodeeditor.node_editor_window import NodeEditorWindow
 from nodeeditor.node_edge import Edge
+from nodeeditor.utils import dumpException, pp
 from nodeeditor.node_edge_validators import (  # Enabling edge validators
     edge_cannot_connect_two_outputs_or_two_inputs,
     edge_cannot_connect_input_and_output_of_same_node,
@@ -14,12 +16,7 @@ from nodeeditor.node_edge_validators import (  # Enabling edge validators
 from fcn_base_node import FCNSocket
 from fcn_sub_window import FCNSubWindow
 from fcn_drag_listbox import QDMDragListbox
-from nodeeditor.utils import dumpException, pp
-from fcn_conf import FC_NODES, refresh_nodes_list
-
-
-Edge.registerEdgeValidator(edge_cannot_connect_two_outputs_or_two_inputs)
-Edge.registerEdgeValidator(edge_cannot_connect_input_and_output_of_same_node)
+from fcn_conf import NodesStore
 
 
 # Local validator to use string type
@@ -30,6 +27,8 @@ def edge_cannot_connect_input_and_output_of_different_type(output_socket: FCNSoc
     return any(check_res)
 
 
+Edge.registerEdgeValidator(edge_cannot_connect_two_outputs_or_two_inputs)
+Edge.registerEdgeValidator(edge_cannot_connect_input_and_output_of_same_node)
 Edge.registerEdgeValidator(edge_cannot_connect_input_and_output_of_different_type)
 
 
@@ -59,9 +58,11 @@ class FCNWindow(NodeEditorWindow):
         self.name_product = 'FreeCAD Nodes (fc_nodes)'
         self.empty_icon = QIcon(".")
 
+        NodesStore.refresh_nodes_list()
+
         if DEBUG:
             print("Registered nodes:")
-            pp(FC_NODES)
+            pp(NodesStore.nodes)
 
         self.mdi_area = QMdiArea()
         self.mdi_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)

@@ -51,6 +51,7 @@ class NumberSlider(FCNNode):
 
     icon: str = icon("fcn_default.png")
     op_title: str = "Number Slider"
+    op_category = "Inputs"
     content_label_objname: str = "fcn_node_bg"
 
     NodeContent_class: QDMNodeContentWidget = NumberSliderContentView

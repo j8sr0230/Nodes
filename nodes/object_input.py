@@ -34,6 +34,7 @@ class ObjectInput(FCNNode):
 
     icon: str = icon("fcn_default.png")
     op_title: str = "Object Input"
+    op_category = "FreeCAD"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
