@@ -36,6 +36,7 @@ class MakePoint(FCNNode):
 
     icon: str = icon("fcn_default.png")
     op_title: str = "Make Point"
+    op_category = "FreeCAD"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):

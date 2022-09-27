@@ -10,7 +10,6 @@ from nodeeditor.utils import dumpException
 
 from fcn_conf import NodesStore, LISTBOX_MIMETYPE
 
-
 DEBUG = False
 DEBUG_CONTEXT = False
 
@@ -65,9 +64,19 @@ class FCNSubWindow(NodeEditorWidget):
             self.node_actions[node.op_code].setData(node.op_code)
 
     def init_nodes_context_menu(self):
-        context_menu = QMenu(self)
+        context_menu: QMenu = QMenu(self)
+
+        sub_menus: dict = dict()
         for key in NodesStore.nodes:
-            context_menu.addAction(self.node_actions[key])
+            node = NodesStore.nodes[key]
+            if node.op_category not in sub_menus.keys():
+                sub_menus[node.op_category] = []
+            sub_menus[node.op_category].append(self.node_actions[key])
+
+        for node_category in sub_menus.keys():
+            menu: QMenu = context_menu.addMenu(node_category)
+            menu.addActions(sub_menus[node_category])
+
         return context_menu
 
     def setTitle(self):
@@ -215,7 +224,7 @@ class FCNSubWindow(NodeEditorWidget):
         action = context_menu.exec_(self.mapToGlobal(event.pos()))
 
         if action is not None:
-            new_calc_node = get_class_from_opcode(action.data())(self.scene)
+            new_calc_node = NodesStore.get_class_from_opcode(action.data())(self.scene)
             scene_pos = self.scene.getView().mapToScene(event.pos())
             new_calc_node.setPos(scene_pos.x(), scene_pos.y())
             if DEBUG_CONTEXT:

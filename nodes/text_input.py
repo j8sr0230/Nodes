@@ -32,6 +32,7 @@ class TextInput(FCNNode):
 
     icon: str = icon("fcn_default.png")
     op_title: str = "Text Input"
+    op_category = "Inputs"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
@@ -48,7 +49,6 @@ class TextInput(FCNNode):
         else:
             self.title = self.default_title
 
-    @staticmethod
-    def eval_operation(sockets_input_data: list) -> list:
+    def eval_operation(self, sockets_input_data: list) -> list:
         in_val: str = sockets_input_data[0][0]
         return [[in_val]]
