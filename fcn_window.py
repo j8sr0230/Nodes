@@ -16,7 +16,6 @@ from nodeeditor.node_edge_validators import (  # Enabling edge validators
 from fcn_base_node import FCNSocket
 from fcn_sub_window import FCNSubWindow
 from fcn_drag_listbox import QDMDragListbox
-from nodeeditor.utils import dumpException, pp
 from fcn_conf import NodesStore
 
 
