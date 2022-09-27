@@ -249,11 +249,24 @@ class FCNWindow(NodeEditorWindow):
         pass
 
     def create_nodes_dock(self):
-        self.nodes_list_widget = QDMDragListbox()
-        self.nodes_dock = QDockWidget("Nodes")
-        self.nodes_dock.setWidget(self.nodes_list_widget)
-        self.nodes_dock.setFloating(False)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.nodes_dock)
+        sub_lists: dict = dict()
+        op_codes = list(NodesStore.nodes.keys())
+        op_codes.sort()
+        for op_code in op_codes:
+            node = NodesStore.nodes[op_code]
+            if node.op_category not in sub_lists.keys():
+                sub_lists[node.op_category] = []
+            sub_lists[node.op_category].append(op_code)
+
+        node_categories = list(sub_lists.keys())
+        node_categories.sort()
+        for node_category in node_categories:
+            op_codes = sub_lists[node_category]
+            self.nodes_list_widget = QDMDragListbox(op_codes, self)
+            self.nodes_dock = QDockWidget(node_category)
+            self.nodes_dock.setWidget(self.nodes_list_widget)
+            self.nodes_dock.setFloating(False)
+            self.addDockWidget(Qt.RightDockWidgetArea, self.nodes_dock)
 
     def refresh_nodes_dock(self):
         refresh_nodes_list()
