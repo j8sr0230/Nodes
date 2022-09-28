@@ -255,16 +255,15 @@ class FCNSubWindow(NodeEditorWidget):
                     self.finish_new_node_state(new_calc_node)
             else:
                 self.scene.history.storeHistory("Created %s" % new_calc_node.__class__.__name__)
-
         else:
-            self.node_search_widget: QWidget = NodeSearchWidget(parent=self)
+            if self.node_search_widget is None:
+                self.node_search_widget: QWidget = NodeSearchWidget(parent=self)
             self.node_search_widget.show()
 
-    def mousePressEvent(self, event):
-        super().mousePressEvent(event)
+    def mouseDoubleClickEvent(self, event):
+        super().mouseDoubleClickEvent(event)
         if self.node_search_widget is not None:
             self.node_search_widget.hide()
-            self.node_search_widget = None
 
 
 class NodeSearchWidget(QWidget):
