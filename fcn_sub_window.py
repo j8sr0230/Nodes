@@ -1,6 +1,8 @@
+from typing import Union
+
 from qtpy.QtGui import QIcon, QPixmap
 from qtpy.QtCore import QDataStream, QIODevice, Qt
-from qtpy.QtWidgets import QAction, QGraphicsProxyWidget, QMenu
+from qtpy.QtWidgets import QAction, QGraphicsProxyWidget, QMenu, QVBoxLayout, QLineEdit, QWidget
 
 from nodeeditor.node_node import Node
 from nodeeditor.node_editor_widget import NodeEditorWidget
@@ -9,6 +11,7 @@ from nodeeditor.node_graphics_view import MODE_EDGE_DRAG
 from nodeeditor.utils import dumpException
 
 from fcn_conf import NodesStore, LISTBOX_MIMETYPE
+from fcn_drag_listbox import QDMDragListbox
 
 DEBUG = False
 DEBUG_CONTEXT = False
@@ -16,6 +19,7 @@ DEBUG_CONTEXT = False
 
 class FCNSubWindow(NodeEditorWidget):
     node_actions: dict
+    node_search_widget: Union[QWidget, None]
 
     def __init__(self):
         super().__init__()
@@ -31,6 +35,8 @@ class FCNSubWindow(NodeEditorWidget):
         self.scene.setNodeClassSelector(self.get_node_class_from_data)
 
         self._close_event_listeners = []
+
+        self.node_search_widget: Union[QWidget, None] = None
 
     @staticmethod
     def get_node_class_from_data(data):
@@ -65,6 +71,8 @@ class FCNSubWindow(NodeEditorWidget):
 
     def init_nodes_context_menu(self):
         context_menu: QMenu = QMenu(self)
+
+        context_menu.addAction("Search")
 
         sub_menus: dict = dict()
         op_codes = list(NodesStore.nodes.keys())
@@ -124,6 +132,9 @@ class FCNSubWindow(NodeEditorWidget):
 
             event.setDropAction(Qt.MoveAction)
             event.accept()
+
+            if self.node_search_widget is not None:
+                self.node_search_widget.hide()
         else:
             event.ignore()
 
@@ -227,7 +238,7 @@ class FCNSubWindow(NodeEditorWidget):
         context_menu = self.init_nodes_context_menu()
         action = context_menu.exec_(self.mapToGlobal(event.pos()))
 
-        if action is not None:
+        if action is not None and action.data() in NodesStore.nodes:
             new_calc_node = NodesStore.get_class_from_opcode(action.data())(self.scene)
             scene_pos = self.scene.getView().mapToScene(event.pos())
             new_calc_node.setPos(scene_pos.x(), scene_pos.y())
@@ -244,3 +255,28 @@ class FCNSubWindow(NodeEditorWidget):
                     self.finish_new_node_state(new_calc_node)
             else:
                 self.scene.history.storeHistory("Created %s" % new_calc_node.__class__.__name__)
+
+        else:
+            self.node_search_widget: QWidget = NodeSearchWidget(parent=self)
+            self.node_search_widget.show()
+
+    def mousePressEvent(self, event):
+        super().mousePressEvent(event)
+        if self.node_search_widget is not None:
+            self.node_search_widget.hide()
+            self.node_search_widget = None
+
+
+class NodeSearchWidget(QWidget):
+    def __init__(self, parent: NodeEditorWidget = None):
+        super().__init__(parent)
+
+        self.setFixedHeight(500)
+        self.setFixedWidth(200)
+
+        self.layout = QVBoxLayout()
+        message = QLineEdit("")
+        self.layout.addWidget(message)
+        box = QDMDragListbox(NodesStore.nodes.keys(), self)
+        self.layout.addWidget(box)
+        self.setLayout(self.layout)
