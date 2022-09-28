@@ -258,6 +258,8 @@ class FCNSubWindow(NodeEditorWidget):
         else:
             if self.node_search_widget is None:
                 self.node_search_widget: QWidget = NodeSearchWidget(parent=self)
+
+            self.node_search_widget.setGeometry(event.pos().x(), event.pos().y(), 200, 200)
             self.node_search_widget.show()
 
     def mouseDoubleClickEvent(self, event):
@@ -267,15 +269,38 @@ class FCNSubWindow(NodeEditorWidget):
 
 
 class NodeSearchWidget(QWidget):
+    layout: QVBoxLayout
+    search_input_widget: QLineEdit
+    node_box: QDMDragListbox
+
     def __init__(self, parent: NodeEditorWidget = None):
         super().__init__(parent)
+        self.init_ui()
 
-        self.setFixedHeight(500)
-        self.setFixedWidth(200)
-
+    def init_ui(self):
         self.layout = QVBoxLayout()
-        message = QLineEdit("")
-        self.layout.addWidget(message)
-        box = QDMDragListbox(NodesStore.nodes.keys(), self)
-        self.layout.addWidget(box)
+        self.search_input_widget = QLineEdit("")
+        self.search_input_widget.grabKeyboard()
+        self.search_input_widget.setFocus()
+        self.search_input_widget.textChanged.connect(self.refresh_node_list)
+        self.layout.addWidget(self.search_input_widget)
+        self.node_box = QDMDragListbox(NodesStore.nodes.keys(), self)
+        self.layout.addWidget(self.node_box)
         self.setLayout(self.layout)
+
+    def refresh_node_list(self):
+        search_string = self.search_input_widget.text()
+
+        op_codes = NodesStore.nodes.keys()
+        node_titles: dict = dict()
+        for op_code in op_codes:
+            node = NodesStore.nodes[op_code]
+            node_titles[node.op_title] = op_code
+
+        filtered_op_titles = [hit for hit in node_titles.keys() if hit.lower().startswith(search_string.lower())]
+        filtered_op_titles.sort()
+        filtered_op_codes = [node_titles[filtered_op_title] for filtered_op_title in filtered_op_titles]
+
+        self.layout.removeWidget(self.node_box)
+        self.node_box = QDMDragListbox(filtered_op_codes, self)
+        self.layout.addWidget(self.node_box)
