@@ -28,6 +28,9 @@ class FCNSubWindow(NodeEditorWidget):
 
         self.init_new_node_actions()
 
+        self.gr_view: QDMGraphicsView = self.scene.getView()
+        self.gr_view.isSnappingEnabled = self.set_snapping
+
         self.scene.addHasBeenModifiedListener(self.setTitle)
         self.scene.history.addHistoryRestoredListener(self.on_history_restored)
         self.scene.addDragEnterListener(self.on_drag_enter)
@@ -266,6 +269,13 @@ class FCNSubWindow(NodeEditorWidget):
         super().mouseDoubleClickEvent(event)
         if self.node_search_widget is not None:
             self.node_search_widget.hide()
+
+    def set_snapping(self, event):
+        if self.gr_view.mode == 2:
+            # If mode is MODE_EDGE_DRAG
+            return True
+        else:
+            return False
 
 
 class NodeSearchWidget(QWidget):

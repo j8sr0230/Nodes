@@ -75,6 +75,12 @@ class FCNSocketView(QDMGraphicsSocket):
 
     label_widget: QLabel
     input_widget: QWidget
+    mouse_over: bool
+
+    def __init__(self, socket: 'Socket'):
+        super().__init__(socket)
+        self.mouse_over = False
+        self.setAcceptHoverEvents(True)
 
     def init_inner_widgets(self, socket_label: str = "", socket_input_index: int = 0,
                            socket_default_values: Union[str, int, float, list] = 0):
@@ -132,6 +138,14 @@ class FCNSocketView(QDMGraphicsSocket):
             self.input_widget.textChanged.connect(lambda: self.socket.node.onInputChanged(
                 self.input_widget.toPlainText()))
             self.input_widget.setWordWrapMode(QTextOption.NoWrap)
+
+    def hoverEnterEvent(self, event):
+        super().hoverEnterEvent(event)
+        self.mouse_over = True
+
+    def hoverLeaveEvent(self, event):
+        super().hoverLeaveEvent(event)
+        self.mouse_over = False
 
     def update_widget_value(self):
         """Updates the value shown by the socket input widget.
@@ -197,6 +211,16 @@ class FCNSocketView(QDMGraphicsSocket):
 
         else:
             self.input_widget.setDisabled(False)
+
+    def paint(self, painter, qstyle_option_graphics_item, widget=None):
+        if self.mouse_over:
+            self.radius = 8
+            self.outline_width = 2
+        else:
+            self.radius = 6
+            self.outline_width = 1
+
+        super().paint(painter, qstyle_option_graphics_item, widget)
 
 
 class FCNSocket(Socket):
