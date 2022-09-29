@@ -8,22 +8,22 @@ from fcn_conf import NodesStore, LISTBOX_MIMETYPE
 
 
 class QDMDragListbox(QListWidget):
-    def __init__(self, parent=None):
+    def __init__(self, op_codes: list = NodesStore.nodes, parent=None):
         super().__init__(parent)
-        self.init_ui()
+        self.init_ui(op_codes)
 
-    def init_ui(self):
+    def init_ui(self, op_codes: list = NodesStore.nodes):
         self.setIconSize(QSize(32, 32))
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setDragEnabled(True)
-        self.add_my_items()
+        self.add_my_items(op_codes)
 
-    def refresh_ui(self):
+    def refresh_ui(self, op_codes: list = NodesStore.nodes):
         self.clear()
-        self.add_my_items()
+        self.add_my_items(op_codes)
 
-    def add_my_items(self):
-        for key in NodesStore.nodes:
+    def add_my_items(self, nodes):
+        for key in nodes:
             node = NodesStore.get_class_from_opcode(key)
             self.add_my_item(node.op_title, node.icon, node.op_code)
 

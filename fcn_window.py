@@ -50,7 +50,7 @@ class FCNWindow(NodeEditorWindow):
     window_menu: QMenu
     help_menu: QMenu
     nodes_list_widget: QDMDragListbox
-    nodes_dock: QDockWidget
+    # nodes_dock: QDockWidget
 
     # noinspection PyUnresolvedReferences
     def initUI(self):
@@ -76,7 +76,7 @@ class FCNWindow(NodeEditorWindow):
         self.window_mapper = QSignalMapper(self)
         self.window_mapper.mapped[QWidget].connect(self.set_active_sub_window)
 
-        self.create_nodes_dock()
+        # self.create_nodes_dock()
         self.createActions()
         self.createMenus()
         self.create_tool_bars()
@@ -206,10 +206,10 @@ class FCNWindow(NodeEditorWindow):
     def update_window_menu(self):
         self.window_menu.clear()
 
-        toolbar_nodes = self.window_menu.addAction("Nodes Toolbar")
-        toolbar_nodes.setCheckable(True)
-        toolbar_nodes.triggered.connect(self.on_window_nodes_toolbar)
-        toolbar_nodes.setChecked(self.nodes_dock.isVisible())
+        # toolbar_nodes = self.window_menu.addAction("Nodes Toolbar")
+        # toolbar_nodes.setCheckable(True)
+        # toolbar_nodes.triggered.connect(self.on_window_nodes_toolbar)
+        # toolbar_nodes.setChecked(self.nodes_dock.isVisible())
 
         self.window_menu.addSeparator()
 
@@ -239,25 +239,38 @@ class FCNWindow(NodeEditorWindow):
             action.triggered.connect(self.window_mapper.map)
             self.window_mapper.setMapping(action, window)
 
-    def on_window_nodes_toolbar(self):
-        if self.nodes_dock.isVisible():
-            self.nodes_dock.hide()
-        else:
-            self.nodes_dock.show()
+    # def on_window_nodes_toolbar(self):
+    #     if self.nodes_dock.isVisible():
+    #         self.nodes_dock.hide()
+    #     else:
+    #         self.nodes_dock.show()
 
     def create_tool_bars(self):
         pass
 
-    def create_nodes_dock(self):
-        self.nodes_list_widget = QDMDragListbox()
-        self.nodes_dock = QDockWidget("Nodes")
-        self.nodes_dock.setWidget(self.nodes_list_widget)
-        self.nodes_dock.setFloating(False)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.nodes_dock)
+    # def create_nodes_dock(self):
+    #     sub_lists: dict = dict()
+    #     op_codes = list(NodesStore.nodes.keys())
+    #     op_codes.sort()
+    #     for op_code in op_codes:
+    #         node = NodesStore.nodes[op_code]
+    #         if node.op_category not in sub_lists.keys():
+    #             sub_lists[node.op_category] = []
+    #         sub_lists[node.op_category].append(op_code)
+    #
+    #     node_categories = list(sub_lists.keys())
+    #     node_categories.sort()
+    #     for node_category in node_categories:
+    #         op_codes = sub_lists[node_category]
+    #         self.nodes_list_widget = QDMDragListbox(op_codes, self)
+    #         self.nodes_dock = QDockWidget(node_category)
+    #         self.nodes_dock.setWidget(self.nodes_list_widget)
+    #         self.nodes_dock.setFloating(False)
+    #         self.addDockWidget(Qt.RightDockWidgetArea, self.nodes_dock)
 
-    def refresh_nodes_dock(self):
-        refresh_nodes_list()
-        self.nodes_list_widget.refresh_ui()
+    # def refresh_nodes_dock(self):
+    #     refresh_nodes_list()
+    #     self.nodes_list_widget.refresh_ui()
 
     def createStatusBar(self):
         self.statusBar().showMessage("Ready")
