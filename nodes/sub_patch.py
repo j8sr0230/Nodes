@@ -111,6 +111,7 @@ class SubPatchNode(FCNNode):
     def __init__(self, scene):
         self.sub_window = None
         self.sub_editor = None
+        self.sub_scene_data = None
 
         super().__init__(scene=scene,
                          inputs_init_list=[],
@@ -127,6 +128,7 @@ class SubPatchNode(FCNNode):
             self.sub_editor.setWindowTitle("SubPatch")
 
             sub_scene = self.sub_editor.scene
+            sub_scene.deserialize(self.sub_scene_data)
             sub_scene.addHasBeenModifiedListener(self.onChange)
             sub_scene.addDropListener(self.onChange)
             sub_scene.container = self
@@ -148,6 +150,7 @@ class SubPatchNode(FCNNode):
 
     def onChange(self, event=None):
         self.resetWidgets()
+        self.sub_scene_data = self.get_sub_scene().serialize()
         self.get_sub_editor().setWindowTitle("SubPatch")
 
     def onClose(self, sub_window, event):
@@ -155,6 +158,8 @@ class SubPatchNode(FCNNode):
         self.sub_editor = None
 
     def resetWidgets(self):
+        self.markInvalid()
+
         # save and delete edges
         starts = []
         for i in self.inputs:
