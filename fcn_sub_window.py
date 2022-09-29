@@ -28,6 +28,9 @@ class FCNSubWindow(NodeEditorWidget):
 
         self.init_new_node_actions()
 
+        self.gr_view: QDMGraphicsView = self.scene.getView()
+        self.gr_view.mousePressEvent = self.my_event
+
         self.scene.addHasBeenModifiedListener(self.setTitle)
         self.scene.history.addHistoryRestoredListener(self.on_history_restored)
         self.scene.addDragEnterListener(self.on_drag_enter)
@@ -266,6 +269,19 @@ class FCNSubWindow(NodeEditorWidget):
         super().mouseDoubleClickEvent(event)
         if self.node_search_widget is not None:
             self.node_search_widget.hide()
+
+    def my_event(self, event):
+        if event.button() == Qt.MiddleButton:
+            self.gr_view.middleMouseButtonPress(event)
+        elif event.button() == Qt.LeftButton:
+            self.gr_view.leftMouseButtonPress(event)
+        elif event.button() == Qt.RightButton:
+            self.gr_view.rightMouseButtonPress(event)
+        else:
+            self.gr_view.super().mousePressEvent(event)
+
+        # self.gr_view.setSocketHighlights(scenepos, highlighted=False, radius=EDGE_SNAPPING_RADIUS+100)
+        print("my_event on mouse pressed")
 
 
 class NodeSearchWidget(QWidget):
