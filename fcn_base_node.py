@@ -69,6 +69,7 @@ class FCNSocketView(QDMGraphicsSocket):
     Attributes:
         label_widget (QLabel): Visual socket label.
         input_widget (QWidget): Visual socket input element.
+        mouse_over (bool): Flag for mouse over state.
     """
 
     Socket_Input_Widget_Classes: list = [QLabel, QLineEdit, QSlider, QComboBox, QPlainTextEdit]
@@ -214,8 +215,8 @@ class FCNSocketView(QDMGraphicsSocket):
 
     def paint(self, painter, qstyle_option_graphics_item, widget=None):
         if self.mouse_over:
-            self.radius = 8
-            self.outline_width = 2
+            self.radius = 7
+            self.outline_width = 1
         else:
             self.radius = 6
             self.outline_width = 1
