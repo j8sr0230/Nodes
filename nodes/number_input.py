@@ -24,9 +24,23 @@
 ###################################################################################
 from decimal import Decimal
 
+from qtpy.QtWidgets import QLineEdit
+from nodeeditor.node_content_widget import QDMNodeContentWidget
+
 from fcn_conf import register_node
-from fcn_base_node import FCNNode
+from fcn_base_node import FCNNode, FCNNodeContentView
 from fcn_locator import icon
+
+
+class NumberInputContentView(FCNNodeContentView):
+    def update_content_ui(self, sockets_input_data: list) -> None:
+        number_input: float = float(sockets_input_data[0][0])
+        number_widget: QLineEdit = self.input_widgets[0]
+
+        # Updates widget value according to the input values
+        number_widget.blockSignals(True)  # Prevents signal loop
+        number_widget.setText(str(number_input))
+        number_widget.blockSignals(False)  # Reset signals
 
 
 @register_node
@@ -36,6 +50,8 @@ class NumberInput(FCNNode):
     op_title: str = "Number Input"
     op_category = "Inputs"
     content_label_objname: str = "fcn_node_bg"
+
+    NodeContent_class: QDMNodeContentWidget = NumberInputContentView
 
     def __init__(self, scene):
         super().__init__(scene=scene,
