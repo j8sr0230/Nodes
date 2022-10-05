@@ -6,6 +6,8 @@ from qtpy.QtWidgets import QAction, QGraphicsProxyWidget, QMenu, QVBoxLayout, QL
 
 from nodeeditor.node_node import Node
 from nodeeditor.node_editor_widget import NodeEditorWidget
+from nodeeditor.node_graphics_view import QDMGraphicsView
+from nodeeditor.node_graphics_view import EDGE_SNAPPING
 from nodeeditor.node_edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER, EDGE_TYPE_SQUARE
 from nodeeditor.node_graphics_view import MODE_EDGE_DRAG
 from nodeeditor.utils import dumpException
@@ -29,7 +31,7 @@ class FCNSubWindow(NodeEditorWidget):
         self.init_new_node_actions()
 
         self.gr_view: QDMGraphicsView = self.scene.getView()
-        self.gr_view.isSnappingEnabled = self.set_snapping
+        self.gr_view.isSnappingEnabled = self.is_snapping_enabled
 
         self.scene.addHasBeenModifiedListener(self.setTitle)
         self.scene.history.addHistoryRestoredListener(self.on_history_restored)
@@ -129,7 +131,7 @@ class FCNSubWindow(NodeEditorWidget):
             try:
                 node = NodesStore.get_class_from_opcode(op_code)(self.scene)
                 node.setPos(scene_position.x(), scene_position.y())
-                self.scene.history.storeHistory("Created node %s" % node.__class__.__name__)
+                self.scene.history.storeHistory("Created node %s" % node.__class__.__name__, setModified=True)
             except Exception as e:
                 dumpException(e)
 
@@ -257,25 +259,25 @@ class FCNSubWindow(NodeEditorWidget):
                     self.scene.getView().dragging.edgeDragEnd(target_socket.grSocket)
                     self.finish_new_node_state(new_calc_node)
             else:
-                self.scene.history.storeHistory("Created %s" % new_calc_node.__class__.__name__)
+                self.scene.history.storeHistory("Created %s" % new_calc_node.__class__.__name__, setModified=True)
         else:
             if self.node_search_widget is None:
                 self.node_search_widget: QWidget = NodeSearchWidget(parent=self)
 
             self.node_search_widget.setGeometry(event.pos().x(), event.pos().y(), 200, 200)
             self.node_search_widget.show()
+            self.node_search_widget.search_input_widget.setFocus()
 
     def mouseDoubleClickEvent(self, event):
         super().mouseDoubleClickEvent(event)
         if self.node_search_widget is not None:
             self.node_search_widget.hide()
 
-    def set_snapping(self, event):
+    def is_snapping_enabled(self, event):
         if self.gr_view.mode == 2:
-            # If mode is MODE_EDGE_DRAG
-            return True
+            return EDGE_SNAPPING if event else True
         else:
-            return False
+            return EDGE_SNAPPING and (event.modifiers() & Qt.CTRL) if event else True
 
 
 class NodeSearchWidget(QWidget):
@@ -290,8 +292,8 @@ class NodeSearchWidget(QWidget):
     def init_ui(self):
         self.layout = QVBoxLayout()
         self.search_input_widget = QLineEdit("")
-        self.search_input_widget.grabKeyboard()
         self.search_input_widget.setFocus()
+        # noinspection PyUnresolvedReferences
         self.search_input_widget.textChanged.connect(self.refresh_node_list)
         self.layout.addWidget(self.search_input_widget)
         self.node_box = QDMDragListbox(NodesStore.nodes.keys(), self)
@@ -307,7 +309,7 @@ class NodeSearchWidget(QWidget):
             node = NodesStore.nodes[op_code]
             node_titles[node.op_title] = op_code
 
-        filtered_op_titles = [hit for hit in node_titles.keys() if hit.lower().startswith(search_string.lower())]
+        filtered_op_titles = [hit for hit in node_titles.keys() if search_string.lower() in hit.lower()]
         filtered_op_titles.sort()
         filtered_op_codes = [node_titles[filtered_op_title] for filtered_op_title in filtered_op_titles]
 
