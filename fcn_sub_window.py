@@ -131,7 +131,7 @@ class FCNSubWindow(NodeEditorWidget):
             try:
                 node = NodesStore.get_class_from_opcode(op_code)(self.scene)
                 node.setPos(scene_position.x(), scene_position.y())
-                self.scene.history.storeHistory("Created node %s" % node.__class__.__name__)
+                self.scene.history.storeHistory("Created node %s" % node.__class__.__name__, setModified=True)
             except Exception as e:
                 dumpException(e)
 
@@ -259,7 +259,7 @@ class FCNSubWindow(NodeEditorWidget):
                     self.scene.getView().dragging.edgeDragEnd(target_socket.grSocket)
                     self.finish_new_node_state(new_calc_node)
             else:
-                self.scene.history.storeHistory("Created %s" % new_calc_node.__class__.__name__)
+                self.scene.history.storeHistory("Created %s" % new_calc_node.__class__.__name__, setModified=True)
         else:
             if self.node_search_widget is None:
                 self.node_search_widget: QWidget = NodeSearchWidget(parent=self)
