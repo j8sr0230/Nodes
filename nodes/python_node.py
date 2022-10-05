@@ -41,10 +41,10 @@ class PythonNode(FCNNode):
         width = 400
         super().__init__(scene=scene,
                          inputs_init_list=[(3, "Code", 4, "#enter python code\noutput_data=input_data",
-                                            False, ('string', )),
+                                            False, ('str', )),
                                            (0, "In", 0, "", True)],
                          outputs_init_list=[(0, "Out", 0, 0, True)],
-                         width=width)
+                         width=width, auto_layout=False)
 
         # Manually set node and content size
         self.grNode.height = width

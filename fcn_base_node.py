@@ -207,11 +207,13 @@ class FCNSocketView(QDMGraphicsSocket):
 
         if self.socket.hasAnyEdge():
             # If socket is connected
-            self.input_widget.setDisabled(True)
+            # self.input_widget.setDisabled(True)
+            self.input_widget.hide()
             self.update_widget_value()
 
         else:
-            self.input_widget.setDisabled(False)
+            # self.input_widget.setDisabled(False)
+            self.input_widget.show()
 
     def paint(self, painter, qstyle_option_graphics_item, widget=None):
         if self.mouse_over:
@@ -345,6 +347,12 @@ class FCNNodeContentView(QDMNodeContentWidget):
             self.output_widgets.append(socket.grSocket.label_widget)
             self.layout.addRow(socket.grSocket.input_widget, socket.grSocket.label_widget)
         self.show()  # Hack for recalculating content geometry before updating socket position.
+
+        # Levels heights of labels and widgets to prevent layout from jumping when individual widgets are shown/hidden.
+        if self.node.auto_layout is True:
+            # Hack: Not for nodes with manual layout management
+            for idx, input_label in enumerate(self.input_labels):
+                input_label.setFixedHeight(self.input_widgets[idx].height())
 
     def update_content_ui(self, sockets_input_data: list) -> None:
         """Updates the node content ui.
@@ -557,7 +565,7 @@ class FCNNode(Node):
     default_title: str
 
     def __init__(self, scene: Scene, inputs_init_list: list = None, outputs_init_list: list = None,
-                 width: int = 250):
+                 width: int = 250, auto_layout: bool = True):
         """Constructor of the FCNNode class.
 
         Note:
@@ -580,10 +588,13 @@ class FCNNode(Node):
         :type outputs_init_list: list
         :param width: Width of the node.
         :type width: int
+        :param auto_layout: Is node height managed by Qt layout manager or manual?
+        :type auto_layout: bool
         """
 
         self.inputs_init_list: list = inputs_init_list
         self.output_init_list: list = outputs_init_list
+        self.auto_layout = auto_layout
 
         super().__init__(scene, self.__class__.op_title, self.inputs_init_list, self.output_init_list)
         self.default_title = self.title
