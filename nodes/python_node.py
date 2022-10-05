@@ -41,10 +41,10 @@ class PythonNode(FCNNode):
         width = 400
         super().__init__(scene=scene,
                          inputs_init_list=[(3, "Code", 4, "#enter python code\noutput_data=input_data",
-                                            False, ('string', )),
+                                            False, ("str", )),
                                            (0, "In", 0, "", True)],
                          outputs_init_list=[(0, "Out", 0, 0, True)],
-                         width=width)
+                         width=width, auto_layout=False)
 
         # Manually set node and content size
         self.grNode.height = width
@@ -62,6 +62,7 @@ class PythonNode(FCNNode):
 
         text_edit.hide()  # Hack: Updates widget geometry to calculate the correct socket positions.
         text_edit.show()  # Hack: See above
+        self.content.input_labels[0].setFixedHeight(text_edit.height())  # Levels heights of code label and widget
 
         # Update socket position
         self.place_sockets()
