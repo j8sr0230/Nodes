@@ -148,56 +148,6 @@ class FCNSocketView(QDMGraphicsSocket):
         super().hoverLeaveEvent(event)
         self.mouse_over = False
 
-    # def update_widget_value(self):
-    #     """Updates the value shown by the socket input widget.
-    #
-    #     Socket input/display widgets work in two directions. If no node is connected to the socket, they serve for quick
-    #     manipulation of the respective socket input value, i.e. the serve as an input field. However, if one a node is
-    #     connected to the socket, they will show the input value passed through that node. If multiple nodes are
-    #     connected to the socket, the input widget will show an arrow. This method evaluates the connected node and
-    #     displays the corresponding value in the input/display widget.
-    #     """
-    #
-    #     if self.socket.hasAnyEdge():
-    #         if len(self.socket.edges) == 1:
-    #             # If one edge is connected to the socket
-    #             connected_node: Node = self.socket.node.getInput(self.socket.index)
-    #             connected_output_index: int = self.socket.edges[0].getOtherSocket(self.socket).index
-    #             input_list = connected_node.eval(connected_output_index)
-    #
-    #             if isinstance(self.input_widget, QLineEdit):
-    #                 if len(input_list) == 1:
-    #                     # List with on element (maybe another list)
-    #                     if isinstance(input_list[0], int) or isinstance(input_list[0], float):
-    #                         self.input_widget.setText("%.2E" % Decimal(str(input_list[0])))
-    #                     elif isinstance(input_list[0], str):
-    #                         self.input_widget.setText(input_list[0])
-    #                     elif isinstance(input_list[0], list):
-    #                         self.input_widget.setText("<list>")
-    #                     else:
-    #                         self.input_widget.setText("<unknown>")
-    #                 else:
-    #                     self.input_widget.setText("<list>")
-    #
-    #             elif isinstance(self.input_widget, QSlider):
-    #                 if isinstance(input_list[0], int) or isinstance(input_list[0], float):
-    #                     self.input_widget.setValue(int(input_list[0]))
-    #
-    #             elif isinstance(self.input_widget, QComboBox):
-    #                 if isinstance(input_list[0], int):
-    #                     self.input_widget.setCurrentIndex(input_list[0])
-    #
-    #             elif isinstance(self.input_widget, QPlainTextEdit):
-    #                 if len(input_list) == 1:
-    #                     self.input_widget.insertPlainText(str(input_list[0]))
-    #                 else:
-    #                     self.input_widget.insertPlainText('\n'.join(input_list[0]))
-    #
-    #         else:
-    #             # Multiple edges at one socket
-    #             if isinstance(self.input_widget, QLineEdit):
-    #                 self.input_widget.setText("<multi>")
-
     def update_widget_status(self):
         """Updates the input widget state.
 
@@ -207,10 +157,7 @@ class FCNSocketView(QDMGraphicsSocket):
 
         if self.socket.hasAnyEdge():
             # If socket is connected
-            # self.input_widget.setDisabled(True)
             self.input_widget.hide()
-            # self.update_widget_value()
-
         else:
             # self.input_widget.setDisabled(False)
             self.input_widget.show()
@@ -817,7 +764,7 @@ class FCNNode(Node):
             output_data: list = self.eval_primer()
             if output_data:
                 return output_data[index]
-        except (ValueError, TypeError) as e:
+        except (ValueError, TypeError, SyntaxError, NameError) as e:
             self.markInvalid()
             self.grNode.setToolTip(str(e))
             self.markDescendantsDirty()
