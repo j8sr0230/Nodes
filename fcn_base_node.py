@@ -767,7 +767,7 @@ class FCNNode(Node):
             output_data: list = self.eval_primer()
             if output_data:
                 return output_data[index]
-        except (ValueError, TypeError, SyntaxError, NameError) as e:
+        except (ValueError, TypeError, SyntaxError, NameError, ZeroDivisionError) as e:
             self.markInvalid()
             self.grNode.setToolTip(str(e))
             self.markDescendantsDirty()
