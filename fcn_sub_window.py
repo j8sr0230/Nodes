@@ -1,8 +1,8 @@
-from typing import Union
+from typing import Optional
 
 from qtpy.QtGui import QIcon, QPixmap
 from qtpy.QtCore import QDataStream, QIODevice, Qt
-from qtpy.QtWidgets import QAction, QGraphicsProxyWidget, QMenu, QVBoxLayout, QLineEdit, QWidget
+from qtpy.QtWidgets import QAction, QGraphicsProxyWidget, QMenu, QVBoxLayout, QLineEdit, QDialog
 
 from nodeeditor.node_node import Node
 from nodeeditor.node_editor_widget import NodeEditorWidget
@@ -21,7 +21,7 @@ DEBUG_CONTEXT = False
 
 class FCNSubWindow(NodeEditorWidget):
     node_actions: dict
-    node_search_widget: Union[QWidget, None]
+    node_search_widget: Optional[QDialog]
 
     def __init__(self):
         super().__init__()
@@ -41,7 +41,7 @@ class FCNSubWindow(NodeEditorWidget):
 
         self._close_event_listeners = []
 
-        self.node_search_widget: Union[QWidget, None] = None
+        self.node_search_widget: Optional[QDialog] = None
 
     @staticmethod
     def get_node_class_from_data(data):
@@ -262,16 +262,16 @@ class FCNSubWindow(NodeEditorWidget):
                 self.scene.history.storeHistory("Created %s" % new_calc_node.__class__.__name__, setModified=True)
         else:
             if self.node_search_widget is None:
-                self.node_search_widget: QWidget = NodeSearchWidget(parent=self)
+                self.node_search_widget: Optional[QDialog] = NodeSearchWidget(parent=self)
 
-            self.node_search_widget.setGeometry(event.pos().x(), event.pos().y(), 200, 200)
+            # self.node_search_widget.setGeometry(event.pos().x(), event.pos().y(), 200, 200)
             self.node_search_widget.show()
             self.node_search_widget.search_input_widget.setFocus()
 
-    def mouseDoubleClickEvent(self, event):
-        super().mouseDoubleClickEvent(event)
-        if self.node_search_widget is not None:
-            self.node_search_widget.hide()
+    # def mouseDoubleClickEvent(self, event):
+    #     super().mouseDoubleClickEvent(event)
+    #     if self.node_search_widget is not None:
+    #         self.node_search_widget.hide()
 
     def is_snapping_enabled(self, event):
         if self.gr_view.mode == 2:
@@ -280,7 +280,7 @@ class FCNSubWindow(NodeEditorWidget):
             return EDGE_SNAPPING and (event.modifiers() & Qt.CTRL) if event else True
 
 
-class NodeSearchWidget(QWidget):
+class NodeSearchWidget(QDialog):
     layout: QVBoxLayout
     search_input_widget: QLineEdit
     node_box: QDMDragListbox
@@ -292,7 +292,6 @@ class NodeSearchWidget(QWidget):
     def init_ui(self):
         self.layout = QVBoxLayout()
         self.search_input_widget = QLineEdit("")
-        self.search_input_widget.setFocus()
         # noinspection PyUnresolvedReferences
         self.search_input_widget.textChanged.connect(self.refresh_node_list)
         self.layout.addWidget(self.search_input_widget)
@@ -301,10 +300,10 @@ class NodeSearchWidget(QWidget):
         self.setLayout(self.layout)
 
     def refresh_node_list(self):
-        search_string = self.search_input_widget.text()
+        search_string: str = self.search_input_widget.text()
 
         op_codes = NodesStore.nodes.keys()
-        node_titles: dict = dict()
+        node_titles: dict = {}
         for op_code in op_codes:
             node = NodesStore.nodes[op_code]
             node_titles[node.op_title] = op_code

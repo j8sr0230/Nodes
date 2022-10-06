@@ -481,6 +481,8 @@ class FCNNode(Node):
         outputs_init_list (list(tuples)): Definition of the output sockets with the signature [(socket_type (int),
             socket_label (str), socket_widget_index (int),widget_default_value (obj), multi_edge (bool))]
         content (FCNNodeContentView): Reference to the node content widget.
+        sockets_input_data (list): Data structure that contains all input data either from widgets or other nodes with
+            the signature [[s1], [s2], ..., [sn]].
         output_data_cache (list): Cache storage for the result of the node evaluation.
         input_socket_position (int): Initial position of the input sockets, referring to node_sockets.py.
         output_socket_position (int): Initial position of the output sockets, referring to node_sockets.py.
@@ -505,6 +507,7 @@ class FCNNode(Node):
     inputs_init_list: list
     output_init_list: list
     content: FCNNodeContentView
+    sockets_input_data: list
     output_data_cache: list
     input_socket_position: int
     output_socket_position: int
@@ -588,7 +591,7 @@ class FCNNode(Node):
         for socket in self.outputs:
             socket.setSocketPosition()
 
-    def collapse_node(self, collapse: bool = False):
+    def collapse_node(self, collapse: bool = False) -> None:
         """Toggles node state between default and collapsed.
 
         Nodes can be collapsed to a smaller size to improve the clarity of a node graph. This function switches between
@@ -764,7 +767,7 @@ class FCNNode(Node):
             output_data: list = self.eval_primer()
             if output_data:
                 return output_data[index]
-        except (ValueError, TypeError, SyntaxError, NameError) as e:
+        except (ValueError, TypeError, SyntaxError, NameError, ZeroDivisionError) as e:
             self.markInvalid()
             self.grNode.setToolTip(str(e))
             self.markDescendantsDirty()
@@ -791,7 +794,7 @@ class FCNNode(Node):
             self.collapse_node(True)
 
         # Build input data structure
-        sockets_input_data: list = []  # Container for input data
+        self.sockets_input_data: list = []  # Container for input data
         for socket in self.inputs:
             socket_input_data: list = []
             if socket.hasAnyEdge():
@@ -826,10 +829,10 @@ class FCNNode(Node):
                         input_value: str = socket_input_widget.toPlainText()
                         socket_input_data.append(input_value)
 
-            sockets_input_data.append(socket_input_data)
+            self.sockets_input_data.append(socket_input_data)
 
-        self.content.update_content_ui(sockets_input_data)  # Update node content ui
-        sockets_output_data: list = self.eval_operation(sockets_input_data)  # Calculate socket output
+        self.content.update_content_ui(self.sockets_input_data)  # Update node content ui
+        sockets_output_data: list = self.eval_operation(self.sockets_input_data)  # Calculate socket output
 
         self.output_data_cache: list = sockets_output_data  # Cache calculation result
         self.markDirty(False)

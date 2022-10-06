@@ -48,11 +48,13 @@ class DataStructure(FCNNode):
         super().collapse_node(collapse)
 
         if collapse is True:
-            self.title = self.content.input_widgets[0].currentText()
+            self.title = self.content.input_widgets[0].itemText(self.sockets_input_data[0][0])
         else:
             self.title = self.default_title
 
     def eval_operation(self, sockets_input_data: list) -> list:
+        self.collapse_node(self.content.isHidden())
+
         # Inputs
         op_code: int = sockets_input_data[0][0]
         in_array = sockets_input_data[1]
