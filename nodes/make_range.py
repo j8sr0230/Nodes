@@ -41,16 +41,25 @@ class MakeRange(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Start", 1, 0, False, ('int', 'float')),
-                                           (0, "Stop", 1, 10, False, ('int', 'float')),
+                         inputs_init_list=[(0, "Start", 1, 0, True, ('int', 'float')),
+                                           (0, "Stop", 1, 10, True, ('int', 'float')),
                                            (0, "Step", 1, 1, False, ('int', 'float'))],
                          outputs_init_list=[(0, "Out", 0, 0, True, ('int', 'float'))],
                          width=150)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         # Inputs
-        start: float = float(sockets_input_data[0][0])
-        stop: float = float(sockets_input_data[1][0])
-        step: float = float(sockets_input_data[2][0])
+        start = np.array(sockets_input_data[0])
+        stop = np.array(sockets_input_data[1])
+        step = sockets_input_data[2][0]
 
-        return [np.arange(start, stop, step).tolist()]
+        # Force array broadcast
+        _start = ((start + stop) - stop).flatten().tolist()
+        _end = ((stop + start) - start).flatten().tolist()
+
+        res = []
+        for idx, _s in enumerate(_start):
+            _e = _end[idx]
+            res.append(np.arange(_s, _e, step).tolist())
+
+        return [res]
