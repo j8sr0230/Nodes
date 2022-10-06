@@ -32,17 +32,6 @@ from fcn_base_node import FCNNode, FCNNodeContentView
 from fcn_locator import icon
 
 
-class NumberInputContentView(FCNNodeContentView):
-    def update_content_ui(self, sockets_input_data: list) -> None:
-        number_input: float = float(sockets_input_data[0][0])
-        number_widget: QLineEdit = self.input_widgets[0]
-
-        # Updates widget value according to the input values
-        number_widget.blockSignals(True)  # Prevents signal loop
-        number_widget.setText(str(number_input))
-        number_widget.blockSignals(False)  # Reset signals
-
-
 @register_node
 class NumberInput(FCNNode):
 
@@ -50,8 +39,6 @@ class NumberInput(FCNNode):
     op_title: str = "Number Input"
     op_category = "Inputs"
     content_label_objname: str = "fcn_node_bg"
-
-    NodeContent_class: QDMNodeContentWidget = NumberInputContentView
 
     def __init__(self, scene):
         super().__init__(scene=scene,
@@ -62,15 +49,13 @@ class NumberInput(FCNNode):
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)
 
-        if collapse is True:
-            input_str = self.content.input_widgets[0].text()
-            if input_str.isdigit():
-                self.title = 'In: %.2E' % Decimal(self.content.input_widgets[0].text())
-            else:
-                self.title = 'In: ' + self.content.input_widgets[0].text()
+        if (collapse is True) and isinstance(self.sockets_input_data[0][0], (int, float)):
+            self.title: str = 'In: %.2E' % Decimal(str(self.sockets_input_data[0][0]))
         else:
-            self.title = self.default_title
+            self.title: str = self.default_title
 
     def eval_operation(self, sockets_input_data: list) -> list:
+        self.collapse_node(self.content.isHidden())
+
         in_val: float = float(sockets_input_data[0][0])
         return [[in_val]]

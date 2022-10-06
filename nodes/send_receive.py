@@ -59,16 +59,15 @@ class Sender(FCNNode):
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)
         if collapse is True:
-            input_str = self.content.input_widgets[0].text()
-            if input_str.isdigit():
-                self.title = 'Sender at <%d>' % int(self.content.input_widgets[0].text())
-            else:
-                self.title = 'Sender at ' + self.content.input_widgets[0].text()
+            input_value = self.sockets_input_data[0][0]
+            self.title = 'Sender: ' + str(input_value)
         else:
             self.title = self.default_title
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        signal_id = sockets_input_data[0][0]
+        self.collapse_node(self.content.isHidden())
+
+        signal_id = str(sockets_input_data[0][0])
         input_data = sockets_input_data[1]
 
         if self.signal_id != signal_id:
@@ -103,11 +102,8 @@ class Receiver(FCNNode):
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)
         if collapse is True:
-            input_str = self.content.input_widgets[0].text()
-            if input_str.isdigit():
-                self.title = 'Receiver at <%d>' % int(self.content.input_widgets[0].text())
-            else:
-                self.title = 'Receiver at ' + self.content.input_widgets[0].text()
+            input_value = self.sockets_input_data[0][0]
+            self.title = 'Receiver: ' + str(input_value)
         else:
             self.title = self.default_title
 
@@ -120,7 +116,9 @@ class Receiver(FCNNode):
             print(e, data)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        signal_id = sockets_input_data[0][0]
+        self.collapse_node(self.content.isHidden())
+
+        signal_id = str(sockets_input_data[0][0])
 
         if self.signal_id != signal_id:
             # New receiver signale id
@@ -132,4 +130,4 @@ class Receiver(FCNNode):
             self.push_data_signal.connect(self.on_push)
             self.pull_data_signal.send(self)
 
-        return [[signal_id], self.data]
+        return [[signal_id], self.data if self.data else [0]]

@@ -35,8 +35,8 @@ from fcn_locator import icon
 
 class NumberSliderContentView(FCNNodeContentView):
     def update_content_ui(self, sockets_input_data: list) -> None:
-        slider_min: float = float(sockets_input_data[0][0])
-        slider_max: float = float(sockets_input_data[1][0])
+        slider_min: float = sockets_input_data[0][0]
+        slider_max: float = sockets_input_data[1][0]
         slider_widget: QSlider = self.input_widgets[2]
 
         # Updates slider value according to the input values
@@ -64,17 +64,19 @@ class NumberSlider(FCNNode):
                          outputs_init_list=[(0, "Out", 0, 0.0, True, ("int", ))],
                          width=150)
 
-    def collapse_node(self, collapse: bool = False):
+    def collapse_node(self, collapse: bool = False) -> None:
         super().collapse_node(collapse)
 
         if collapse is True:
-            self.title = 'In: %.2E' % Decimal(str(self.content.input_widgets[2].value()))
+            self.title = 'In: %.2E' % Decimal(str(self.sockets_input_data[2][0]))
         else:
             self.title = self.default_title
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        min_val: float = float(sockets_input_data[0][0])
-        max_val: float = float(sockets_input_data[1][0])
+        self.collapse_node(self.content.isHidden())
+
+        min_val: float = sockets_input_data[0][0]
+        max_val: float = sockets_input_data[1][0]
         clamped_val: float = max(min(sockets_input_data[2][0], int(max_val)), int(min_val))
 
         return [[clamped_val]]
