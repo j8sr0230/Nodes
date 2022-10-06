@@ -45,10 +45,12 @@ class TextInput(FCNNode):
         super().collapse_node(collapse)
 
         if collapse is True:
-            self.title = 'In: ' + self.content.input_widgets[0].text()
+            self.title = 'In: ' + str(self.sockets_input_data[0][0])
         else:
             self.title = self.default_title
 
     def eval_operation(self, sockets_input_data: list) -> list:
+        self.collapse_node(self.content.isHidden())
+
         in_val: str = sockets_input_data[0][0]
         return [[in_val]]

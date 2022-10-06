@@ -47,11 +47,13 @@ class ObjectInput(FCNNode):
         super().collapse_node(collapse)
 
         if collapse is True:
-            self.title = 'Obj: ' + self.content.input_widgets[0].text()
+            self.title = 'Obj: ' + str(self.sockets_input_data[0][0])
         else:
             self.title = self.default_title
 
     def eval_operation(self, sockets_input_data: list) -> list:
+        self.collapse_node(self.content.isHidden())
+
         label_list: list = sockets_input_data[0]
         obj_list: list = []
 

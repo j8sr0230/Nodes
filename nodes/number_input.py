@@ -24,8 +24,11 @@
 ###################################################################################
 from decimal import Decimal
 
+from qtpy.QtWidgets import QLineEdit
+from nodeeditor.node_content_widget import QDMNodeContentWidget
+
 from fcn_conf import register_node
-from fcn_base_node import FCNNode
+from fcn_base_node import FCNNode, FCNNodeContentView
 from fcn_locator import icon
 
 
@@ -46,15 +49,13 @@ class NumberInput(FCNNode):
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)
 
-        if collapse is True:
-            input_str = self.content.input_widgets[0].text()
-            if input_str.isdigit():
-                self.title = 'In: %.2E' % Decimal(self.content.input_widgets[0].text())
-            else:
-                self.title = 'In: ' + self.content.input_widgets[0].text()
+        if (collapse is True) and isinstance(self.sockets_input_data[0][0], (int, float)):
+            self.title: str = 'In: %.2E' % Decimal(str(self.sockets_input_data[0][0]))
         else:
-            self.title = self.default_title
+            self.title: str = self.default_title
 
     def eval_operation(self, sockets_input_data: list) -> list:
+        self.collapse_node(self.content.isHidden())
+
         in_val: float = float(sockets_input_data[0][0])
         return [[in_val]]
