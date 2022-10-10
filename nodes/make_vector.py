@@ -24,6 +24,7 @@
 ###################################################################################
 import os
 import numpy as np
+import awkward as ak
 from FreeCAD import Vector
 
 from fcn_conf import register_node
@@ -49,13 +50,11 @@ class MakeVector(FCNNode):
 
     def eval_operation(self, sockets_input_data: list) -> list:
         # Inputs
-        x_in = np.array(sockets_input_data[0], dtype=object)
-        y_in = np.array(sockets_input_data[1], dtype=object)
-        z_in = np.array(sockets_input_data[2], dtype=object)
+        x_in = ak.Array(sockets_input_data[0])
+        y_in = ak.Array(sockets_input_data[1])
+        z_in = ak.Array(sockets_input_data[2])
 
-        x_vector = x_in * np.array([1, 0, 0])
-        y_vector = y_in * np.array([0, 1, 0])
-        z_vector = z_in * np.array([0, 0, 1])
-
-        res = x_vector + y_vector + z_vector
-        return [[np.array(res).tolist()]]
+        # Broadcast an zip to vector
+        x_vector, y_vector, z_vector = ak.broadcast_arrays(x_in, y_in, z_in)
+        res = ak.zip([x_vector, y_vector, z_vector])
+        return [res.tolist()]

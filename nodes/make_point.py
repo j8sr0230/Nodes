@@ -30,7 +30,7 @@ import pivy.coin as coin
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import flatten_to_vectors
+from fcn_utils import flatten_to_vectors, flatten_to_tuple
 
 
 @register_node
@@ -62,7 +62,8 @@ class MakePoint(FCNNode):
         position_list: list = sockets_input_data[0]
 
         # vertex_list = []
-        vector_pos_list = flatten_to_vectors(position_list)
+        # vector_pos_list = flatten_to_vectors(position_list)
+        vector_pos_list = flatten_to_tuple(position_list)
 
         # for vec in vector_pos_list:
         #     vertex = Part.Point(Vector(vec)).toShape()

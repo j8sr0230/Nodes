@@ -43,3 +43,24 @@ def flatten_to_vectors(data_structure: list) -> list:
             copy.extend(entry)
 
     return res
+
+
+def flatten_to_tuple(data_structure: list) -> list:
+    """Flattens a vector list of arbitrary depth to a simple list of 3D vectors.
+
+    :param data_structure: Editor Scene in which the node is to be inserted.
+    :type data_structure: list
+    :return: Flat list of 3D vectors
+    :rtype: list
+    """
+    res: list = []
+
+    copy: list = data_structure[:]
+    while copy:
+        entry: list = copy.pop()
+        if isinstance(entry, list) or isinstance(entry, tuple):
+            if isinstance(entry, tuple) and len(entry) == 3:
+                res.append(entry)
+            copy.extend(entry)
+
+    return res
