@@ -23,9 +23,7 @@
 #
 ###################################################################################
 import os
-import numpy as np
 import awkward as ak
-from FreeCAD import Vector
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode

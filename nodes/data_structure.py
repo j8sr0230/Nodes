@@ -27,7 +27,7 @@ import numpy as np
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import flatten_to_vectors
+from fcn_utils import flatten_to_tuples
 
 
 @register_node
@@ -65,7 +65,7 @@ class DataStructure(FCNNode):
         elif op_code == 1:  # Flat
             res = np.array(in_array).flatten().tolist()
         elif op_code == 2:  # Flat Topo
-            res = flatten_to_vectors(in_array)
+            res = flatten_to_tuples(in_array)
         else:
             raise ValueError("Unknown operation (Op)")
         return [res]
