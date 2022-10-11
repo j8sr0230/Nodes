@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  number_range.py
+#  text_text_in.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,43 +22,35 @@
 #
 #
 ###################################################################################
-import os
-import awkward as ak
-import numpy as np
-
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
 
 
 @register_node
-class NumberRange(FCNNode):
+class TextIn(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Number Range"
-    op_category = "Number"
+    op_title: str = "Text In"
+    op_category = "Text"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Start", 1, 0, True, ('int', 'float')),
-                                           (0, "Stop", 1, 10, True, ('int', 'float')),
-                                           (0, "Step", 1, 1, False, ('int', 'float'))],
-                         outputs_init_list=[(0, "Out", 0, 0, True, ('int', 'float'))],
+                         inputs_init_list=[(3, "In", 1, "Enter text", False, ("str", ))],
+                         outputs_init_list=[(3, "Out", 0, 0, True, ("str", ))],
                          width=150)
 
+    def collapse_node(self, collapse: bool = False):
+        super().collapse_node(collapse)
+
+        if collapse is True:
+            self.title = 'In: ' + str(self.sockets_input_data[0][0])
+        else:
+            self.title = self.default_title
+
     def eval_operation(self, sockets_input_data: list) -> list:
-        # Inputs
-        start = sockets_input_data[0]
-        stop = sockets_input_data[1]
-        step = sockets_input_data[2][0]
+        self.collapse_node(self.content.isHidden())
 
-        # Force array broadcast
-        start, stop = ak.broadcast_arrays(start, stop)
-
-        res = []
-        for idx, _start in enumerate(ak.flatten(start, axis=None)):
-            _stop = ak.flatten(stop, axis=None)[idx]
-            res.append(np.arange(_start, _stop, step).tolist())
-
-        return [res]
+        in_val: str = sockets_input_data[0][0]
+        return [[in_val]]

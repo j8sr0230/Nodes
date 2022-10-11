@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  set_shape.py
+#  generator_sphere.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,39 +22,38 @@
 #
 #
 ###################################################################################
-import FreeCAD
+from FreeCAD import Vector
 import Part
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
+from fcn_utils import flatten_to_tuples
 
 
 @register_node
-class SetObjectsShape(FCNNode):
+class Sphere(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Set Objects Shape"
-    op_category = "Scene"
+    op_title: str = "Sphere"
+    op_category = "Generator"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", )),
-                                           (5, "Shp", 0, "0", False, ("Shape", ))],
-                         outputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", ))],
-                         width=170)
+                         inputs_init_list=[(0, "R", 1, "10.0", False, ("int", "float")),
+                                           (1, "Pos", 0, 0, True, ("int", "float"))],
+                         outputs_init_list=[(5, "Shp", 0, 0, True, ("Shape", ))],
+                         width=150)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        obj_list: list = sockets_input_data[0]
-        compound = Part.makeCompound(sockets_input_data[1])
+        sphere_radius: float = float(sockets_input_data[0][0])
+        position_list: list = sockets_input_data[1]
 
-        if not (FreeCAD.ActiveDocument is None):
-            for obj in obj_list:
-                obj.Shape = compound
+        sphere_list = []
+        vector_pos_lis = flatten_to_tuples(position_list)
+        for vec in vector_pos_lis:
+            sphere = Part.makeSphere(sphere_radius, Vector(vec))
+            sphere_list.append(sphere)
 
-            FreeCAD.ActiveDocument.recompute()
-        else:
-            raise Exception('No active document')
-
-        return [obj_list]
+        return [sphere_list]

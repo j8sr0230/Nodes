@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  vector_in.py
+#  vector_vector_in.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,11 +22,10 @@
 #
 #
 ###################################################################################
-import os
 import awkward as ak
 
-from fcn_conf import register_node
 from fcn_base_node import FCNNode
+from fcn_conf import register_node
 from fcn_locator import icon
 
 

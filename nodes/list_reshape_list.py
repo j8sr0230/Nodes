@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  scalar_math.py
+#  list_reshape_list.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -27,50 +27,45 @@ import awkward as ak
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
+from fcn_utils import flatten_to_tuples
 
 
 @register_node
-class ScalarMath(FCNNode):
-
+class ReshapeList(FCNNode):
     icon: str = icon("fcn_default.png")
-    op_title: str = "Scalar Math"
-    op_category = "Number"
+    op_title: str = "Reshape List"
+    op_category = "List"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Op", 3, ["a+b", "a-b", "a*b", "a/b", "a^b", ], False, ('int', )),
-                                           (0, "a", 1, 1, True, ('float', 'int')),
-                                           (0, "b", 1, 10, True, ('float', 'int'))],
-                         outputs_init_list=[(0, "Res", 0, 11, True, ('float', 'int'))],
-                         width=150)
+                         inputs_init_list=[(0, 'Op', 3, ['Graft', 'Flat', 'Vec Flat'], False, ('int', )),
+                                           (6, 'In', 1, 0, True, ('*', ))],
+                         outputs_init_list=[(6, 'Out', 0, 0, True, ('*', ))],
+                         width=160)
 
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)
 
         if collapse is True:
-            self.title = "Math: " + self.content.input_widgets[0].currentText()
+            self.title = self.content.input_widgets[0].itemText(self.sockets_input_data[0][0])
         else:
             self.title = self.default_title
 
     def eval_operation(self, sockets_input_data: list) -> list:
+        self.collapse_node(self.content.isHidden())
+
         # Inputs
         op_code: int = sockets_input_data[0][0]
-        a_array = ak.Array(sockets_input_data[1])
-        b_array = ak.Array(sockets_input_data[2])
+        in_array = sockets_input_data[1]
 
         # Outputs
-        if op_code == 0:  # Add
-            res = a_array + b_array
-        elif op_code == 1:  # Sub
-            res = a_array - b_array
-        elif op_code == 2:  # Mul
-            res = a_array * b_array
-        elif op_code == 3:  # Div
-            res = a_array / b_array
-        elif op_code == 4:  # Pow
-            res = a_array ** b_array
+        if op_code == 0:  # Graft
+            res = [[val] for val in in_array]
+        elif op_code == 1:  # Flat
+            res = ak.flatten(in_array, axis=None).tolist()
+        elif op_code == 2:  # Vec Flat
+            res = flatten_to_tuples(in_array)
         else:
             raise ValueError("Unknown operation (Op)")
-
-        return [res.tolist()]
+        return [res]

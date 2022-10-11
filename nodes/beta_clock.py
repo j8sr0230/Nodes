@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  clock.py
+#  beta_clock.py
 #
 #  Copyright (c) 2022 Florian Foinant-Willig <ffw@2f2v.fr>
 #
@@ -28,6 +28,7 @@ from fcn_base_node import FCNNode
 import fcn_locator as locator
 
 from PySide2 import QtCore
+
 
 @register_node
 class Clock(FCNNode):
