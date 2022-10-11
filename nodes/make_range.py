@@ -25,7 +25,6 @@
 import os
 import awkward as ak
 import numpy as np
-from FreeCAD import Vector
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
@@ -56,12 +55,10 @@ class MakeRange(FCNNode):
 
         # Force array broadcast
         start, stop = ak.broadcast_arrays(start, stop)
-        start = np.array(start).flatten()
-        stop = np.array(stop).flatten()
 
         res = []
-        for idx, i in enumerate(start):
-            j = stop[idx]
-            res.append(np.arange(i, j, step).tolist())
+        for idx, _start in enumerate(ak.flatten(start, axis=None)):
+            _stop = ak.flatten(stop, axis=None)[idx]
+            res.append(np.arange(_start, _stop, step).tolist())
 
         return [res]

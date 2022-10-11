@@ -22,7 +22,7 @@
 #
 #
 ###################################################################################
-import numpy as np
+import awkward as ak
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
@@ -63,7 +63,7 @@ class DataStructure(FCNNode):
         if op_code == 0:  # Graft
             res = [[val] for val in in_array]
         elif op_code == 1:  # Flat
-            res = np.array(in_array).flatten().tolist()
+            res = ak.flatten(in_array, axis=None).tolist()
         elif op_code == 2:  # Flat Topo
             res = flatten_to_tuples(in_array)
         else:

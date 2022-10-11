@@ -25,7 +25,7 @@
 # from FreeCAD import Vector
 # import Part
 import FreeCADGui as Gui
-import pivy.coin as coin
+from pivy import coin
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
@@ -92,4 +92,4 @@ class MakePoint(FCNNode):
 
             sg.addChild(self.sg_node)
 
-        return [vector_pos_list]
+        return [position_list]
