@@ -25,6 +25,7 @@
 import FreeCADGui as Gui
 from pivy import coin
 import awkward as ak
+import numpy as np
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
@@ -46,12 +47,14 @@ class Box(FCNNode):
         super().__init__(scene=scene,
                          inputs_init_list=[(0, "W", 1, 10, True, ("int", "float")),
                                            (0, "L", 1, 10, True, ("int", "float")),
-                                           (0, "H", 1, 10, True, ("int", "float"))],
+                                           (0, "H", 1, 10, True, ("int", "float")),
+                                           (1, "Pos", 0, 0, True, ("vec", ))],
                          outputs_init_list=[(3, "Box", 0, 0, True, ("shape", ))],
                          width=150)
 
     def remove(self):
         super().remove()
+        print("remove box", self.sg_nodes)
 
         if hasattr(Gui, "ActiveDocument"):
             view = Gui.ActiveDocument.ActiveView
@@ -63,9 +66,12 @@ class Box(FCNNode):
         width = sockets_input_data[0]
         length = sockets_input_data[1]
         height = sockets_input_data[2]
+        pos = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [(0, 0, 0)]
+        pos = flatten_to_tuples(pos)
 
         # Force array broadcast
-        width, length, height = ak.broadcast_arrays(width, length, height)
+        pos_idx = np.arange(0, len(pos), 1)
+        width, length, height, pos_idx = ak.broadcast_arrays(width, length, height, pos_idx)
 
         width_list = ak.flatten(width, axis=None).tolist()
         length_list = ak.flatten(length, axis=None).tolist()
@@ -75,7 +81,7 @@ class Box(FCNNode):
             view = Gui.ActiveDocument.ActiveView
             sg = view.getSceneGraph()
 
-            if len(self.sg_nodes) != 0:
+            if len(self.sg_nodes) > 0:
                 for sg_node in self.sg_nodes:
                     sg.removeChild(sg_node)
                 self.sg_nodes = []
@@ -89,13 +95,15 @@ class Box(FCNNode):
                 color = coin.SoMaterial()
                 color.diffuseColor = (1., 0, 0)
 
+                trans = coin.SoTranslation()
+                trans.translation.setValue(pos[pos_idx[idx]])
+
                 sg_node = coin.SoSeparator()
                 sg_node.addChild(color)
+                sg_node.addChild(trans)
                 sg_node.addChild(box)
 
                 self.sg_nodes.append(sg_node)
-
-            for sg_node in self.sg_nodes:
                 sg.addChild(sg_node)
 
         return [[self.sg_nodes]]

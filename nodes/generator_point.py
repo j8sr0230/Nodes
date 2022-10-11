@@ -51,6 +51,7 @@ class Point(FCNNode):
 
     def remove(self):
         super().remove()
+        print("remove point")
 
         if hasattr(Gui, "ActiveDocument"):
             view = Gui.ActiveDocument.ActiveView
@@ -59,7 +60,7 @@ class Point(FCNNode):
                 sg.removeChild(self.sg_node)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        position_list: list = sockets_input_data[0]
+        position_list: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [(0, 0, 0)]
 
         vector_pos_list = flatten_to_tuples(position_list)
 
