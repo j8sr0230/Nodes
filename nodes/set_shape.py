@@ -31,11 +31,11 @@ from fcn_locator import icon
 
 
 @register_node
-class SetShape(FCNNode):
+class SetObjectsShape(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Set Shape"
-    op_category = "FreeCAD"
+    op_title: str = "Set Objects Shape"
+    op_category = "Scene"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
@@ -43,7 +43,7 @@ class SetShape(FCNNode):
                          inputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", )),
                                            (5, "Shp", 0, "0", False, ("Shape", ))],
                          outputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", ))],
-                         width=150)
+                         width=170)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         obj_list: list = sockets_input_data[0]

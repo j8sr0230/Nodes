@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  object_input.py
+#  get_objects_data.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -30,18 +30,18 @@ from fcn_locator import icon
 
 
 @register_node
-class ObjectInput(FCNNode):
+class GetObjectsData(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Object Input"
-    op_category = "FreeCAD"
+    op_title: str = "Get Objects Data"
+    op_category = "Scene"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
                          inputs_init_list=[(3, "In", 1, "Object label", True, ("str", ))],
                          outputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", ))],
-                         width=150)
+                         width=170)
 
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)

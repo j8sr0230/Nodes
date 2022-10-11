@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  make_sphere.py
+#  reshape_list.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,8 +22,7 @@
 #
 #
 ###################################################################################
-from FreeCAD import Vector
-import Part
+import awkward as ak
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
@@ -32,28 +31,41 @@ from fcn_utils import flatten_to_tuples
 
 
 @register_node
-class MakeSphere(FCNNode):
-
+class ReshapeList(FCNNode):
     icon: str = icon("fcn_default.png")
-    op_title: str = "Make Sphere"
-    op_category = "FreeCAD"
+    op_title: str = "Reshape List"
+    op_category = "List"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "R", 1, "10.0", False, ("int", "float")),
-                                           (1, "Pos", 0, 0, True, ("int", "float"))],
-                         outputs_init_list=[(5, "Shp", 0, 0, True, ("Shape", ))],
-                         width=150)
+                         inputs_init_list=[(0, 'Op', 3, ['Graft', 'Flat', 'Vec Flat'], False, ('int', )),
+                                           (6, 'In', 1, 0, True, ('*', ))],
+                         outputs_init_list=[(6, 'Out', 0, 0, True, ('*', ))],
+                         width=160)
+
+    def collapse_node(self, collapse: bool = False):
+        super().collapse_node(collapse)
+
+        if collapse is True:
+            self.title = self.content.input_widgets[0].itemText(self.sockets_input_data[0][0])
+        else:
+            self.title = self.default_title
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        sphere_radius: float = float(sockets_input_data[0][0])
-        position_list: list = sockets_input_data[1]
+        self.collapse_node(self.content.isHidden())
 
-        sphere_list = []
-        vector_pos_lis = flatten_to_tuples(position_list)
-        for vec in vector_pos_lis:
-            sphere = Part.makeSphere(sphere_radius, Vector(vec))
-            sphere_list.append(sphere)
+        # Inputs
+        op_code: int = sockets_input_data[0][0]
+        in_array = sockets_input_data[1]
 
-        return [sphere_list]
+        # Outputs
+        if op_code == 0:  # Graft
+            res = [[val] for val in in_array]
+        elif op_code == 1:  # Flat
+            res = ak.flatten(in_array, axis=None).tolist()
+        elif op_code == 2:  # Vec Flat
+            res = flatten_to_tuples(in_array)
+        else:
+            raise ValueError("Unknown operation (Op)")
+        return [res]

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  number_input.py
+#  text_in.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,40 +22,35 @@
 #
 #
 ###################################################################################
-from decimal import Decimal
-
-from qtpy.QtWidgets import QLineEdit
-from nodeeditor.node_content_widget import QDMNodeContentWidget
-
 from fcn_conf import register_node
-from fcn_base_node import FCNNode, FCNNodeContentView
+from fcn_base_node import FCNNode
 from fcn_locator import icon
 
 
 @register_node
-class NumberInput(FCNNode):
+class TextIn(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Number Input"
-    op_category = "Inputs"
+    op_title: str = "Text In"
+    op_category = "Text"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "In", 1, 0, False, ('int', 'float'))],
-                         outputs_init_list=[(0, "Out", 0, 0, True, ('int', 'float'))],
+                         inputs_init_list=[(3, "In", 1, "Enter text", False, ("str", ))],
+                         outputs_init_list=[(3, "Out", 0, 0, True, ("str", ))],
                          width=150)
 
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)
 
-        if (collapse is True) and isinstance(self.sockets_input_data[0][0], (int, float)):
-            self.title: str = 'In: %.2E' % Decimal(str(self.sockets_input_data[0][0]))
+        if collapse is True:
+            self.title = 'In: ' + str(self.sockets_input_data[0][0])
         else:
-            self.title: str = self.default_title
+            self.title = self.default_title
 
     def eval_operation(self, sockets_input_data: list) -> list:
         self.collapse_node(self.content.isHidden())
 
-        in_val: float = float(sockets_input_data[0][0])
+        in_val: str = sockets_input_data[0][0]
         return [[in_val]]

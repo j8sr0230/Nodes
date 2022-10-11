@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  make_vector.py
+#  number_range.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -24,6 +24,7 @@
 ###################################################################################
 import os
 import awkward as ak
+import numpy as np
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
@@ -31,28 +32,33 @@ from fcn_locator import icon
 
 
 @register_node
-class MakeVector(FCNNode):
+class NumberRange(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Make Vector"
-    op_category = "Math"
+    op_title: str = "Number Range"
+    op_category = "Number"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "X", 1, 1.0, True, ("int", "float")),
-                                           (0, "Y", 1, 0.0, True, ("int", "float")),
-                                           (0, "Z", 1, 0.0, True, ("int", "float"))],
-                         outputs_init_list=[(1, "Vec", 0, 0, True, ("vec", ))],
+                         inputs_init_list=[(0, "Start", 1, 0, True, ('int', 'float')),
+                                           (0, "Stop", 1, 10, True, ('int', 'float')),
+                                           (0, "Step", 1, 1, False, ('int', 'float'))],
+                         outputs_init_list=[(0, "Out", 0, 0, True, ('int', 'float'))],
                          width=150)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         # Inputs
-        x_in = sockets_input_data[0]
-        y_in = sockets_input_data[1]
-        z_in = sockets_input_data[2]
+        start = sockets_input_data[0]
+        stop = sockets_input_data[1]
+        step = sockets_input_data[2][0]
 
-        # Broadcast an zip to vector
-        x_vector, y_vector, z_vector = ak.broadcast_arrays(x_in, y_in, z_in)
-        res = ak.zip([x_vector, y_vector, z_vector])
-        return [res.tolist()]
+        # Force array broadcast
+        start, stop = ak.broadcast_arrays(start, stop)
+
+        res = []
+        for idx, _start in enumerate(ak.flatten(start, axis=None)):
+            _stop = ak.flatten(stop, axis=None)[idx]
+            res.append(np.arange(_start, _stop, step).tolist())
+
+        return [res]
