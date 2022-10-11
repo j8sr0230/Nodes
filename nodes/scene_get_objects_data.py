@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  data_structure.py
+#  scene_get_objects_data.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,50 +22,49 @@
 #
 #
 ###################################################################################
-import awkward as ak
+import FreeCAD
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import flatten_to_tuples
 
 
 @register_node
-class DataStructure(FCNNode):
+class GetObjectsData(FCNNode):
+
     icon: str = icon("fcn_default.png")
-    op_title: str = "Data Structure"
-    op_category = "Lists"
+    op_title: str = "Get Objects Data"
+    op_category = "Scene"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, 'Op', 3, ['Graft', 'Flat', 'Flat Topo'], False, ('int', )),
-                                           (6, 'In', 1, 0, True, ('*', ))],
-                         outputs_init_list=[(6, 'Out', 0, 0, True, ('*', ))],
-                         width=160)
+                         inputs_init_list=[(3, "In", 1, "Object label", True, ("str", ))],
+                         outputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", ))],
+                         width=170)
 
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)
 
         if collapse is True:
-            self.title = self.content.input_widgets[0].itemText(self.sockets_input_data[0][0])
+            self.title = 'Obj: ' + str(self.sockets_input_data[0][0])
         else:
             self.title = self.default_title
 
     def eval_operation(self, sockets_input_data: list) -> list:
         self.collapse_node(self.content.isHidden())
 
-        # Inputs
-        op_code: int = sockets_input_data[0][0]
-        in_array = sockets_input_data[1]
+        label_list: list = sockets_input_data[0]
+        obj_list: list = []
 
-        # Outputs
-        if op_code == 0:  # Graft
-            res = [[val] for val in in_array]
-        elif op_code == 1:  # Flat
-            res = ak.flatten(in_array, axis=None).tolist()
-        elif op_code == 2:  # Flat Topo
-            res = flatten_to_tuples(in_array)
+        if not (FreeCAD.ActiveDocument is None):
+            for label in label_list:
+                obj = FreeCAD.ActiveDocument.getObjectsByLabel(label)
+                if len(obj) == 1:
+                    obj_list.append(obj[0])
+                else:
+                    raise ValueError('Unknown object')
         else:
-            raise ValueError("Unknown operation (Op)")
-        return [res]
+            raise Exception('No active document')
+
+        return [obj_list]

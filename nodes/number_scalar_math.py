@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  number_input.py
+#  number_scalar_math.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,40 +22,55 @@
 #
 #
 ###################################################################################
-from decimal import Decimal
-
-from qtpy.QtWidgets import QLineEdit
-from nodeeditor.node_content_widget import QDMNodeContentWidget
+import awkward as ak
 
 from fcn_conf import register_node
-from fcn_base_node import FCNNode, FCNNodeContentView
+from fcn_base_node import FCNNode
 from fcn_locator import icon
 
 
 @register_node
-class NumberInput(FCNNode):
+class ScalarMath(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Number Input"
-    op_category = "Inputs"
+    op_title: str = "Scalar Math"
+    op_category = "Number"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "In", 1, 0, False, ('int', 'float'))],
-                         outputs_init_list=[(0, "Out", 0, 0, True, ('int', 'float'))],
+                         inputs_init_list=[(0, "Op", 3, ["a+b", "a-b", "a*b", "a/b", "a^b", ], False, ('int', )),
+                                           (0, "a", 1, 1, True, ('float', 'int')),
+                                           (0, "b", 1, 10, True, ('float', 'int'))],
+                         outputs_init_list=[(0, "Res", 0, 11, True, ('float', 'int'))],
                          width=150)
 
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)
 
-        if (collapse is True) and isinstance(self.sockets_input_data[0][0], (int, float)):
-            self.title: str = 'In: %.2E' % Decimal(str(self.sockets_input_data[0][0]))
+        if collapse is True:
+            self.title = "Math: " + self.content.input_widgets[0].currentText()
         else:
-            self.title: str = self.default_title
+            self.title = self.default_title
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        self.collapse_node(self.content.isHidden())
+        # Inputs
+        op_code: int = sockets_input_data[0][0]
+        a_array = ak.Array(sockets_input_data[1])
+        b_array = ak.Array(sockets_input_data[2])
 
-        in_val: float = float(sockets_input_data[0][0])
-        return [[in_val]]
+        # Outputs
+        if op_code == 0:  # Add
+            res = a_array + b_array
+        elif op_code == 1:  # Sub
+            res = a_array - b_array
+        elif op_code == 2:  # Mul
+            res = a_array * b_array
+        elif op_code == 3:  # Div
+            res = a_array / b_array
+        elif op_code == 4:  # Pow
+            res = a_array ** b_array
+        else:
+            raise ValueError("Unknown operation (Op)")
+
+        return [res.tolist()]

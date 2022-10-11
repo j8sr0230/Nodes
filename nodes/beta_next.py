@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  clock_node.py
+#  beta_next.py
 #
 #  Copyright (c) 2022 Florian Foinant-Willig <ffw@2f2v.fr>
 #
@@ -27,40 +27,35 @@ from fcn_base_node import FCNNode
 
 import fcn_locator as locator
 
-from PySide2 import QtCore
 
 @register_node
-class ClockNode(FCNNode):
+class Next(FCNNode):
 
     icon: str = locator.icon("fcn_default.png")
-    op_title: str = "Clock"
-    op_category = "Animation"
+    op_title: str = "Next"
+    op_category = "Beta Nodes"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene: 'Scene'):
-        inputs: list = [(0, "period (s.)", 1, "0.1", True)]
-        outputs: list = [(0, "tick", 0, 0, True)]
-        width: int = 150
+        """Constructor of the DemoNode class.
 
-        self.timer = QtCore.QTimer()
-        self.timer.start(100)
-        self.timer.timeout.connect(self.timer_callback)
+        :param scene: Editor Scene in which the node is to be inserted.
+        :type scene: Scene
+        """
+
+        inputs: list = [(6, "List", 1, 0, False), (0, "tick", 0, 0, True)]
+        outputs: list = [(0, "Item", 0, 0, True)]
+        width: int = 150
+        self.index = 0
 
         super().__init__(scene=scene, inputs_init_list=inputs, outputs_init_list=outputs, width=width)
 
-    def timer_callback(self):
-        self.markInvalid()
-        try:
-            self.eval()
-        except:
-            self.timer.stop()
-
     def eval_operation(self, sockets_input_data: list) -> list:
-        period: float = float(sockets_input_data[0][0]) * 1000
-        if (self.timer.interval != period):
-            self.timer.setInterval(period)
+        inputarray = sockets_input_data[0]
+        if (not isinstance(inputarray, list)):
+            return 0
 
-        if not self.timer.isActive():
-            self.timer.start()
-
-        return [[1]]
+        self.index +=1
+        if self.index >= len(inputarray):
+            self.index=0
+        return [[inputarray[self.index]]]

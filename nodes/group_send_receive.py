@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  send_receive.py
+#  group_send_receive.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -33,7 +33,7 @@ from fcn_locator import icon
 class Sender(FCNNode):
     icon: str = icon("fcn_default.png")
     op_title: str = "Sender"
-    op_category = "Utils"
+    op_category = "Group"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
@@ -85,7 +85,7 @@ class Receiver(FCNNode):
     data: list
     icon: str = icon("fcn_default.png")
     op_title: str = "Receiver"
-    op_category = "Utils"
+    op_category = "Group"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  number_slider.py
+#  number_number_slider.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -51,7 +51,7 @@ class NumberSlider(FCNNode):
 
     icon: str = icon("fcn_default.png")
     op_title: str = "Number Slider"
-    op_category = "Inputs"
+    op_category = "Number"
     content_label_objname: str = "fcn_node_bg"
 
     NodeContent_class: QDMNodeContentWidget = NumberSliderContentView

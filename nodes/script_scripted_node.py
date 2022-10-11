@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  python_node.py
+#  script_scripted_node.py
 #
 #  Copyright (c) 2022 Florian Foinant-Willig <ffw@2f2v.fr>
 #
@@ -30,11 +30,11 @@ from fcn_locator import icon
 
 
 @register_node
-class PythonNode(FCNNode):
+class ScriptedNode(FCNNode):
 
     icon: str = icon("python_logo.png")
-    op_title: str = "Python"
-    op_category = "Experimental"
+    op_title: str = "Scripted Node"
+    op_category = "Script"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):

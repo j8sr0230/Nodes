@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  make_sphere.py
+#  generator_sphere.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -32,11 +32,11 @@ from fcn_utils import flatten_to_tuples
 
 
 @register_node
-class MakeSphere(FCNNode):
+class Sphere(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Make Sphere"
-    op_category = "FreeCAD"
+    op_title: str = "Sphere"
+    op_category = "Generator"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):

@@ -260,7 +260,7 @@ class FCNSubWindow(NodeEditorWidget):
                     self.finish_new_node_state(new_calc_node)
             else:
                 self.scene.history.storeHistory("Created %s" % new_calc_node.__class__.__name__, setModified=True)
-        else:
+        elif action is not None and action.text() == "Search":
             if self.node_search_widget is None:
                 self.node_search_widget: Optional[QDialog] = NodeSearchWidget(parent=self)
 

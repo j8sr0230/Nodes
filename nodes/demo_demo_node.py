@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  sample_node.py
+#  demo_demo_node.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -29,15 +29,15 @@ import fcn_locator as locator
 
 
 @register_node
-class SampleNode(FCNNode):
+class DemoNode(FCNNode):
 
     icon: str = locator.icon("fcn_default.png")
-    op_title: str = "Sample Node"
-    op_category = "Sample Category"
+    op_title: str = "Demo Node"
+    op_category = "Demo Category"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene: 'Scene'):
-        """Constructor of the SampleNode class.
+        """Constructor of the DemoNode class.
 
         :param scene: Editor Scene in which the node is to be inserted.
         :type scene: Scene
