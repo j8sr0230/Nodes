@@ -74,7 +74,7 @@ class MakePoint(FCNNode):
             sg = view.getSceneGraph()
 
             marker = coin.SoMarkerSet()
-            marker.markerIndex = coin.SoMarkerSet.CIRCLE_FILLED_9_9
+            marker.markerIndex = coin.SoMarkerSet.CIRCLE_FILLED_5_5
 
             data = coin.SoCoordinate3()
             data.point.setValues(0, len(vector_pos_list), vector_pos_list)

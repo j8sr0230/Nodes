@@ -283,6 +283,7 @@ class FCNWindow(NodeEditorWindow):
         # nodeeditor.scene.addItemsDeselectedListener(self.update_edit_menu)
         nodeeditor.scene.history.addHistoryModifiedListener(self.update_edit_menu)
         nodeeditor.add_close_event_listener(self.on_sub_wnd_close)
+        nodeeditor.add_close_event_listener(nodeeditor.remove_all_nodes)
         return sub_wnd
 
     def on_sub_wnd_close(self, widget, event):
