@@ -45,8 +45,8 @@ class MakePoint(FCNNode):
         self.sg_node = None
 
         super().__init__(scene=scene,
-                         inputs_init_list=[(1, "Pos", 0, 0, True, ("int", "float"))],
-                         outputs_init_list=[(5, "Shp", 0, 0, True, ("Shape", ))],
+                         inputs_init_list=[(1, "Pos", 0, 0, True, ("vec", ))],
+                         outputs_init_list=[(1, "Pos", 0, 0, True, ("vec", ))],
                          width=150)
 
     def remove(self):
