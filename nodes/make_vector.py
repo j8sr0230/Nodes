@@ -48,9 +48,9 @@ class MakeVector(FCNNode):
 
     def eval_operation(self, sockets_input_data: list) -> list:
         # Inputs
-        x_in = ak.Array(sockets_input_data[0])
-        y_in = ak.Array(sockets_input_data[1])
-        z_in = ak.Array(sockets_input_data[2])
+        x_in = sockets_input_data[0]
+        y_in = sockets_input_data[1]
+        z_in = sockets_input_data[2]
 
         # Broadcast an zip to vector
         x_vector, y_vector, z_vector = ak.broadcast_arrays(x_in, y_in, z_in)

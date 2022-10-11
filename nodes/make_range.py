@@ -50,16 +50,18 @@ class MakeRange(FCNNode):
 
     def eval_operation(self, sockets_input_data: list) -> list:
         # Inputs
-        start = ak.Array(sockets_input_data[0])
-        stop = ak.Array(sockets_input_data[1])
+        start = sockets_input_data[0]
+        stop = sockets_input_data[1]
         step = sockets_input_data[2][0]
 
         # Force array broadcast
         start, stop = ak.broadcast_arrays(start, stop)
+        start = np.array(start).flatten()
+        stop = np.array(stop).flatten()
 
         res = []
         for idx, i in enumerate(start):
             j = stop[idx]
             res.append(np.arange(i, j, step).tolist())
 
-        return res
+        return [res]
