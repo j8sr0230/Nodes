@@ -837,23 +837,23 @@ class FCNNode(Node):
         self.output_data_cache: list = sockets_output_data  # Cache calculation result
         self.markDirty(False)
         self.markInvalid(False)
-        self.formatToolTip()
+        self.format_tool_tip()
         self.markDescendantsDirty()
         self.evalChildren()
         if DEBUG:
             print("%s::__eval()" % self.__class__.__name__, "self.output_data_cache = ", self.output_data_cache)
         return sockets_output_data
 
-    def formatToolTip(self):
-        richText : str = ""
-        for input in self.inputs:
-            richText += f"<b><i>{input.socket_label}({','.join(input.socket_str_type)})</i></b> "
-        richText += "<br/>"
-        for i, output in enumerate(self.output_data_cache):
-            richText += f"<b>{self.outputs[i].socket_label}({','.join(self.outputs[i].socket_str_type)}): </b>"
-            for outLine in output:
-                richText += f"{outLine}<br/>"
-        self.grNode.setToolTip(richText)
+    def format_tool_tip(self):
+        rich_text: str = ""
+        for input_socket in self.inputs:
+            rich_text += f"<b><i>{input_socket.socket_label}({','.join(input_socket.socket_str_type)})</i></b> "
+        rich_text += "<br/>"
+        for i, output_socket in enumerate(self.output_data_cache):
+            rich_text += f"<b>{self.outputs[i].socket_label}({','.join(self.outputs[i].socket_str_type)}): </b>"
+            for outLine in output_socket:
+                rich_text += f"{outLine}<br/>"
+        self.grNode.setToolTip(rich_text)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         """Calculation of the socket outputs.
