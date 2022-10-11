@@ -23,8 +23,8 @@
 #
 ###################################################################################
 import os
+import awkward as ak
 import numpy as np
-from FreeCAD import Vector
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
@@ -49,17 +49,16 @@ class MakeRange(FCNNode):
 
     def eval_operation(self, sockets_input_data: list) -> list:
         # Inputs
-        start = np.array(sockets_input_data[0])
-        stop = np.array(sockets_input_data[1])
+        start = sockets_input_data[0]
+        stop = sockets_input_data[1]
         step = sockets_input_data[2][0]
 
         # Force array broadcast
-        _start = ((start + stop) - stop).flatten().tolist()
-        _end = ((stop + start) - start).flatten().tolist()
+        start, stop = ak.broadcast_arrays(start, stop)
 
         res = []
-        for idx, _s in enumerate(_start):
-            _e = _end[idx]
-            res.append(np.arange(_s, _e, step).tolist())
+        for idx, _start in enumerate(ak.flatten(start, axis=None)):
+            _stop = ak.flatten(stop, axis=None)[idx]
+            res.append(np.arange(_start, _stop, step).tolist())
 
         return [res]

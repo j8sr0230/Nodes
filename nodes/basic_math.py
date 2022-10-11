@@ -22,7 +22,7 @@
 #
 #
 ###################################################################################
-import numpy as np
+import awkward as ak
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
@@ -56,8 +56,8 @@ class BasicMath(FCNNode):
     def eval_operation(self, sockets_input_data: list) -> list:
         # Inputs
         op_code: int = sockets_input_data[0][0]
-        a_array = np.array(sockets_input_data[1])
-        b_array = np.array(sockets_input_data[2])
+        a_array = ak.Array(sockets_input_data[1])
+        b_array = ak.Array(sockets_input_data[2])
 
         # Outputs
         if op_code == 0:  # Add
@@ -73,4 +73,4 @@ class BasicMath(FCNNode):
         else:
             raise ValueError("Unknown operation (Op)")
 
-        return [np.array(res).tolist()]
+        return [res.tolist()]

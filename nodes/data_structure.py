@@ -22,12 +22,12 @@
 #
 #
 ###################################################################################
-import numpy as np
+import awkward as ak
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import flatten_to_vectors
+from fcn_utils import flatten_to_tuples
 
 
 @register_node
@@ -63,9 +63,9 @@ class DataStructure(FCNNode):
         if op_code == 0:  # Graft
             res = [[val] for val in in_array]
         elif op_code == 1:  # Flat
-            res = np.array(in_array).flatten().tolist()
+            res = ak.flatten(in_array, axis=None).tolist()
         elif op_code == 2:  # Flat Topo
-            res = flatten_to_vectors(in_array)
+            res = flatten_to_tuples(in_array)
         else:
             raise ValueError("Unknown operation (Op)")
         return [res]
