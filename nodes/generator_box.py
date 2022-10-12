@@ -54,7 +54,6 @@ class Box(FCNNode):
 
     def remove(self):
         super().remove()
-        print("remove box", self.sg_nodes)
 
         if hasattr(Gui, "ActiveDocument"):
             view = Gui.ActiveDocument.ActiveView

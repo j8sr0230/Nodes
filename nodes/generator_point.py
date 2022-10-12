@@ -51,7 +51,6 @@ class Point(FCNNode):
 
     def remove(self):
         super().remove()
-        print("remove point")
 
         if hasattr(Gui, "ActiveDocument"):
             view = Gui.ActiveDocument.ActiveView

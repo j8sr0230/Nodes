@@ -279,11 +279,6 @@ class FCNSubWindow(NodeEditorWidget):
         else:
             return EDGE_SNAPPING and (event.modifiers() & Qt.CTRL) if event else True
 
-    # noinspection PyUnusedLocal
-    def remove_all_nodes(self, widget, event):
-        for node in self.scene.nodes:
-            node.remove()
-
 
 class NodeSearchWidget(QDialog):
     layout: QVBoxLayout
