@@ -289,18 +289,17 @@ class FCNWindow(NodeEditorWindow):
         existing = self.find_mdi_child(widget.filename)
         self.mdi_area.setActiveSubWindow(existing)
 
-        # Removes all nodes from FreeCAD scene graph
-        scene = existing.widget().scene
-        node_list_copy = scene.nodes[:]
-        while node_list_copy:
-            node = node_list_copy.pop(-1)
-            node.remove()
-
         if self.maybeSave():
             event.accept()
+
+            # Removes all nodes from FreeCAD scene graph
+            scene = existing.widget().scene
+            node_list_copy = scene.nodes[:]
+            while node_list_copy:
+                node = node_list_copy.pop(-1)
+                node.remove()
         else:
             event.ignore()
-        print(scene.nodes)
 
     def find_mdi_child(self, filename):
         for window in self.mdi_area.subWindowList():
