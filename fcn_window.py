@@ -283,7 +283,6 @@ class FCNWindow(NodeEditorWindow):
         # nodeeditor.scene.addItemsDeselectedListener(self.update_edit_menu)
         nodeeditor.scene.history.addHistoryModifiedListener(self.update_edit_menu)
         nodeeditor.add_close_event_listener(self.on_sub_wnd_close)
-        nodeeditor.add_close_event_listener(nodeeditor.remove_all_nodes)
         return sub_wnd
 
     def on_sub_wnd_close(self, widget, event):
@@ -292,6 +291,13 @@ class FCNWindow(NodeEditorWindow):
 
         if self.maybeSave():
             event.accept()
+
+            # Removes all nodes from FreeCAD scene graph
+            scene = existing.widget().scene
+            node_list_copy = scene.nodes[:]
+            while node_list_copy:
+                node = node_list_copy.pop(-1)
+                node.remove()
         else:
             event.ignore()
 
