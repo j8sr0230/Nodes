@@ -28,7 +28,7 @@ import Part
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import flatten_to_tuples
+from fcn_utils import simplify
 
 
 @register_node
@@ -51,7 +51,7 @@ class Sphere(FCNNode):
         position_list: list = sockets_input_data[1]
 
         sphere_list = []
-        vector_pos_lis = flatten_to_tuples(position_list)
+        vector_pos_lis = simplify(position_list)
         for vec in vector_pos_lis:
             sphere = Part.makeSphere(sphere_radius, Vector(vec))
             sphere_list.append(sphere)

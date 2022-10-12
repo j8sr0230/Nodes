@@ -30,7 +30,7 @@ import numpy as np
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import flatten_to_tuples
+from fcn_utils import simplify
 
 
 @register_node
@@ -66,7 +66,7 @@ class Box(FCNNode):
         length = sockets_input_data[1]
         height = sockets_input_data[2]
         pos = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [(0, 0, 0)]
-        pos = flatten_to_tuples(pos)
+        pos = simplify(pos)
 
         # Force array broadcast
         pos_idx = np.arange(0, len(pos), 1)
