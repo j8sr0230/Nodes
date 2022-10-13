@@ -46,3 +46,12 @@ def simplify(data_structure: list) -> list:
 
     res.reverse()
     return res
+
+
+def traverse(nested_list):
+    if isinstance(nested_list, list):
+        for sub_list in nested_list:
+            yield from traverse(sub_list)
+    else:
+        if isinstance(nested_list, tuple):
+            yield nested_list

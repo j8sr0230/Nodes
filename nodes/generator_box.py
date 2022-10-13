@@ -66,10 +66,10 @@ class Box(FCNNode):
         length = sockets_input_data[1]
         height = sockets_input_data[2]
         pos = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [(0, 0, 0)]
-        pos = simplify(pos)
 
         # Force array broadcast
-        pos_idx = np.arange(0, len(pos), 1)
+        pos_list = simplify(pos)
+        pos_idx = np.arange(0, len(pos_list), 1)
         width, length, height, pos_idx = ak.broadcast_arrays(width, length, height, pos_idx)
 
         width_list = ak.flatten(width, axis=None).tolist()
@@ -85,17 +85,17 @@ class Box(FCNNode):
                     sg.removeChild(sg_node)
                 self.sg_nodes = []
 
-            for idx, _width in enumerate(width_list):
+            for i in pos_idx:
                 box = coin.SoCube()
-                box.width = _width
-                box.height = length_list[idx]
-                box.depth = height_list[idx]
+                box.width = width_list[i]
+                box.height = length_list[i]
+                box.depth = height_list[i]
 
                 color = coin.SoMaterial()
                 color.diffuseColor = (1., 0, 0)
 
                 trans = coin.SoTranslation()
-                trans.translation.setValue(pos[pos_idx[idx]])
+                trans.translation.setValue(pos_list[i])
 
                 sg_node = coin.SoSeparator()
                 sg_node.addChild(color)
@@ -105,4 +105,4 @@ class Box(FCNNode):
                 self.sg_nodes.append(sg_node)
                 sg.addChild(sg_node)
 
-        return [[self.sg_nodes]]
+        return [self.sg_nodes]
