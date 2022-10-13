@@ -55,3 +55,15 @@ def traverse(nested_list):
     else:
         if isinstance(nested_list, tuple):
             yield nested_list
+
+
+def traverse_list(nested_list):
+    res = []
+    if isinstance(nested_list, list):
+        for sub_list in nested_list:
+            res.append(traverse_list(sub_list))
+    else:
+        if isinstance(nested_list, tuple):
+            # return nested_list
+            return "X"
+    return res
