@@ -69,12 +69,13 @@ class Box(FCNNode):
 
         # Force array broadcast
         pos_list = simplify(pos)
-        pos_idx = np.arange(0, len(pos_list), 1)
-        width, length, height, pos_idx = ak.broadcast_arrays(width, length, height, pos_idx)
+        pos_idx_list = np.arange(0, len(pos_list), 1)
+        width, length, height, pos_idx_list = ak.broadcast_arrays(width, length, height, pos_idx_list)
 
         width_list = ak.flatten(width, axis=None).tolist()
         length_list = ak.flatten(length, axis=None).tolist()
         height_list = ak.flatten(height, axis=None).tolist()
+        pos_idx_list = ak.flatten(pos_idx_list, axis=None).tolist()
 
         if hasattr(Gui, "ActiveDocument"):
             view = Gui.ActiveDocument.ActiveView
@@ -85,7 +86,7 @@ class Box(FCNNode):
                     sg.removeChild(sg_node)
                 self.sg_nodes = []
 
-            for i in pos_idx:
+            for i in pos_idx_list:
                 box = coin.SoCube()
                 box.width = width_list[i]
                 box.height = length_list[i]
