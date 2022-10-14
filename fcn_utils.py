@@ -23,6 +23,7 @@
 #
 ###################################################################################
 from collections.abc import Iterable
+import awkward as ak
 
 
 def simplify(data_structure: list) -> list:
@@ -57,13 +58,17 @@ def traverse(nested_list):
             yield nested_list
 
 
-def traverse_list(nested_list):
+def recreate_structure(template_list, targets):
     res = []
-    if isinstance(nested_list, list):
-        for sub_list in nested_list:
-            res.append(traverse_list(sub_list))
+    targets = ak.flatten(targets, axis=None).tolist()
+
+    if isinstance(template_list, list):
+        for sub_list in template_list:
+            res.append(recreate_structure(sub_list, targets))
     else:
-        if isinstance(nested_list, tuple):
-            # return nested_list
+        if isinstance(template_list, tuple):
+            # return template_list
             return "X"
+
     return res
+    # Result: ['X', [[], [], [], 'X'], [[], [], 'X']]
