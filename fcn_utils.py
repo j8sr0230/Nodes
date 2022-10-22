@@ -58,17 +58,29 @@ def traverse(nested_list):
             yield nested_list
 
 
-def recreate_structure(template_list, targets):
-    res = []
-    targets = ak.flatten(targets, axis=None).tolist()
+def nest_items(template, items):
+    """Generates a template-defined nested list of items.
 
-    if isinstance(template_list, list):
-        for sub_list in template_list:
-            res.append(recreate_structure(sub_list, targets))
+    This function creates a list with the nested structure of the template list. The following rules apply to the
+    elements of this new nested list:
+    - Tuples within the template list are chronologically replaced by elements from the item list.
+    - All other non-iterable data types are replaced by a 'None' as marker.
+
+    :param template: Template list, with the desired nested structure (may contain tuples).
+    :type template: list
+    :param items: Flat list (stack) of items, to replace tuples.
+    :type items: list
+    :return: New nested list with the template-defined list structure and items instead of tuples.
+    :rtype: list
+    """
+
+    items_copy = items[:]
+
+    if isinstance(template, list):
+        temp_list = []
+        for sub_list in template:
+            temp_list.append(nest_items(sub_list, items))
+        return temp_list
     else:
-        if isinstance(template_list, tuple):
-            # return template_list
-            return "X"
-
-    return res
-    # Result: ['X', [[], [], [], 'X'], [[], [], 'X']]
+        if isinstance(template, tuple):
+            return items_copy.pop(0)
