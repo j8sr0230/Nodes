@@ -75,7 +75,6 @@ class Box(FCNNode):
         width_list = ak.flatten(width, axis=None).tolist()
         length_list = ak.flatten(length, axis=None).tolist()
         height_list = ak.flatten(height, axis=None).tolist()
-        pos_idx_list = ak.flatten(pos_idx_list, axis=None).tolist()
 
         if hasattr(Gui, "ActiveDocument"):
             view = Gui.ActiveDocument.ActiveView
