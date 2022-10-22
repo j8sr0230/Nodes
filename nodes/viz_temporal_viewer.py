@@ -1,0 +1,107 @@
+# -*- coding: utf-8 -*-
+###################################################################################
+#
+#  viz_temporal_viewer.py
+#
+#  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+#
+###################################################################################
+import FreeCADGui as Gui
+from pivy import coin
+import awkward as ak
+
+from fcn_conf import register_node
+from fcn_base_node import FCNNode
+from fcn_locator import icon
+
+
+@register_node
+class TemporalViewer(FCNNode):
+
+    icon: str = icon("fcn_default.png")
+    op_title: str = "Temporal Viewer"
+    op_category = "Viz"
+    content_label_objname: str = "fcn_node_bg"
+
+    def __init__(self, scene):
+        self.sg_nodes = []
+
+        super().__init__(scene=scene,
+                         inputs_init_list=[(3, "In", 0, 0, True, ("shape", )),
+                                           (0, "R", 2, (0, 255, 255), False, ("int", )),
+                                           (0, "G", 2, (0, 255, 0), False, ("int", )),
+                                           (0, "B", 2, (0, 255, 0), False, ("int", ))],
+                         outputs_init_list=[(3, "Out", 0, 0, True, ("shape", ))],
+                         width=170)
+
+    def remove(self):
+        super().remove()
+
+        if hasattr(Gui, "ActiveDocument"):
+            view = Gui.ActiveDocument.ActiveView
+            sg = view.getSceneGraph()
+            for sg_node in self.sg_nodes:
+                sg.removeChild(sg_node)
+
+    def eval_operation(self, sockets_input_data: list) -> list:
+        # width = sockets_input_data[0]
+        # length = sockets_input_data[1]
+        # height = sockets_input_data[2]
+        # pos = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [(0, 0, 0)]
+        #
+        # # Force array broadcast
+        # pos_list = simplify(pos)
+        # pos_idx_list = np.arange(0, len(pos_list), 1)
+        # width, length, height, pos_idx_list = ak.broadcast_arrays(width, length, height, pos_idx_list)
+        #
+        # width_list = ak.flatten(width, axis=None).tolist()
+        # length_list = ak.flatten(length, axis=None).tolist()
+        # height_list = ak.flatten(height, axis=None).tolist()
+        #
+        # if hasattr(Gui, "ActiveDocument"):
+        #     view = Gui.ActiveDocument.ActiveView
+        #     sg = view.getSceneGraph()
+        #
+        #     if len(self.sg_nodes) > 0:
+        #         for sg_node in self.sg_nodes:
+        #             sg.removeChild(sg_node)
+        #         self.sg_nodes = []
+        #
+        #     for i in pos_idx_list:
+        #         box = coin.SoCube()
+        #         box.width = width_list[i]
+        #         box.height = length_list[i]
+        #         box.depth = height_list[i]
+        #
+        #         color = coin.SoMaterial()
+        #         color.diffuseColor = (1., 0, 0)
+        #
+        #         trans = coin.SoTranslation()
+        #         trans.translation.setValue(pos_list[i])
+        #
+        #         sg_node = coin.SoSeparator()
+        #         sg_node.addChild(color)
+        #         sg_node.addChild(trans)
+        #         sg_node.addChild(box)
+        #
+        #         self.sg_nodes.append(sg_node)
+        #         sg.addChild(sg_node)
+        #
+        # return [nest_items(pos, self.sg_nodes)] if self.sg_nodes else [[]]
+        return [[]]
