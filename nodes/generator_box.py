@@ -30,7 +30,7 @@ import numpy as np
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import simplify
+from fcn_utils import simplify, nest_items
 
 
 @register_node
@@ -106,4 +106,4 @@ class Box(FCNNode):
                 self.sg_nodes.append(sg_node)
                 sg.addChild(sg_node)
 
-        return [self.sg_nodes]
+        return [nest_items(pos, self.sg_nodes)] if self.sg_nodes else [[]]
