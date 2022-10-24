@@ -25,12 +25,11 @@
 import FreeCADGui as Gui
 from pivy import coin
 import awkward as ak
-import numpy as np
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import simplify, nest_items
+from fcn_utils import simplify, map_tuple
 
 
 @register_node
@@ -38,11 +37,13 @@ class Box(FCNNode):
 
     icon: str = icon("fcn_default.png")
     op_title: str = "Box"
-    op_category = "Generator"
+    op_category: str = "Generator"
     content_label_objname: str = "fcn_node_bg"
 
-    def __init__(self, scene):
-        self.sg_nodes = []
+    def __init__(self, scene: 'Scene'):
+        self.width_list = []
+        self.length_list = []
+        self.height_list = []
 
         super().__init__(scene=scene,
                          inputs_init_list=[(0, "W", 1, 10, True, ("int", "float")),
@@ -52,14 +53,20 @@ class Box(FCNNode):
                          outputs_init_list=[(3, "Box", 0, 0, True, ("shape", ))],
                          width=150)
 
-    def remove(self):
-        super().remove()
+    def make_coin_box(self, position: tuple):
+        trans = coin.SoTranslation()
+        trans.translation.setValue(position)
 
-        if hasattr(Gui, "ActiveDocument"):
-            view = Gui.ActiveDocument.ActiveView
-            sg = view.getSceneGraph()
-            for sg_node in self.sg_nodes:
-                sg.removeChild(sg_node)
+        box = coin.SoCube()
+        box.width = self.width_list.pop(0)
+        box.height = self.length_list.pop(0)
+        box.depth = self.height_list.pop(0)
+
+        sg_node = coin.SoSeparator()
+        sg_node.addChild(trans)
+        sg_node.addChild(box)
+
+        return sg_node
 
     def eval_operation(self, sockets_input_data: list) -> list:
         width = sockets_input_data[0]
@@ -69,40 +76,11 @@ class Box(FCNNode):
 
         # Force array broadcast
         pos_list = simplify(pos)
-        pos_idx_list = np.arange(0, len(pos_list), 1)
+        pos_idx_list = list(range(len(pos_list)))  # np.arange(0, len(pos_list), 1)
         width, length, height, pos_idx_list = ak.broadcast_arrays(width, length, height, pos_idx_list)
 
-        width_list = ak.flatten(width, axis=None).tolist()
-        length_list = ak.flatten(length, axis=None).tolist()
-        height_list = ak.flatten(height, axis=None).tolist()
+        self.width_list = ak.flatten(width, axis=None).tolist()
+        self.length_list = ak.flatten(length, axis=None).tolist()
+        self.height_list = ak.flatten(height, axis=None).tolist()
 
-        if hasattr(Gui, "ActiveDocument"):
-            view = Gui.ActiveDocument.ActiveView
-            sg = view.getSceneGraph()
-
-            if len(self.sg_nodes) > 0:
-                for sg_node in self.sg_nodes:
-                    sg.removeChild(sg_node)
-                self.sg_nodes = []
-
-            for i in pos_idx_list:
-                box = coin.SoCube()
-                box.width = width_list[i]
-                box.height = length_list[i]
-                box.depth = height_list[i]
-
-                color = coin.SoMaterial()
-                color.diffuseColor = (1., 0, 0)
-
-                trans = coin.SoTranslation()
-                trans.translation.setValue(pos_list[i])
-
-                sg_node = coin.SoSeparator()
-                sg_node.addChild(color)
-                sg_node.addChild(trans)
-                sg_node.addChild(box)
-
-                self.sg_nodes.append(sg_node)
-                sg.addChild(sg_node)
-
-        return [nest_items(pos, self.sg_nodes)] if self.sg_nodes else [[]]
+        return [map_tuple(pos, self.make_coin_box)]

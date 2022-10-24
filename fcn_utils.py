@@ -23,7 +23,16 @@
 #
 ###################################################################################
 from collections.abc import Iterable
-import awkward as ak
+
+
+def flatten(nested_list):
+    flattened = []
+    for item in nested_list:
+        if isinstance(item, list):
+            flattened.extend(flatten(item))
+        else:
+            flattened.append(item)
+    return flattened
 
 
 def simplify(data_structure: list) -> list:
@@ -58,29 +67,24 @@ def traverse(nested_list):
             yield nested_list
 
 
-def nest_items(template, items):
-    """Generates a template-defined nested list of items.
+def map_tuple(nested_data: list, callback: 'function') -> list:
+    """Applies the callback function to each tuple item of a nested list.
 
-    This function creates a list with the nested structure of the template list. The following rules apply to the
-    elements of this new nested list:
-    - Tuples within the template list are chronologically replaced by elements from the item list.
-    - All other non-iterable data types are replaced by a 'None' as marker.
+    Creates a list with the nested structure of the input list.
 
-    :param template: Template list, with the desired nested structure (may contain tuples).
-    :type template: list
-    :param items: Flat list (stack) of items, to replace tuples.
-    :type items: list
-    :return: New nested list with the template-defined list structure and items instead of tuples.
+    :param nested_data: Nested input list with tuple items.
+    :type nested_data: list
+    :param callback: Function that performs some action to each tuple element.
+    :type callback: function
+    :return: Nested list with function values.
     :rtype: list
     """
 
-    items_copy = items[:]
-
-    if isinstance(template, list):
-        temp_list = []
-        for sub_list in template:
-            temp_list.append(nest_items(sub_list, items))
+    if isinstance(nested_data, list):
+        temp_list: list = []
+        for sub_list in nested_data:
+            temp_list.append(map_tuple(sub_list, callback))
         return temp_list
     else:
-        if isinstance(template, tuple):
-            return items_copy.pop(0)
+        if isinstance(nested_data, tuple):
+            return callback(nested_data)

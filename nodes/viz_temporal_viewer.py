@@ -29,6 +29,7 @@ import awkward as ak
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
+from fcn_utils import flatten
 
 
 @register_node
@@ -60,48 +61,27 @@ class TemporalViewer(FCNNode):
                 sg.removeChild(sg_node)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        # width = sockets_input_data[0]
-        # length = sockets_input_data[1]
-        # height = sockets_input_data[2]
-        # pos = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [(0, 0, 0)]
-        #
-        # # Force array broadcast
-        # pos_list = simplify(pos)
-        # pos_idx_list = np.arange(0, len(pos_list), 1)
-        # width, length, height, pos_idx_list = ak.broadcast_arrays(width, length, height, pos_idx_list)
-        #
-        # width_list = ak.flatten(width, axis=None).tolist()
-        # length_list = ak.flatten(length, axis=None).tolist()
-        # height_list = ak.flatten(height, axis=None).tolist()
-        #
-        # if hasattr(Gui, "ActiveDocument"):
-        #     view = Gui.ActiveDocument.ActiveView
-        #     sg = view.getSceneGraph()
-        #
-        #     if len(self.sg_nodes) > 0:
-        #         for sg_node in self.sg_nodes:
-        #             sg.removeChild(sg_node)
-        #         self.sg_nodes = []
-        #
-        #     for i in pos_idx_list:
-        #         box = coin.SoCube()
-        #         box.width = width_list[i]
-        #         box.height = length_list[i]
-        #         box.depth = height_list[i]
-        #
-        #         color = coin.SoMaterial()
-        #         color.diffuseColor = (1., 0, 0)
-        #
-        #         trans = coin.SoTranslation()
-        #         trans.translation.setValue(pos_list[i])
-        #
-        #         sg_node = coin.SoSeparator()
-        #         sg_node.addChild(color)
-        #         sg_node.addChild(trans)
-        #         sg_node.addChild(box)
-        #
-        #         self.sg_nodes.append(sg_node)
-        #         sg.addChild(sg_node)
-        #
-        # return [nest_items(pos, self.sg_nodes)] if self.sg_nodes else [[]]
-        return [[]]
+        sg_nodes = flatten(sockets_input_data[0])
+        rgb = (sockets_input_data[1][0]/255, sockets_input_data[2][0]/255, sockets_input_data[3][0]/255)
+
+        color = coin.SoMaterial()
+        color.diffuseColor = rgb
+
+        if hasattr(Gui, "ActiveDocument"):
+            view = Gui.ActiveDocument.ActiveView
+            sg = view.getSceneGraph()
+
+            if len(self.sg_nodes) > 0:
+                for sg_node in self.sg_nodes:
+                    sg.removeChild(sg_node)
+                self.sg_nodes = []
+
+            for sg_node in sg_nodes:
+                sg_sep = coin.SoSeparator()
+                sg_sep.addChild(color)
+                sg_sep.addChild(sg_node)
+
+                self.sg_nodes.append(sg_sep)
+                sg.addChild(sg_sep)
+
+        return [sockets_input_data[0]]
