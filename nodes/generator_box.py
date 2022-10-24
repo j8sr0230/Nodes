@@ -29,7 +29,7 @@ import awkward as ak
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import simplify, map_tuple
+from fcn_utils import simplify, map_objects
 
 
 @register_node
@@ -76,11 +76,11 @@ class Box(FCNNode):
 
         # Force array broadcast
         pos_list = simplify(pos)
-        pos_idx_list = list(range(len(pos_list)))  # np.arange(0, len(pos_list), 1)
+        pos_idx_list = list(range(len(pos_list)))
         width, length, height, pos_idx_list = ak.broadcast_arrays(width, length, height, pos_idx_list)
 
         self.width_list = ak.flatten(width, axis=None).tolist()
         self.length_list = ak.flatten(length, axis=None).tolist()
         self.height_list = ak.flatten(height, axis=None).tolist()
 
-        return [map_tuple(pos, self.make_coin_box)]
+        return [map_objects(pos, tuple, self.make_coin_box)]
