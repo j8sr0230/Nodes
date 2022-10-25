@@ -25,14 +25,14 @@
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import simplify, graft, graft_topology, flatten
+from fcn_utils import flatten, simplify, graft, graft_topology, unwrap, wrap
 
 
 @register_node
 class ReshapeList(FCNNode):
     icon: str = icon("fcn_default.png")
     op_title: str = "Reshape List"
-    op_category = "List"
+    op_category: str = "List"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
@@ -68,9 +68,9 @@ class ReshapeList(FCNNode):
         elif op_code == 3:  # Graft Topology
             res = graft_topology(in_array)
         elif op_code == 4:  # Unwrap
-            res = in_array[0] if len(in_array) == 1 else in_array
+            res = unwrap(in_array)
         elif op_code == 5:  # Wrap
-            res = [in_array]
+            res = wrap(in_array)
         else:
             raise ValueError("Unknown operation (Op)")
         return [res]
