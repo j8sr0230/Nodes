@@ -28,7 +28,7 @@ from collections.abc import Iterable
 def flatten(nested_list):
     flattened = []
     for item in nested_list:
-        if isinstance(item, list):
+        if isinstance(item, Iterable):
             flattened.extend(flatten(item))
         else:
             flattened.append(item)
@@ -50,24 +50,57 @@ def simplify(data_structure: list) -> list:
     while copy:
         entry: list = copy.pop()
         if isinstance(entry, Iterable):
-            if len(entry) > 0 and not (isinstance(entry[0], Iterable)):
+            if len(entry) > 0 and not all([isinstance(i, Iterable) for i in entry]):
                 res.append(entry)
-            copy.extend(entry)
+            else:
+                copy.extend(entry)
+        else:
+            res.append(entry)
 
     res.reverse()
     return res
 
 
-def traverse(nested_list):
-    if isinstance(nested_list, list):
-        for sub_list in nested_list:
-            yield from traverse(sub_list)
+def graft(nested_data: list):
+    if isinstance(nested_data, Iterable):
+        if len(nested_data) == 3 and not all([isinstance(i, Iterable) for i in nested_data]):
+            # Vertex
+            return [nested_data]
+        else:
+            temp_list: list = []
+            for sub_list in nested_data:
+                temp_list.append(graft(sub_list))
+            return temp_list
     else:
-        if isinstance(nested_list, tuple):
-            yield nested_list
+        # Atomic item
+        return [nested_data]
 
 
-def map_objects(nested_data: list, object_type: type, callback: 'function') -> list:
+def graft_topology(nested_data: list):
+    if isinstance(nested_data, Iterable):
+        if not all([isinstance(i, Iterable) for i in nested_data]):
+            # Level 1 list
+            return [nested_data]
+        else:
+            temp_list: list = []
+            for sub_list in nested_data:
+                temp_list.append(graft(sub_list))
+            return temp_list
+    else:
+        # Atomic item
+        return [nested_data]
+
+
+# def traverse(nested_list):
+#     if isinstance(nested_list, list):
+#         for sub_list in nested_list:
+#             yield from traverse(sub_list)
+#     else:
+#         if isinstance(nested_list, tuple):
+#             yield nested_list
+
+
+def map_objects(nested_data: list, object_type: type, callback) -> list:
     """Applies a callback function to each data_type item of a nested input list.
 
     Creates a list with data_type objects and the nested structure of the input list.

@@ -25,8 +25,6 @@
 import FreeCAD as App
 import FreeCADGui as Gui
 import Part
-from pivy import coin
-import awkward as ak
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode

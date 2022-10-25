@@ -22,10 +22,7 @@
 #
 #
 ###################################################################################
-import FreeCAD as App
-import FreeCADGui as Gui
 import Mesh
-from pivy import coin
 import awkward as ak
 
 from fcn_conf import register_node
@@ -42,7 +39,7 @@ class MeshBox(FCNNode):
     op_category: str = "Generator"
     content_label_objname: str = "fcn_node_bg"
 
-    def __init__(self, scene: 'Scene'):
+    def __init__(self, scene):
         self.width_list = []
         self.length_list = []
         self.height_list = []
