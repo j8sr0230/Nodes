@@ -22,25 +22,23 @@
 #
 #
 ###################################################################################
-import awkward as ak
-
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import simplify
+from fcn_utils import flatten, simplify, graft, graft_topology, unwrap, wrap
 
 
 @register_node
 class ReshapeList(FCNNode):
     icon: str = icon("fcn_default.png")
     op_title: str = "Reshape List"
-    op_category = "List"
+    op_category: str = "List"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, 'Op', 3, ['Flatten', 'Simplify', 'Graft', 'Unwrap', 'Wrap'],
-                                            False, ('int', )),
+                         inputs_init_list=[(0, 'Op', 3, ['Flatten', 'Simplify', 'Graft', 'Graft Topology', 'Unwrap',
+                                                         'Wrap'], False, ('int', )),
                                            (6, 'In', 1, 0, True, ('*', ))],
                          outputs_init_list=[(6, 'Out', 0, 0, True, ('*', ))],
                          width=160)
@@ -62,15 +60,17 @@ class ReshapeList(FCNNode):
 
         # Outputs
         if op_code == 0:  # Flatten
-            res = ak.flatten(in_array, axis=None).tolist()
+            res = flatten(in_array)
         elif op_code == 1:  # Simplify
             res = simplify(in_array)
         elif op_code == 2:  # Graft
-            res = [[val] for val in in_array]
-        elif op_code == 3:  # Unwrap
-            res = ak.flatten(in_array, axis=1)
-        elif op_code == 4:  # Wrap
-            res = [in_array]
+            res = graft(in_array)
+        elif op_code == 3:  # Graft Topology
+            res = graft_topology(in_array)
+        elif op_code == 4:  # Unwrap
+            res = unwrap(in_array)
+        elif op_code == 5:  # Wrap
+            res = wrap(in_array)
         else:
             raise ValueError("Unknown operation (Op)")
         return [res]

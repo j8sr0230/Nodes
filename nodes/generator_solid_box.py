@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  generator_box.py
+#  generator_solid_box.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,27 +22,28 @@
 #
 #
 ###################################################################################
-import FreeCADGui as Gui
-from pivy import coin
+import FreeCAD as App
+import Part
 import awkward as ak
-import numpy as np
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import simplify
+from fcn_utils import simplify, map_objects
 
 
 @register_node
-class Box(FCNNode):
+class SolidBox(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Box"
-    op_category = "Generator"
+    op_title: str = "Solid Box"
+    op_category: str = "Generator"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
-        self.sg_nodes = []
+        self.width_list = []
+        self.length_list = []
+        self.height_list = []
 
         super().__init__(scene=scene,
                          inputs_init_list=[(0, "W", 1, 10, True, ("int", "float")),
@@ -52,57 +53,24 @@ class Box(FCNNode):
                          outputs_init_list=[(3, "Box", 0, 0, True, ("shape", ))],
                          width=150)
 
-    def remove(self):
-        super().remove()
-
-        if hasattr(Gui, "ActiveDocument"):
-            view = Gui.ActiveDocument.ActiveView
-            sg = view.getSceneGraph()
-            for sg_node in self.sg_nodes:
-                sg.removeChild(sg_node)
+    def make_occ_box(self, position: tuple):
+        box = Part.makeBox(self.width_list.pop(0), self.length_list.pop(0), self.height_list.pop(0),
+                           App.Vector(position))
+        return box
 
     def eval_operation(self, sockets_input_data: list) -> list:
         width = sockets_input_data[0]
         length = sockets_input_data[1]
         height = sockets_input_data[2]
         pos = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [(0, 0, 0)]
-        pos = simplify(pos)
 
         # Force array broadcast
-        pos_idx = np.arange(0, len(pos), 1)
-        width, length, height, pos_idx = ak.broadcast_arrays(width, length, height, pos_idx)
+        pos_list = simplify(pos)
+        pos_idx_list = list(range(len(pos_list)))
+        width, length, height, pos_idx_list = ak.broadcast_arrays(width, length, height, pos_idx_list)
 
-        width_list = ak.flatten(width, axis=None).tolist()
-        length_list = ak.flatten(length, axis=None).tolist()
-        height_list = ak.flatten(height, axis=None).tolist()
+        self.width_list = ak.flatten(width, axis=None).tolist()
+        self.length_list = ak.flatten(length, axis=None).tolist()
+        self.height_list = ak.flatten(height, axis=None).tolist()
 
-        if hasattr(Gui, "ActiveDocument"):
-            view = Gui.ActiveDocument.ActiveView
-            sg = view.getSceneGraph()
-
-            if len(self.sg_nodes) > 0:
-                for sg_node in self.sg_nodes:
-                    sg.removeChild(sg_node)
-                self.sg_nodes = []
-
-            for idx, _width in enumerate(width_list):
-                box = coin.SoCube()
-                box.width = _width
-                box.height = length_list[idx]
-                box.depth = height_list[idx]
-
-                color = coin.SoMaterial()
-                color.diffuseColor = (1., 0, 0)
-
-                trans = coin.SoTranslation()
-                trans.translation.setValue(pos[pos_idx[idx]])
-
-                sg_node = coin.SoSeparator()
-                sg_node.addChild(color)
-                sg_node.addChild(trans)
-                sg_node.addChild(box)
-
-                self.sg_nodes.append(sg_node)
-                sg.addChild(sg_node)
-
-        return [[self.sg_nodes]]
+        return [map_objects(pos, tuple, self.make_occ_box)]

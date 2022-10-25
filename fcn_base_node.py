@@ -837,7 +837,10 @@ class FCNNode(Node):
         self.output_data_cache: list = sockets_output_data  # Cache calculation result
         self.markDirty(False)
         self.markInvalid(False)
-        self.format_tool_tip()
+
+        # self.format_tool_tip()
+        self.grNode.setToolTip(str(self.output_data_cache))  # For better data structure debugging
+
         self.markDescendantsDirty()
         self.evalChildren()
         if DEBUG:
