@@ -22,7 +22,9 @@
 #
 #
 ###################################################################################
+import FreeCAD as App
 import FreeCADGui as Gui
+import Part
 from pivy import coin
 import awkward as ak
 
@@ -68,6 +70,11 @@ class Box(FCNNode):
 
         return sg_node
 
+    def make_occ_box(self, position: tuple):
+        box = Part.makeBox(self.width_list.pop(0), self.length_list.pop(0), self.height_list.pop(0),
+                           App.Vector(position))
+        return box
+
     def eval_operation(self, sockets_input_data: list) -> list:
         width = sockets_input_data[0]
         length = sockets_input_data[1]
@@ -83,4 +90,5 @@ class Box(FCNNode):
         self.length_list = ak.flatten(length, axis=None).tolist()
         self.height_list = ak.flatten(height, axis=None).tolist()
 
-        return [map_objects(pos, tuple, self.make_coin_box)]
+        # return [map_objects(pos, tuple, self.make_coin_box)]
+        return [map_objects(pos, tuple, self.make_occ_box)]

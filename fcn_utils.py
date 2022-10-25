@@ -67,15 +67,15 @@ def traverse(nested_list):
             yield nested_list
 
 
-def map_objects(nested_data: list, data_type: type, callback: 'function') -> list:
+def map_objects(nested_data: list, object_type: type, callback: 'function') -> list:
     """Applies a callback function to each data_type item of a nested input list.
 
     Creates a list with data_type objects and the nested structure of the input list.
 
     :param nested_data: Nested input list with data_type items.
     :type nested_data: list
-    :param data_type: Only elements with this data type are evaluated by the callback function.
-    :type data_type: type
+    :param object_type: Only elements with this data type are evaluated by the callback function.
+    :type object_type: type
     :param callback: Function that performs some action to each data_type element.
     :type callback: 'function'
     :return: Nested list with calculated function values.
@@ -85,8 +85,8 @@ def map_objects(nested_data: list, data_type: type, callback: 'function') -> lis
     if isinstance(nested_data, list):
         temp_list: list = []
         for sub_list in nested_data:
-            temp_list.append(map_objects(sub_list, data_type, callback))
+            temp_list.append(map_objects(sub_list, object_type, callback))
         return temp_list
     else:
-        if isinstance(nested_data, data_type):
+        if isinstance(nested_data, object_type):
             return callback(nested_data)
