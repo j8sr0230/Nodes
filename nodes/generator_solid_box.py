@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  generator_box.py
+#  generator_solid_box.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -35,10 +35,10 @@ from fcn_utils import simplify, map_objects
 
 
 @register_node
-class Box(FCNNode):
+class SolidBox(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Box"
+    op_title: str = "Solid Box"
     op_category: str = "Generator"
     content_label_objname: str = "fcn_node_bg"
 

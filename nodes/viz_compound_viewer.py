@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  viz_temporal_viewer.py
+#  viz_compound_viewer.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -35,16 +35,17 @@ from fcn_utils import flatten
 
 
 @register_node
-class TemporalViewer(FCNNode):
+class CompoundViewer(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Temporal Viewer"
+    op_title: str = "Compound Viewer"
     op_category = "Viz"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         if hasattr(Gui, "ActiveDocument"):
             self.fc_obj = App.ActiveDocument.addObject("Part::Feature", "Viewer")
+            self.fc_obj.setPropertyStatus("Shape", ["Transient", "Output"])
 
         super().__init__(scene=scene,
                          inputs_init_list=[(3, "In", 0, 0, True, ("shape", ))],
