@@ -22,7 +22,9 @@
 #
 #
 ###################################################################################
+import FreeCAD as App
 import FreeCADGui as Gui
+import Part
 from pivy import coin
 import awkward as ak
 
@@ -41,13 +43,11 @@ class TemporalViewer(FCNNode):
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
-        self.sg_nodes = []
+        if hasattr(Gui, "ActiveDocument"):
+            self.fc_obj = App.ActiveDocument.addObject("Part::Feature", "Viewer")
 
         super().__init__(scene=scene,
-                         inputs_init_list=[(3, "In", 0, 0, True, ("shape", )),
-                                           (0, "R", 2, (0, 255, 255), False, ("int", )),
-                                           (0, "G", 2, (0, 255, 0), False, ("int", )),
-                                           (0, "B", 2, (0, 255, 0), False, ("int", ))],
+                         inputs_init_list=[(3, "In", 0, 0, True, ("shape", ))],
                          outputs_init_list=[(3, "Out", 0, 0, True, ("shape", ))],
                          width=170)
 
@@ -55,33 +55,16 @@ class TemporalViewer(FCNNode):
         super().remove()
 
         if hasattr(Gui, "ActiveDocument"):
-            view = Gui.ActiveDocument.ActiveView
-            sg = view.getSceneGraph()
-            for sg_node in self.sg_nodes:
-                sg.removeChild(sg_node)
+            if self.fc_obj is not None:
+                App.ActiveDocument.removeObject(self.fc_obj.Name)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        sg_nodes = flatten(sockets_input_data[0])
-        rgb = (sockets_input_data[1][0]/255, sockets_input_data[2][0]/255, sockets_input_data[3][0]/255)
-
-        color = coin.SoMaterial()
-        color.diffuseColor = rgb
+        shapes = flatten(sockets_input_data[0])
 
         if hasattr(Gui, "ActiveDocument"):
-            view = Gui.ActiveDocument.ActiveView
-            sg = view.getSceneGraph()
-
-            if len(self.sg_nodes) > 0:
-                for sg_node in self.sg_nodes:
-                    sg.removeChild(sg_node)
-                self.sg_nodes = []
-
-            for sg_node in sg_nodes:
-                sg_sep = coin.SoSeparator()
-                sg_sep.addChild(color)
-                sg_sep.addChild(sg_node)
-
-                self.sg_nodes.append(sg_sep)
-                sg.addChild(sg_sep)
+            if len(shapes) > 0:
+                comp = Part.makeCompound(shapes)
+                self.fc_obj.Shape = comp
+                App.activeDocument().recompute()
 
         return [sockets_input_data[0]]
