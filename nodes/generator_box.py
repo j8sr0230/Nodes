@@ -55,21 +55,6 @@ class Box(FCNNode):
                          outputs_init_list=[(3, "Box", 0, 0, True, ("shape", ))],
                          width=150)
 
-    def make_coin_box(self, position: tuple):
-        trans = coin.SoTranslation()
-        trans.translation.setValue(position)
-
-        box = coin.SoCube()
-        box.width = self.width_list.pop(0)
-        box.height = self.length_list.pop(0)
-        box.depth = self.height_list.pop(0)
-
-        sg_node = coin.SoSeparator()
-        sg_node.addChild(trans)
-        sg_node.addChild(box)
-
-        return sg_node
-
     def make_occ_box(self, position: tuple):
         box = Part.makeBox(self.width_list.pop(0), self.length_list.pop(0), self.height_list.pop(0),
                            App.Vector(position))
@@ -90,5 +75,4 @@ class Box(FCNNode):
         self.length_list = ak.flatten(length, axis=None).tolist()
         self.height_list = ak.flatten(height, axis=None).tolist()
 
-        # return [map_objects(pos, tuple, self.make_coin_box)]
         return [map_objects(pos, tuple, self.make_occ_box)]
