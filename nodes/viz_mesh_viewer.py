@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  viz_compound_viewer.py
+#  viz_mesh_viewer.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -24,7 +24,7 @@
 ###################################################################################
 import FreeCAD as App
 import FreeCADGui as Gui
-import Part
+import Mesh
 from pivy import coin
 import awkward as ak
 
@@ -38,14 +38,13 @@ from fcn_utils import flatten
 class CompoundViewer(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Compound Viewer"
+    op_title: str = "Mesh Viewer"
     op_category = "Viz"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         if hasattr(Gui, "ActiveDocument"):
-            self.fc_obj = App.ActiveDocument.addObject("Part::Feature", "CViewer")
-            self.fc_obj.setPropertyStatus("Shape", ["Transient", "Output"])
+            self.fc_obj = App.ActiveDocument.addObject("Mesh::Feature", "MViewer")
 
         super().__init__(scene=scene,
                          inputs_init_list=[(3, "In", 0, 0, True, ("shape", ))],
@@ -60,12 +59,16 @@ class CompoundViewer(FCNNode):
                 App.ActiveDocument.removeObject(self.fc_obj.Name)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        shapes = flatten(sockets_input_data[0])
+        meshes = flatten(sockets_input_data[0])
 
         if hasattr(Gui, "ActiveDocument"):
-            if len(shapes) > 0:
-                comp = Part.makeCompound(shapes)
-                self.fc_obj.Shape = comp
+            if len(meshes) > 0:
+
+                merge = Mesh.Mesh()
+                for mesh in meshes:
+                    merge.addMesh(mesh)
+
+                self.fc_obj.Mesh = merge
                 App.activeDocument().recompute()
 
         return [sockets_input_data[0]]
