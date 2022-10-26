@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  generator_sphere.py
+#  generator_solid_sphere.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,38 +22,45 @@
 #
 #
 ###################################################################################
-from FreeCAD import Vector
+import FreeCAD as App
 import Part
+import awkward as ak
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import simplify
+from fcn_utils import simplify, map_objects
 
 
 @register_node
 class Sphere(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Sphere"
+    op_title: str = "Solid Sphere"
     op_category: str = "Generator"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
+        self.radius_list: list = []
+
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "R", 1, "10.0", False, ("int", "float")),
-                                           (1, "Pos", 0, 0, True, ("int", "float"))],
-                         outputs_init_list=[(5, "Shp", 0, 0, True, ("Shape", ))],
+                         inputs_init_list=[(0, "R", 1, "10.0", True, ("int", "float")),
+                                           (1, "Pos", 0, 0, True, ("vec", ))],
+                         outputs_init_list=[(3, "Sphere", 0, 0, True, ("shape", ))],
                          width=150)
 
+    def make_occ_sphere(self, position: tuple) -> Part.Shape:
+        return Part.makeSphere(self.radius_list.pop(0), App.Vector(position))
+
     def eval_operation(self, sockets_input_data: list) -> list:
-        sphere_radius: float = float(sockets_input_data[0][0])
-        position_list: list = sockets_input_data[1]
+        radius: list = sockets_input_data[0]
+        pos: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [(0, 0, 0)]
 
-        sphere_list = []
-        vector_pos_lis = simplify(position_list)
-        for vec in vector_pos_lis:
-            sphere = Part.makeSphere(sphere_radius, Vector(vec))
-            sphere_list.append(sphere)
+        # Force array broadcast
+        pos_list: list = list(simplify(pos))
+        pos_idx_list: list = list(range(len(pos_list)))
+        radius, pos_idx_list = ak.broadcast_arrays(radius, pos_idx_list)
 
-        return [sphere_list]
+        self.radius_list = ak.flatten(radius, axis=None).tolist()
+
+        return [map_objects(pos, tuple, self.make_occ_sphere)]

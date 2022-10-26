@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  generator_sphere.py
+#  generator_solid_sphere.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,15 +22,13 @@
 #
 #
 ###################################################################################
-# from FreeCAD import Vector
-# import Part
-import FreeCADGui as Gui
-from pivy import coin
+import FreeCAD as App
+import Part
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import simplify
+from fcn_utils import map_objects
 
 
 @register_node
@@ -42,54 +40,16 @@ class Point(FCNNode):
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
-        self.sg_node = None
-
         super().__init__(scene=scene,
                          inputs_init_list=[(1, "Pos", 0, 0, True, ("vec", ))],
-                         outputs_init_list=[(1, "Pos", 0, 0, True, ("vec", ))],
+                         outputs_init_list=[(3, "Point", 0, 0, True, ("shape", ))],
                          width=150)
 
-    def remove(self):
-        super().remove()
-
-        if hasattr(Gui, "ActiveDocument"):
-            view = Gui.ActiveDocument.ActiveView
-            sg = view.getSceneGraph()
-            if self.sg_node is not None:
-                sg.removeChild(self.sg_node)
+    @staticmethod
+    def make_occ_point(position: tuple) -> Part.Shape:
+        return Part.Point(App.Vector(position)).toShape()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        position_list: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [(0, 0, 0)]
+        pos: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [(0, 0, 0)]
 
-        vector_pos_list = simplify(position_list)
-
-        # for vec in vector_pos_list:
-        #     vertex = Part.Point(Vector(vec)).toShape()
-        #     vertex_list.append(vertex)
-        #
-        # return [vertex_list]
-
-        if hasattr(Gui, "ActiveDocument"):
-            view = Gui.ActiveDocument.ActiveView
-            sg = view.getSceneGraph()
-
-            marker = coin.SoMarkerSet()
-            marker.markerIndex = coin.SoMarkerSet.CIRCLE_FILLED_5_5
-
-            data = coin.SoCoordinate3()
-            data.point.setValues(0, len(vector_pos_list), vector_pos_list)
-
-            color = coin.SoMaterial()
-            color.diffuseColor = (1., 0, 0)
-
-            if self.sg_node is not None:
-                sg.removeChild(self.sg_node)
-
-            self.sg_node = coin.SoSeparator()
-            self.sg_node.addChild(color)
-            self.sg_node.addChild(data)
-            self.sg_node.addChild(marker)
-
-            sg.addChild(self.sg_node)
-
-        return [position_list]
+        return [map_objects(pos, tuple, self.make_occ_point)]
