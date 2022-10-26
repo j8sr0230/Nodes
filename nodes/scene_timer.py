@@ -41,8 +41,9 @@ class Timer(FCNNode):
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
-        inputs: list = [(0, "p [ms]", 1, 1000, False, ('int', 'float'))]
-        outputs: list = [(0, "p [ms]", 0, 0, True, ('int', 'float'))]
+        inputs: list = [(0, 'State', 3, ['Hold', 'Run'], False, ('int', )),
+                        (0, "Period", 1, 1000, False, ('int', 'float'))]
+        outputs: list = [(0, "Tick", 0, 0, True, ('int', 'float'))]
         width: int = 150
 
         self.timer = QtCore.QTimer()
@@ -64,11 +65,15 @@ class Timer(FCNNode):
         self.timer.stop()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        period: float = float(sockets_input_data[0][0])
+        op_code: int = sockets_input_data[0][0]
+        period: float = float(sockets_input_data[1][0])
+
         if self.timer.interval != period:
             self.timer.setInterval(period)
 
-        if not self.timer.isActive():
+        if op_code == 0:  # Hold
+            self.timer.stop()
+        elif op_code == 1:  # Run
             self.timer.start()
 
         if DEBUG:

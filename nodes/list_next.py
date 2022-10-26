@@ -40,7 +40,7 @@ class Next(FCNNode):
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
-        inputs: list = [(6, "List", 1, 0, True, ('*', )), (0, "tick", 0, 0, False)]
+        inputs: list = [(6, "List", 1, 0, True, ('*', )), (0, "Tick", 0, 0, False)]
         outputs: list = [(6, "Item", 0, 0, True, ('*', ))]
         width: int = 150
         self.index: int = 0
