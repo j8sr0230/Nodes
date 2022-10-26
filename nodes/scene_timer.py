@@ -29,7 +29,7 @@ from fcn_base_node import FCNNode
 import fcn_locator as locator
 
 
-DEBUG = True
+DEBUG = False
 
 
 @register_node
@@ -41,8 +41,8 @@ class Timer(FCNNode):
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
-        inputs: list = [(0, "p [ms]", 1, 1000, True)]
-        outputs: list = [(0, "p [ms]", 0, 0, True)]
+        inputs: list = [(0, "p [ms]", 1, 1000, False, ('int', 'float'))]
+        outputs: list = [(0, "p [ms]", 0, 0, True, ('int', 'float'))]
         width: int = 150
 
         self.timer = QtCore.QTimer()
@@ -52,14 +52,16 @@ class Timer(FCNNode):
         super().__init__(scene=scene, inputs_init_list=inputs, outputs_init_list=outputs, width=width)
 
     def timer_callback(self):
-        self.markInvalid()
-        self.eval()
+        try:
+            self.markInvalid()
+            self.eval()
+        except AttributeError as e:
+            if DEBUG:
+                print(e)
 
     def remove(self):
         super().remove()
-
-        if self.timer.isActive():
-            self.timer.stop()
+        self.timer.stop()
 
     def eval_operation(self, sockets_input_data: list) -> list:
         period: float = float(sockets_input_data[0][0])
@@ -70,6 +72,6 @@ class Timer(FCNNode):
             self.timer.start()
 
         if DEBUG:
-            print("Tick")
+            print("Running timer no.:", self.timer.timerId())
 
         return [[period]]

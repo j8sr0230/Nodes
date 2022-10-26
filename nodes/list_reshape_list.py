@@ -41,7 +41,7 @@ class ReshapeList(FCNNode):
                                                          'Wrap'], False, ('int', )),
                                            (6, 'In', 1, 0, True, ('*', ))],
                          outputs_init_list=[(6, 'Out', 0, 0, True, ('*', ))],
-                         width=160)
+                         width=190)
 
     def collapse_node(self, collapse: bool = False):
         super().collapse_node(collapse)

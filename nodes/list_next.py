@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  beta_next.py
+#  list_next.py
 #
 #  Copyright (c) 2022 Florian Foinant-Willig <ffw@2f2v.fr>
 #
@@ -28,34 +28,35 @@ from fcn_base_node import FCNNode
 import fcn_locator as locator
 
 
+DEBUG = False
+
+
 @register_node
 class Next(FCNNode):
 
     icon: str = locator.icon("fcn_default.png")
     op_title: str = "Next"
-    op_category = "Beta Nodes"
+    op_category: str = "List"
     content_label_objname: str = "fcn_node_bg"
 
-    def __init__(self, scene: 'Scene'):
-        """Constructor of the DemoNode class.
-
-        :param scene: Editor Scene in which the node is to be inserted.
-        :type scene: Scene
-        """
-
-        inputs: list = [(6, "List", 1, 0, False), (0, "tick", 0, 0, True)]
-        outputs: list = [(0, "Item", 0, 0, True)]
+    def __init__(self, scene):
+        inputs: list = [(6, "List", 1, 0, True, ('*', )), (0, "tick", 0, 0, False)]
+        outputs: list = [(6, "Item", 0, 0, True, ('*', ))]
         width: int = 150
-        self.index = 0
+        self.index: int = 0
 
         super().__init__(scene=scene, inputs_init_list=inputs, outputs_init_list=outputs, width=width)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        inputarray = sockets_input_data[0]
-        if (not isinstance(inputarray, list)):
-            return 0
+        input_array = sockets_input_data[0]
 
-        self.index +=1
-        if self.index >= len(inputarray):
-            self.index=0
-        return [[inputarray[self.index]]]
+        res = input_array[self.index]
+        self.index += 1
+
+        if self.index >= len(input_array):
+            self.index = 0
+
+        if DEBUG:
+            print(res)
+
+        return [[res]]
