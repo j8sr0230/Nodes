@@ -22,6 +22,7 @@
 #
 #
 ###################################################################################
+# TODO: Class names should be CamelCase, function names should be lowercase (if possible).
 
 class FCNodesWorkbench(Workbench):
 
