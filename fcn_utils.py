@@ -154,15 +154,6 @@ def wrap(nested_list: Iterable) -> Iterable:
     return [nested_list]
 
 
-# def traverse(nested_list):
-#     if isinstance(nested_list, list):
-#         for sub_list in nested_list:
-#             yield from traverse(sub_list)
-#     else:
-#         if isinstance(nested_list, tuple):
-#             yield nested_list
-
-
 def map_objects(nested_list: Iterable, object_type: type, callback: 'function') -> Iterable:
     """Applies a callback function to each data_type item of a nested input list.
 
@@ -186,3 +177,20 @@ def map_objects(nested_list: Iterable, object_type: type, callback: 'function') 
     else:
         if isinstance(nested_list, object_type):
             return callback(nested_list)
+
+
+def traverse_tuples(nested_list: Iterable) -> Iterable:
+    """Generator to yield every tuple within an arbitrary nested iterable.
+
+    :param nested_list: Arbitrary nested input (data structure)
+    :type nested_list: Iterable
+    :return: Tuple item.
+    :rtype: Iterable
+   """
+
+    if isinstance(nested_list, list):
+        for sub_list in nested_list:
+            yield from traverse_tuples(sub_list)
+    else:
+        if isinstance(nested_list, tuple):
+            yield nested_list
