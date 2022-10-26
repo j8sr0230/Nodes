@@ -27,6 +27,9 @@ import FreeCADGui
 import fcn_locator as locator
 
 
+# TODO: Class names should be CamelCase, function names should be lowercase (if possible).
+
+
 def QT_TRANSLATE_NOOP(scope, text):
     return text
 
