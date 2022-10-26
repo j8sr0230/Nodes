@@ -41,9 +41,9 @@ class SolidBox(FCNNode):
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
-        self.width_list = []
-        self.length_list = []
-        self.height_list = []
+        self.width_list: list = []
+        self.length_list: list = []
+        self.height_list: list = []
 
         super().__init__(scene=scene,
                          inputs_init_list=[(0, "W", 1, 10, True, ("int", "float")),
@@ -53,20 +53,19 @@ class SolidBox(FCNNode):
                          outputs_init_list=[(3, "Box", 0, 0, True, ("shape", ))],
                          width=150)
 
-    def make_occ_box(self, position: tuple):
-        box = Part.makeBox(self.width_list.pop(0), self.length_list.pop(0), self.height_list.pop(0),
-                           App.Vector(position))
-        return box
+    def make_occ_box(self, position: tuple) -> Part.Shape:
+        return Part.makeBox(self.width_list.pop(0), self.length_list.pop(0), self.height_list.pop(0),
+                            App.Vector(position))
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        width = sockets_input_data[0]
-        length = sockets_input_data[1]
-        height = sockets_input_data[2]
-        pos = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [(0, 0, 0)]
+        width: list = sockets_input_data[0]
+        length: list = sockets_input_data[1]
+        height: list = sockets_input_data[2]
+        pos: list = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [(0, 0, 0)]
 
         # Force array broadcast
-        pos_list = simplify(pos)
-        pos_idx_list = list(range(len(pos_list)))
+        pos_list: list = list(simplify(pos))
+        pos_idx_list: list = list(range(len(pos_list)))
         width, length, height, pos_idx_list = ak.broadcast_arrays(width, length, height, pos_idx_list)
 
         self.width_list = ak.flatten(width, axis=None).tolist()
