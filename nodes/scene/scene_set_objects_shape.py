@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  number_number_range.py
+#  scene_set_objects_shape.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,9 +22,8 @@
 #
 #
 ###################################################################################
-import os
-import awkward as ak
-import numpy as np
+import FreeCAD
+import Part
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
@@ -32,33 +31,30 @@ from fcn_locator import icon
 
 
 @register_node
-class NumberRange(FCNNode):
+class SetObjectsShape(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Number Range"
-    op_category = "Number"
+    op_title: str = "Set Objects Shape"
+    op_category: str = "Scene"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Start", 1, 0, True, ('int', 'float')),
-                                           (0, "Stop", 1, 10, True, ('int', 'float')),
-                                           (0, "Step", 1, 1, False, ('int', 'float'))],
-                         outputs_init_list=[(0, "Out", 0, 0, True, ('int', 'float'))],
-                         width=150)
+                         inputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", )),
+                                           (5, "Shp", 0, "0", False, ("Shape", ))],
+                         outputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", ))],
+                         width=170)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        # Inputs
-        start = sockets_input_data[0]
-        stop = sockets_input_data[1]
-        step = sockets_input_data[2][0]
+        obj_list: list = sockets_input_data[0]
+        compound = Part.makeCompound(sockets_input_data[1])
 
-        # Force array broadcast
-        start, stop = ak.broadcast_arrays(start, stop)
+        if not (FreeCAD.ActiveDocument is None):
+            for obj in obj_list:
+                obj.Shape = compound
 
-        res = []
-        for idx, _start in enumerate(ak.flatten(start, axis=None)):
-            _stop = ak.flatten(stop, axis=None)[idx]
-            res.append(np.arange(_start, _stop, step).tolist())
+            FreeCAD.ActiveDocument.recompute()
+        else:
+            raise Exception('No active document')
 
-        return [res]
+        return [obj_list]

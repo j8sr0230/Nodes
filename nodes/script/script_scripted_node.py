@@ -34,11 +34,11 @@ class ScriptedNode(FCNNode):
 
     icon: str = icon("python_logo.png")
     op_title: str = "Scripted Node"
-    op_category = "Script"
+    op_category: str = "Script"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
-        width = 400
+        width: int = 400
         super().__init__(scene=scene,
                          inputs_init_list=[(3, "Code", 4, "#enter python code\noutput_data=input_data",
                                             False, ("str", )),

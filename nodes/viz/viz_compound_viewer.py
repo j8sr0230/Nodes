@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  scene_set_objects_shape.py
+#  viz_compound_viewer.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,39 +22,48 @@
 #
 #
 ###################################################################################
-import FreeCAD
+import FreeCAD as App
+import FreeCADGui as Gui
 import Part
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
+from fcn_utils import flatten
 
 
 @register_node
-class SetObjectsShape(FCNNode):
+class CompoundViewer(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Set Objects Shape"
-    op_category = "Scene"
+    op_title: str = "Compound Viewer"
+    op_category: str = "Viz"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
+        if hasattr(Gui, "ActiveDocument"):
+            self.fc_obj = App.ActiveDocument.addObject("Part::Feature", "CViewer")
+            self.fc_obj.setPropertyStatus("Shape", ["Transient", "Output"])
+
         super().__init__(scene=scene,
-                         inputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", )),
-                                           (5, "Shp", 0, "0", False, ("Shape", ))],
-                         outputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", ))],
+                         inputs_init_list=[(3, "In", 0, 0, True, ("shape", ))],
+                         outputs_init_list=[(3, "Out", 0, 0, True, ("shape", ))],
                          width=170)
 
+    def remove(self):
+        super().remove()
+
+        if hasattr(Gui, "ActiveDocument"):
+            if self.fc_obj is not None:
+                App.ActiveDocument.removeObject(self.fc_obj.Name)
+
     def eval_operation(self, sockets_input_data: list) -> list:
-        obj_list: list = sockets_input_data[0]
-        compound = Part.makeCompound(sockets_input_data[1])
+        shapes = flatten(sockets_input_data[0])
 
-        if not (FreeCAD.ActiveDocument is None):
-            for obj in obj_list:
-                obj.Shape = compound
+        if hasattr(Gui, "ActiveDocument"):
+            if len(shapes) > 0:
+                comp = Part.makeCompound(shapes)
+                self.fc_obj.Shape = comp
+                App.activeDocument().recompute()
 
-            FreeCAD.ActiveDocument.recompute()
-        else:
-            raise Exception('No active document')
-
-        return [obj_list]
+        return [sockets_input_data[0]]
