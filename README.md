@@ -5,7 +5,6 @@ A visual scripting environment for [FreeCAD](https://www.freecad.org) using
 from Pavel Křupala.
 
 ![FreeCAD Nodes](https://github.com/j8sr0230/fc_nodes/blob/main/img/fcn_nested_array.png)
-![FreeCAD Nodes](https://github.com/j8sr0230/fc_nodes/blob/main/img/fcn_snapshot.png)
 <!-- Add screenshots here -->
 
 ## Prerequisites
