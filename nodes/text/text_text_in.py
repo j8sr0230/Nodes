@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  vector_vector_in.py
+#  text_text_in.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,36 +22,35 @@
 #
 #
 ###################################################################################
-import awkward as ak
-
-from fcn_base_node import FCNNode
 from fcn_conf import register_node
+from fcn_base_node import FCNNode
 from fcn_locator import icon
 
 
 @register_node
-class VectorIn(FCNNode):
+class TextIn(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Vector In"
-    op_category = "Vector"
+    op_title: str = "Text In"
+    op_category: str = "Text"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "X", 1, 1.0, True, ("int", "float")),
-                                           (0, "Y", 1, 0.0, True, ("int", "float")),
-                                           (0, "Z", 1, 0.0, True, ("int", "float"))],
-                         outputs_init_list=[(1, "Vec", 0, 0, True, ("vec", ))],
+                         inputs_init_list=[(3, "In", 1, "Enter text", False, ("str", ))],
+                         outputs_init_list=[(3, "Out", 0, 0, True, ("str", ))],
                          width=150)
 
-    def eval_operation(self, sockets_input_data: list) -> list:
-        # Inputs
-        x_in = sockets_input_data[0]
-        y_in = sockets_input_data[1]
-        z_in = sockets_input_data[2]
+    def collapse_node(self, collapse: bool = False):
+        super().collapse_node(collapse)
 
-        # Broadcast an zip to vector
-        x_vector, y_vector, z_vector = ak.broadcast_arrays(x_in, y_in, z_in)
-        res = ak.zip([x_vector, y_vector, z_vector])
-        return [res.tolist()]
+        if collapse is True:
+            self.title = 'In: ' + str(self.sockets_input_data[0][0])
+        else:
+            self.title = self.default_title
+
+    def eval_operation(self, sockets_input_data: list) -> list:
+        self.collapse_node(self.content.isHidden())
+
+        in_val: str = sockets_input_data[0][0]
+        return [[in_val]]

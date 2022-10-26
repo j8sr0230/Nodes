@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  viz_mesh_viewer.py
+#  generator_sphere.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,51 +22,38 @@
 #
 #
 ###################################################################################
-import FreeCAD as App
-import FreeCADGui as Gui
-import Mesh
+from FreeCAD import Vector
+import Part
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import flatten
+from fcn_utils import simplify
 
 
 @register_node
-class CompoundViewer(FCNNode):
+class Sphere(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Mesh Viewer"
-    op_category = "Viz"
+    op_title: str = "Sphere"
+    op_category: str = "Generator"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
-        if hasattr(Gui, "ActiveDocument"):
-            self.fc_obj = App.ActiveDocument.addObject("Mesh::Feature", "MViewer")
-
         super().__init__(scene=scene,
-                         inputs_init_list=[(3, "In", 0, 0, True, ("shape", ))],
-                         outputs_init_list=[(3, "Out", 0, 0, True, ("shape", ))],
-                         width=170)
-
-    def remove(self):
-        super().remove()
-
-        if hasattr(Gui, "ActiveDocument"):
-            if self.fc_obj is not None:
-                App.ActiveDocument.removeObject(self.fc_obj.Name)
+                         inputs_init_list=[(0, "R", 1, "10.0", False, ("int", "float")),
+                                           (1, "Pos", 0, 0, True, ("int", "float"))],
+                         outputs_init_list=[(5, "Shp", 0, 0, True, ("Shape", ))],
+                         width=150)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        meshes = flatten(sockets_input_data[0])
+        sphere_radius: float = float(sockets_input_data[0][0])
+        position_list: list = sockets_input_data[1]
 
-        if hasattr(Gui, "ActiveDocument"):
-            if len(meshes) > 0:
+        sphere_list = []
+        vector_pos_lis = simplify(position_list)
+        for vec in vector_pos_lis:
+            sphere = Part.makeSphere(sphere_radius, Vector(vec))
+            sphere_list.append(sphere)
 
-                merge = Mesh.Mesh()
-                for mesh in meshes:
-                    merge.addMesh(mesh)
-
-                self.fc_obj.Mesh = merge
-                App.activeDocument().recompute()
-
-        return [sockets_input_data[0]]
+        return [sphere_list]

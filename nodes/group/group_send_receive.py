@@ -33,7 +33,7 @@ from fcn_locator import icon
 class Sender(FCNNode):
     icon: str = icon("fcn_default.png")
     op_title: str = "Sender"
-    op_category = "Group"
+    op_category: str = "Group"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
@@ -85,7 +85,7 @@ class Receiver(FCNNode):
     data: list
     icon: str = icon("fcn_default.png")
     op_title: str = "Receiver"
-    op_category = "Group"
+    op_category: str = "Group"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):

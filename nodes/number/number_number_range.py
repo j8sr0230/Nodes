@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  viz_compound_viewer.py
+#  number_number_range.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,48 +22,43 @@
 #
 #
 ###################################################################################
-import FreeCAD as App
-import FreeCADGui as Gui
-import Part
+import os
+import awkward as ak
+import numpy as np
 
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
 from fcn_locator import icon
-from fcn_utils import flatten
 
 
 @register_node
-class CompoundViewer(FCNNode):
+class NumberRange(FCNNode):
 
     icon: str = icon("fcn_default.png")
-    op_title: str = "Compound Viewer"
-    op_category = "Viz"
+    op_title: str = "Number Range"
+    op_category: str = "Number"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
-        if hasattr(Gui, "ActiveDocument"):
-            self.fc_obj = App.ActiveDocument.addObject("Part::Feature", "CViewer")
-            self.fc_obj.setPropertyStatus("Shape", ["Transient", "Output"])
-
         super().__init__(scene=scene,
-                         inputs_init_list=[(3, "In", 0, 0, True, ("shape", ))],
-                         outputs_init_list=[(3, "Out", 0, 0, True, ("shape", ))],
-                         width=170)
-
-    def remove(self):
-        super().remove()
-
-        if hasattr(Gui, "ActiveDocument"):
-            if self.fc_obj is not None:
-                App.ActiveDocument.removeObject(self.fc_obj.Name)
+                         inputs_init_list=[(0, "Start", 1, 0, True, ('int', 'float')),
+                                           (0, "Stop", 1, 10, True, ('int', 'float')),
+                                           (0, "Step", 1, 1, False, ('int', 'float'))],
+                         outputs_init_list=[(0, "Out", 0, 0, True, ('int', 'float'))],
+                         width=150)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        shapes = flatten(sockets_input_data[0])
+        # Inputs
+        start = sockets_input_data[0]
+        stop = sockets_input_data[1]
+        step = sockets_input_data[2][0]
 
-        if hasattr(Gui, "ActiveDocument"):
-            if len(shapes) > 0:
-                comp = Part.makeCompound(shapes)
-                self.fc_obj.Shape = comp
-                App.activeDocument().recompute()
+        # Force array broadcast
+        start, stop = ak.broadcast_arrays(start, stop)
 
-        return [sockets_input_data[0]]
+        res = []
+        for idx, _start in enumerate(ak.flatten(start, axis=None)):
+            _stop = ak.flatten(stop, axis=None)[idx]
+            res.append(np.arange(_start, _stop, step).tolist())
+
+        return [res]
