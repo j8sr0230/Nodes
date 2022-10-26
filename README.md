@@ -13,10 +13,12 @@ from Pavel Křupala.
 
 ## Installation
 FreeCAD Nodes uses the [pyqt-node-editor](https://gitlab.com/pavel.krupala/pyqt-node-editor) 
-from Pavel Křupala as node editor framework. You can install the latest version via **pip 
-of your FreeCAD environment** with the following command.
+from Pavel Křupala as node editor framework and [Awkward Array](https://awkward-array.readthedocs.io/en/stable/) for 
+handling nested, variable-sized data structures. You can install the latest versions via **pip of your FreeCAD 
+environment** with the following command.
 ```
 $ pip install git+https://gitlab.com/pavel.krupala/pyqt-node-editor.git
+$ pip install awkward
 ```
 
 Subsequently, download the archive `fc_nodes-main.zip` from this repo (Code > Download ZIP) 
