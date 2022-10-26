@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  beta_clock.py
+#  scene_timer.py
 #
 #  Copyright (c) 2022 Florian Foinant-Willig <ffw@2f2v.fr>
 #
@@ -22,46 +22,54 @@
 #
 #
 ###################################################################################
+from qtpy import QtCore
+
 from fcn_conf import register_node
 from fcn_base_node import FCNNode
-
 import fcn_locator as locator
 
-from PySide2 import QtCore
+
+DEBUG = True
 
 
 @register_node
-class Clock(FCNNode):
+class Timer(FCNNode):
 
     icon: str = locator.icon("fcn_default.png")
-    op_title: str = "Clock"
-    op_category = "Beta Nodes"
+    op_title: str = "Timer"
+    op_category: str = "Scene"
     content_label_objname: str = "fcn_node_bg"
 
-    def __init__(self, scene: 'Scene'):
-        inputs: list = [(0, "period (s.)", 1, "0.1", True)]
-        outputs: list = [(0, "tick", 0, 0, True)]
+    def __init__(self, scene):
+        inputs: list = [(0, "p [ms]", 1, 1000, True)]
+        outputs: list = [(0, "p [ms]", 0, 0, True)]
         width: int = 150
 
         self.timer = QtCore.QTimer()
-        self.timer.start(100)
+        self.timer.start(1000)
         self.timer.timeout.connect(self.timer_callback)
 
         super().__init__(scene=scene, inputs_init_list=inputs, outputs_init_list=outputs, width=width)
 
     def timer_callback(self):
         self.markInvalid()
-        try:
-            self.eval()
-        except:
+        self.eval()
+
+    def remove(self):
+        super().remove()
+
+        if self.timer.isActive():
             self.timer.stop()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        period: float = float(sockets_input_data[0][0]) * 1000
-        if (self.timer.interval != period):
+        period: float = float(sockets_input_data[0][0])
+        if self.timer.interval != period:
             self.timer.setInterval(period)
 
         if not self.timer.isActive():
             self.timer.start()
 
-        return [[1]]
+        if DEBUG:
+            print("Tick")
+
+        return [[period]]
