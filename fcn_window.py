@@ -36,6 +36,8 @@ DEBUG = False
 
 
 class FCNWindow(NodeEditorWindow):
+    name_company: str
+    name_product: str
     empty_icon: QIcon
     mdi_area: QMdiArea
     window_mapper: QSignalMapper
@@ -151,6 +153,7 @@ class FCNWindow(NodeEditorWindow):
         except Exception as e:
             dumpException(e)
 
+    # noinspection PyArgumentList
     def about(self):
         QMessageBox.about(self, "FreeCAD Nodes by j8sr0230 et al.", "A visual scripting environment for "
                           "<a href='https://www.freecad.org/'>FreeCAD</a> using "
