@@ -38,7 +38,6 @@ node editor base framework.
 from collections import OrderedDict
 from typing import Union
 from math import floor
-# from decimal import Decimal
 
 from qtpy.QtGui import QImage, QTextOption
 from qtpy.QtCore import QRectF, Qt
@@ -141,10 +140,22 @@ class FCNSocketView(QDMGraphicsSocket):
             self.input_widget.setWordWrapMode(QTextOption.NoWrap)
 
     def hoverEnterEvent(self, event):
+        """Handles socket hover events by setting the mouse_over state.
+
+        :param event: A graphics scene hover event.
+        :type event: qtpy.QtCore.QEvent
+        """
+
         super().hoverEnterEvent(event)
         self.mouse_over = True
 
     def hoverLeaveEvent(self, event):
+        """Handles socket hover events by setting the mouse_over state.
+
+        :param event: A graphics scene hover event.
+        :type event: QEvent
+        """
+
         super().hoverLeaveEvent(event)
         self.mouse_over = False
 
@@ -163,6 +174,20 @@ class FCNSocketView(QDMGraphicsSocket):
             self.input_widget.show()
 
     def paint(self, painter, qstyle_option_graphics_item, widget=None):
+        """Provides the item’s painting implementation.
+
+        The option parameter provides style options for the item, such as its state, exposed area and its
+        level-of-detail hints. The widget argument is optional. If provided, it points to the widget that is being
+        painted on; otherwise, it is 0. For cached painting, widget is always 0.
+
+        :param painter: Corresponding QPainter for low-level painting on widgets and other paint devices.
+        :type painter: qtpy.QtGui.QPainter
+        :param qstyle_option_graphics_item: Style options for the item
+        :type qstyle_option_graphics_item: qtpy.QtGui.QStyleOptionGraphicsItem
+        :param widget: The widget that is being painted on
+        :type widget: qtpy.QtGui.QWidget
+        """
+
         if self.mouse_over:
             self.radius = 7
             self.outline_width = 1
