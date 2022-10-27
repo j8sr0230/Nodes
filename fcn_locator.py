@@ -27,10 +27,15 @@ import os
 import FreeCADGui
 
 PATH = os.path.dirname(__file__)
+LIB_PATH = os.path.join(PATH, 'lib')
 RESOURCES_PATH = os.path.join(PATH, 'resources')
 ICONS_PATH = os.path.join(PATH, 'icons')
 TRANSLATIONS_PATH = os.path.join(PATH, 'translations')
 NODES_PATH = os.path.join(PATH, 'nodes')
+
+
+def lib():
+    return LIB_PATH
 
 
 def icon(filename):
