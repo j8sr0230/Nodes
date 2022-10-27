@@ -24,8 +24,8 @@
       <tag>geometry-nodes</tag>
 
       <!-- Python package dependencies (no support for version information) -->
-      <depend>nodeeditor</depend>
-      <depend>qtpy</depend>
+       <!-- <depend>nodeeditor</depend> -->
+       <!-- <depend>qtpy</depend> -->
     </workbench>
   </content>
 
