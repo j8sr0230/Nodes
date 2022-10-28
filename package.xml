@@ -25,6 +25,7 @@
 
       <depend>awkward</depend>
       <depend>blinker</depend>
+      <depend>numpy</depend>
       <depend>qtpy</depend>
     </workbench>
   </content>

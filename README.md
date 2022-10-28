@@ -9,25 +9,18 @@ from Pavel Křupala.
 
 ## Prerequisites
 * FreeCAD >= LinkDaily 2022.430.26244 +4758 (Git)
-* or FreeCAD >= v0.20 (not tested yet)
+* or FreeCAD >= v0.20
 
 ## Installation
-FreeCAD Nodes uses the [pyqt-node-editor](https://gitlab.com/pavel.krupala/pyqt-node-editor) 
-from Pavel Křupala as node editor framework and [Awkward Array](https://awkward-array.readthedocs.io/en/stable/) for 
-handling nested, variable-sized data structures. You can install the latest versions via **pip of your FreeCAD 
-environment** with the following command.
-```
-$ pip install git+https://gitlab.com/pavel.krupala/pyqt-node-editor.git
-$ pip install awkward
-```
+Download and install the FreeCAD Nodes workbench via the Addon Manager (**Tools → Addon Manager**). Since FreeCAD Nodes is 
+not yet an official FreeCAD Workbench, you previously have to add the FreeCAD Nodes Git repository as custom repository
+(**Edit → Settings → Addon Manager → Custom Repositories**). To do this, simply paste the following data into the 
+corresponding dialog fields (see figure). 
 
-Subsequently, download the archive `fc_nodes-main.zip` from this repo (Code > Download ZIP) 
-and unpack it at your preferred location.
+* Repository URL: `https://github.com/j8sr0230/fc_nodes`
+* Branch name: `master`
 
-The last thing you have to do is to set the FreeCAD macro directory to the path of 
-the unzipped `fc_nodes-main` folder and restart FreeCAD.
-
-Now you can run the file `main.py` as a FreeCAD macro.
+![FreeCAD Nodes installation](https://github.com/j8sr0230/fc_nodes/blob/main/img/fcn_installation.png)
 
 ## Usage
 ### Feature overview
