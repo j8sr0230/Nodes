@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
   <name>FreeCAD Nodes</name>
-  <description>Node based visual scripting environment for FreeCAD</description>
+  <description>Visual scripting environment for FreeCAD</description>
   <version>0.1.0</version>
-  <date>2022-08-18</date>
-  <maintainer email="no-one@freecad.org">j8sr0230</maintainer>
+  <date>2022-09-28</date>
+  <maintainer email="ronny.scharf08@gmail.com">j8sr0230</maintainer>
   <license file="LICENSE">LGPLv2.1</license>
   <url type="repository" branch="main">https://github.com/j8sr0230/fc_nodes</url>
   <url type="issues" branch="main">https://github.com/j8sr0230/fc_nodes/issues</url>
-  <icon>icons/fcnodes.svg</icon>
+  <icon>icons/fcn_wb_icon.svg</icon>
 
   <content>
     <workbench>
-      <name>fc_nodes</name>
+      <name>FreeCAD Nodes</name>
       <version>0.1.0</version>
       <description>A visual scripting environment</description>
       <classname>InitGui</classname>
@@ -21,11 +21,11 @@
       <tag>nodes</tag>
       <tag>node-editor</tag>
       <tag>scripting</tag>
-      <tag>geometry-nodes</tag>
+      <tag>geometry nodes</tag>
 
-      <!-- Python package dependencies (no support for version information) -->
-       <!-- <depend>nodeeditor</depend> -->
-       <!-- <depend>qtpy</depend> -->
+      <depend>awkward</depend>
+      <depend>blinker</depend>
+      <depend>qtpy</depend>
     </workbench>
   </content>
 
