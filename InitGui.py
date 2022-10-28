@@ -26,7 +26,12 @@
 
 class FCNodesWorkbench(Workbench):
 
+    import sys
     import fcn_locator as locator
+    sys.path.append(locator.lib())
+
+    import qtpy
+    qtpy.API = "pyqt5"
 
     def QT_TRANSLATE_NOOP(scope, text):
         return text

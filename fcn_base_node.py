@@ -123,6 +123,7 @@ class FCNSocketView(QDMGraphicsSocket):
 
         elif socket_input_index == 2:  # QSlider
             self.input_widget.setOrientation(Qt.Horizontal)
+            self.input_widget.setMaximumHeight(20)
             self.input_widget.setMinimum(floor(socket_default_values[0]))
             self.input_widget.setMaximum(floor(socket_default_values[1]))
             self.input_widget.setValue(floor(socket_default_values[2]))
