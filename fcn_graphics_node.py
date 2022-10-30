@@ -29,9 +29,11 @@
 """
 A module containing the view class (visual representation) of a node in the node editor application.
 """
-from PySide2.QtCore import Qt, QRectF
-from PySide2.QtWidgets import QGraphicsItem, QWidget, QGraphicsTextItem
-from PySide2.QtGui import QFont, QColor, QPen, QBrush, QPainterPath
+from typing import Optional
+
+from PySide2.QtCore import Qt, QRectF, QGraphicsSceneMouseEvent, QGraphicsSceneHoverEvent
+from PySide2.QtWidgets import QGraphicsItem, QWidget, QGraphicsTextItem, QGraphicsProxyWidget, QStyleOptionGraphicsItem
+from PySide2.QtGui import QFont, QColor, QPen, QBrush, QPainterPath, QPainter
 
 
 class QGraphicsNode(QGraphicsItem):
@@ -117,18 +119,18 @@ class QGraphicsNode(QGraphicsItem):
 
         super().__init__(parent)
 
-        self.node = node
+        self.node: nodeeditor.node_node.Node = node
 
-        self.hovered = False
-        self._was_moved = False
-        self._last_selected_state = False
+        self.hovered: bool = False
+        self._was_moved: bool = False
+        self._last_selected_state: bool = False
 
         self.init_sizes()
         self.init_assets()
         self.init_ui()
 
     @property
-    def content(self):
+    def content(self) -> Optional[QWidget]:
         """Reference to the node content"""
         return self.node.content if self.node else None
 
@@ -143,17 +145,17 @@ class QGraphicsNode(QGraphicsItem):
         return self._title
 
     @title.setter
-    def title(self, title: str):
+    def title(self, title: str) -> None:
         """Sets the node title and updates the title widget
 
         :param title: The new node title
         :type title: str
         """
 
-        self._title = title
+        self._title: str = title
         self.title_item.setPlainText(self._title)
 
-    def init_ui(self):
+    def init_ui(self) -> None:
         """Sets up QGraphicsNode user interface"""
 
         self.setFlag(QGraphicsItem.ItemIsSelectable)
@@ -165,61 +167,67 @@ class QGraphicsNode(QGraphicsItem):
 
         self.init_content()
 
-    def init_sizes(self):
+    def init_sizes(self) -> None:
         """Sets up QGraphicsNode dimensions"""
-        self.width = 180
-        self.height = 240
+        self.width: int = 180
+        self.height: int = 240
         self.default_height: int = self.height
         self.collapsed_height: int = 50
-        self.edge_roundness = 10
-        self.edge_padding = 10
-        self.title_height = 24
-        self.title_horizontal_padding = 4
-        self.title_vertical_padding = 4
+        self.edge_roundness: int = 10
+        self.edge_padding: int = 10
+        self.title_height: int = 24
+        self.title_horizontal_padding: int = 4
+        self.title_vertical_padding: int = 4
 
-    def init_assets(self):
+    def init_assets(self) -> None:
         """Initialize all necessary QGraphicsNode assets (colors, pens, brushes and icons)"""
 
-        self._title_color = Qt.white
-        self._title_font = QFont("Ubuntu", 10)
+        self._title_color: QColor = Qt.white
+        self._title_font: QFont = QFont("Ubuntu", 10)
 
-        self._color = QColor("#7F000000")
-        self._color_selected = QColor("#FFFFA637")
-        self._color_hovered = QColor("#FF37A6FF")
+        self._color: QColor = QColor("#7F000000")
+        self._color_selected: QColor = QColor("#FFFFA637")
+        self._color_hovered: QColor = QColor("#FF37A6FF")
 
-        self._pen_default = QPen(self._color)
-        self._pen_selected: QPen
-        self._pen_hovered = QPen(self._color_hovered)
+        self._pen_default: QPen = QPen(self._color)
+        self._pen_default.setWidthF(2.0)
+        self._pen_selected: QPen = QPen(self._color_selected)
+        self._pen_selected.setWidthF(2.0)
+        self._pen_hovered: QPen = QPen(self._color_hovered)
         self._pen_hovered.setWidthF(3.0)
 
-        self._brush_title = QBrush(QColor("#FF313131"))
-        self._brush_background = QBrush(QColor("#E3212121"))
+        self._brush_title: QBrush = QBrush(QColor("#FF313131"))
+        self._brush_background: QBrush = QBrush(QColor("#E3212121"))
 
         path: str = locator.icon("fcn_status_icon.png")
         self.status_icons: QImage = QImage(path)
         self.main_icon: QImage = QImage(self.node.icon)
 
-    def on_selected(self):
+    def on_selected(self) -> None:
         """Event handling when the node was selected"""
 
         self.node.scene.grScene.itemSelected.emit()
 
-    def do_select(self, new_state: bool = True):
+    def do_select(self, new_state: bool = True) -> None:
         """Safe version of selecting the QGraphicsNode
 
         This method takes care about the selection state flag used internally.
 
         :param new_state: True to select, False to deselect
-        :type new_state: bool`
+        :type new_state: bool
         """
 
         self.setSelected(new_state)
-        self._last_selected_state = new_state
+        self._last_selected_state: bool = new_state
         if new_state:
             self.on_selected()
 
-    def mouseMoveEvent(self, event):
-        """Event to detect that the node was moved"""
+    def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent) -> None:
+        """Event to detect that the node was moved
+
+        :param event: Mouse event
+        :type event: QGraphicsSceneMouseEvent
+        """
 
         super().mouseMoveEvent(event)
 
@@ -227,16 +235,20 @@ class QGraphicsNode(QGraphicsItem):
         for node in self.scene().scene.nodes:
             if node.grNode.isSelected():
                 node.updateConnectedEdges()
-        self._was_moved = True
+        self._was_moved: bool = True
 
-    def mouseReleaseEvent(self, event):
-        """Event to handle when the node was moved, selected or deselected"""
+    def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent) -> None:
+        """Event to handle when the node was moved, selected or deselected
+
+        :param event: Mouse event
+        :type event: QGraphicsSceneMouseEvent
+        """
 
         super().mouseReleaseEvent(event)
 
         # When moved
         if self._was_moved:
-            self._was_moved = False
+            self._was_moved: bool = False
             self.node.scene.history.storeHistory("Node moved", setModified=True)
 
             self.node.scene.resetLastSelectedStates()
@@ -252,59 +264,78 @@ class QGraphicsNode(QGraphicsItem):
         if self._last_selected_state != self.isSelected() or \
                 self.node.scene._last_selected_items != self.node.scene.getSelectedItems():
             self.node.scene.resetLastSelectedStates()
-            self._last_selected_state = self.isSelected()
+            self._last_selected_state: bool = self.isSelected()
             self.on_selected()
 
-    def mouseDoubleClickEvent(self, event):
-        """Overriden event for doubleclick. Resend to `Node::onDoubleClicked`"""
+    def mouseDoubleClickEvent(self, event: QGraphicsSceneMouseEvent) -> None:
+        """Handles doubleclick event
+
+        :param event: Mouse event
+        :type event: QGraphicsSceneMouseEvent
+        """
+
+        # Resends event to the model class
         self.node.onDoubleClicked(event)
 
-    def hoverEnterEvent(self, event: 'QGraphicsSceneHoverEvent') -> None:
-        """Handle hover effect"""
-        self.hovered = True
+    def hoverEnterEvent(self, event: QGraphicsSceneHoverEvent) -> None:
+        """Handles hover enter event
+
+        :param event: Mouse event
+        :type event: QGraphicsSceneMouseEvent
+        """
+
+        self.hovered: bool = True
         self.update()
 
-    def hoverLeaveEvent(self, event: 'QGraphicsSceneHoverEvent') -> None:
-        """Handle hover effect"""
-        self.hovered = False
+    def hoverLeaveEvent(self, event: QGraphicsSceneHoverEvent) -> None:
+        """Handles hover leave event
+
+        :param event: Mouse event
+        :type event: QGraphicsSceneMouseEvent
+        """
+
+        self.hovered: bool = False
         self.update()
 
     def boundingRect(self) -> QRectF:
         """Defining Qt' bounding rectangle"""
+
         return QRectF(0, 0, self.width, self.height).normalized()
 
     def init_title(self):
-        """Set up the title Graphics representation: font, color, position, etc."""
-        self.title_item = QGraphicsTextItem(self)
+        """Set up the title graphics representation"""
+
+        self.title_item: QGraphicsTextItem = QGraphicsTextItem(self)
         self.title_item.node = self.node
         self.title_item.setDefaultTextColor(self._title_color)
         self.title_item.setFont(self._title_font)
         self.title_item.setPos(self.title_horizontal_padding, 0)
-        self.title_item.setTextWidth(
-            self.width
-            - 2 * self.title_horizontal_padding
-        )
+        self.title_item.setTextWidth(self.width - 2 * self.title_horizontal_padding)
 
     def init_content(self):
-        """Set up the `grContent` - ``QGraphicsProxyWidget`` to have a container for `Graphics Content`"""
+        """Sets up a container for the node content as QGraphicsProxyWidget"""
+
         if self.content is not None:
             self.content.setGeometry(self.edge_padding, self.title_height + self.edge_padding,
-                                     self.width - 2 * self.edge_padding, self.height - 2 * self.edge_padding -
-                                     self.title_height)
+                                     self.width - 2 * self.edge_padding,
+                                     self.height - 2 * self.edge_padding - self.title_height)
 
-        # get the QGraphicsProxyWidget when inserted into the grScene
-        self.grContent = self.node.scene.grScene.addWidget(self.content)
+        # Get the QGraphicsProxyWidget when inserted into the grScene
+        self.grContent: QGraphicsProxyWidget = self.node.scene.grScene.addWidget(self.content)
         self.grContent.node = self.node
         self.grContent.setParentItem(self)
 
-    def paint(self, painter, option, widget=None, **kwargs):
-        """Painting the rounded rectangular `Node`
-        :param widget:
-        :type widget:
+    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: QWidget = None, **kwargs):
+        """Painting the rounded rectangular node
+
+        :param painter:
+        :type painter: QPainter
         :param option:
-        :type option:
-        :type painter: object:
+        :type option: QStyleOptionGraphicsItem
+        :param widget:
+        :type widget: QWidget
         """
+
         # title
         path_title = QPainterPath()
         path_title.setFillRule(Qt.WindingFill)
