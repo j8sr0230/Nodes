@@ -302,7 +302,7 @@ class QGraphicsNode(QGraphicsItem):
 
         return QRectF(0, 0, self.width, self.height).normalized()
 
-    def init_title(self):
+    def init_title(self) -> None:
         """Set up the title graphics representation"""
 
         self.title_item: QGraphicsTextItem = QGraphicsTextItem(self)
@@ -312,7 +312,7 @@ class QGraphicsNode(QGraphicsItem):
         self.title_item.setPos(self.title_horizontal_padding, 0)
         self.title_item.setTextWidth(self.width - 2 * self.title_horizontal_padding)
 
-    def init_content(self):
+    def init_content(self) -> None:
         """Sets up a container for the node content as QGraphicsProxyWidget"""
 
         if self.content is not None:
@@ -325,19 +325,19 @@ class QGraphicsNode(QGraphicsItem):
         self.grContent.node = self.node
         self.grContent.setParentItem(self)
 
-    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: QWidget = None, **kwargs):
-        """Painting the rounded rectangular node
+    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: QWidget = None, **kwargs) -> None:
+        """Paints the rounded rectangular node in local coordinates
 
-        :param painter:
+        :param painter: Painter instance that is performing the drawing
         :type painter: QPainter
-        :param option:
+        :param option: Style options for the drawing
         :type option: QStyleOptionGraphicsItem
-        :param widget:
+        :param widget: The widget that is being painted on
         :type widget: QWidget
         """
 
-        # title
-        path_title = QPainterPath()
+        # Title
+        path_title: QPainterPath = QPainterPath()
         path_title.setFillRule(Qt.WindingFill)
         path_title.addRoundedRect(0, 0, self.width, self.title_height, self.edge_roundness, self.edge_roundness)
         path_title.addRect(0, self.title_height - self.edge_roundness, self.edge_roundness, self.edge_roundness)
@@ -347,22 +347,23 @@ class QGraphicsNode(QGraphicsItem):
         painter.setBrush(self._brush_title)
         painter.drawPath(path_title.simplified())
 
-        # content
-        path_content = QPainterPath()
+        # Content
+        path_content: QPainterPath = QPainterPath()
         path_content.setFillRule(Qt.WindingFill)
         path_content.addRoundedRect(0, self.title_height, self.width, self.height - self.title_height,
                                     self.edge_roundness, self.edge_roundness)
         path_content.addRect(0, self.title_height, self.edge_roundness, self.edge_roundness)
-        path_content.addRect(self.width - self.edge_roundness, self.title_height, self.edge_roundness,
-                             self.edge_roundness)
+        path_content.addRect(self.width - self.edge_roundness, self.title_height,
+                             self.edge_roundness, self.edge_roundness)
         painter.setPen(Qt.NoPen)
         painter.setBrush(self._brush_background)
         painter.drawPath(path_content.simplified())
 
-        # outline
-        path_outline = QPainterPath()
+        # Outline
+        path_outline: QPainterPath = QPainterPath()
         path_outline.addRoundedRect(-1, -1, self.width+2, self.height+2, self.edge_roundness, self.edge_roundness)
         painter.setBrush(Qt.NoBrush)
+
         if self.hovered:
             painter.setPen(self._pen_hovered)
             painter.drawPath(path_outline.simplified())
@@ -372,8 +373,9 @@ class QGraphicsNode(QGraphicsItem):
             painter.setPen(self._pen_default if not self.isSelected() else self._pen_selected)
             painter.drawPath(path_outline.simplified())
 
+        # Status and main icon
         painter.drawImage(QRectF(-12, -12, 24, 24), self.main_icon, QRectF(self.main_icon.rect()))
-        status_icon_placement = QRectF(self.width - 12, -12, 24.0, 24.0)
+        status_icon_placement: QRectF = QRectF(self.width - 12, -12, 24.0, 24.0)
         if self.node.isDirty():
             painter.drawImage(status_icon_placement, self.status_icons, QRectF(0, 0, 24, 24))
         if self.node.isInvalid():
