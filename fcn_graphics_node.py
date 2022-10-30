@@ -27,7 +27,7 @@
 #
 ###################################################################################
 """
-A module containing the visual representation of a node in the graphics scene.
+A module containing the view class (visual representation) of a node in the node editor application.
 """
 from PySide2.QtCore import Qt, QRectF
 from PySide2.QtWidgets import QGraphicsItem, QWidget, QGraphicsTextItem
@@ -35,13 +35,13 @@ from PySide2.QtGui import QFont, QColor, QPen, QBrush, QPainterPath
 
 
 class QGraphicsNode(QGraphicsItem):
-    """Visual representation of a node in the graphics scene.
+    """View class of a node in the node editor application.
 
-    The visual node is a QGraphicsItem that is display in a QGraphicsScene instance. In addition, it serves as a
-    container for the visual node content (see FCNNodeContentView class).The FCNNodeView class specifies all the
-    necessary geometric information needed, to display a node in the scene.
+    The view class QGraphicsNode is a QGraphicsItem to display nodes in QGraphicsScene instances.
 
     Attributes:
+        node: (nodeeditor.node_node.Node): Model class of a node in the graphics scene
+
         width (int): Current width of the node.
         height (int): Current height of the node.
         collapsed_height (int): Height of the collapsed node.
@@ -50,43 +50,61 @@ class QGraphicsNode(QGraphicsItem):
         edge_padding (int): Padding between node and node content.
         title_horizontal_padding (int): Horizontal padding between node and node title.
         title_vertical_padding (int): Vertical padding between node and node title.
-        icons (QImage): Status icons of the node, that is displayed in the top left corner.
+
+        _title (str): Title of the node
+        _title_color (QColor): Title color
+        _title_font (QFont): Title font
+        _color (QColor): Node color
+        _color_selected (QColor): Node color for selected nodes
+        _color_hovered (QColor): Node color for nodes in hover state
+        _pen_default (QPen): Node pen
+        _pen_selected (QPen): Node pen for selected nodes
+        _pen_hovered (QPen): Node pen for nodes in hover state
+        _brush_title (QBrush): Title brush
+        _brush_background (QBrush): Background brush
+
+        title_item (QGraphicsTextItem): QWidget to display the node title
+        grContent (QGraphicsProxyWidget): QWidget to display the node content
+        status_icons (QImage): Icons for the node state (valid, invalid, dirty)
+        main_icon (QImage): Main icons of the node
+
+        hovered (bool): Indicates weather a node is in the hover state
+        _was_moved (bool): Indicates weather a node was moved
+        _last_selected_state (bool): Indicates weather a node was selected
     """
 
     node: nodeeditor.node_node.Node
-    hovered: bool
-    _was_moved: bool
-    _last_selected_state: bool
-    _title: str
+
     width: int
     height: int
+    collapsed_height: int
+    default_height: int
     edge_roundness: int
     edge_padding: int
     title_height: int
     title_horizontal_padding: int
     title_vertical_padding: int
+
+    _title: str
     _title_color: QColor
     _title_font: QFont
-
     _color: QColor
     _color_selected: QColor
     _color_hovered: QColor
-
     _pen_default: QPen
     _pen_selected: QPen
     _pen_hovered: QPen
-
     _brush_title: QBrush
     _brush_background: QBrush
 
     title_item: QGraphicsTextItem
     grContent: QGraphicsProxyWidget
-
-    collapsed_height: int
-    default_height: int
-
-    icons: QImage
+    status_icons: QImage
     main_icon: QImage
+
+    hovered: bool
+    _was_moved: bool
+    _last_selected_state: bool
 
     def __init__(self, node: nodeeditor.node_node.Node, parent: QWidget = None):
         """QGraphicsNode constructor
@@ -101,7 +119,6 @@ class QGraphicsNode(QGraphicsItem):
 
         self.node = node
 
-        # Init node state flags
         self.hovered = False
         self._was_moved = False
         self._last_selected_state = False
@@ -112,51 +129,57 @@ class QGraphicsNode(QGraphicsItem):
 
     @property
     def content(self):
-        """Reference to `Node Content`"""
+        """Reference to the node content"""
         return self.node.content if self.node else None
 
     @property
-    def title(self):
-        """title of this `Node`
+    def title(self) -> str:
+        """Returns the node title
 
-        :getter: current Graphics Node title
-        :setter: stores and make visible the new title
-        :type: str
+        :return: Title of the node
+        :rtype: str
         """
+
         return self._title
 
     @title.setter
-    def title(self, value):
-        self._title = value
+    def title(self, title: str):
+        """Sets the node title and updates the title widget
+
+        :param title: The new node title
+        :type title: str
+        """
+
+        self._title = title
         self.title_item.setPlainText(self._title)
 
     def init_ui(self):
-        """Set up this ``QGraphicsItem``"""
+        """Sets up QGraphicsNode user interface"""
+
         self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setAcceptHoverEvents(True)
 
-        # init title
         self.init_title()
         self.title = self.node.title
 
         self.init_content()
 
     def init_sizes(self):
-        """Set up internal attributes like `width`, `height`, etc."""
+        """Sets up QGraphicsNode dimensions"""
         self.width = 180
         self.height = 240
+        self.default_height: int = self.height
+        self.collapsed_height: int = 50
         self.edge_roundness = 10
         self.edge_padding = 10
         self.title_height = 24
         self.title_horizontal_padding = 4
         self.title_vertical_padding = 4
 
-        self.default_height: int = self.height
-        self.collapsed_height: int = 50
-
     def init_assets(self):
-        """Initialize ``QObjects`` like ``QColor``, ``QPen`` and ``QBrush``"""
+        """Initialize all necessary QGraphicsNode assets (colors, pens, brushes and icons)"""
+
         self._title_color = Qt.white
         self._title_font = QFont("Ubuntu", 10)
 
@@ -173,58 +196,64 @@ class QGraphicsNode(QGraphicsItem):
         self._brush_background = QBrush(QColor("#E3212121"))
 
         path: str = locator.icon("fcn_status_icon.png")
-        self.icons: QImage = QImage(path)
+        self.status_icons: QImage = QImage(path)
         self.main_icon: QImage = QImage(self.node.icon)
 
     def on_selected(self):
-        """Our event handling when the node was selected"""
+        """Event handling when the node was selected"""
+
         self.node.scene.grScene.itemSelected.emit()
 
-    def do_select(self, new_state=True):
-        """Safe version of selecting the `Graphics Node`. Takes care about the selection state flag used internally
+    def do_select(self, new_state: bool = True):
+        """Safe version of selecting the QGraphicsNode
 
-        :param new_state: ``True`` to select, ``False`` to deselect
-        :type new_state: ``bool``
+        This method takes care about the selection state flag used internally.
+
+        :param new_state: True to select, False to deselect
+        :type new_state: bool`
         """
+
         self.setSelected(new_state)
         self._last_selected_state = new_state
         if new_state:
-            self.onSelected()
+            self.on_selected()
 
     def mouseMoveEvent(self, event):
-        """Overridden event to detect that we moved with this `Node`"""
+        """Event to detect that the node was moved"""
+
         super().mouseMoveEvent(event)
 
-        # optimize me! just update the selected nodes
+        # Needs improvement: Just update the selected nodes
         for node in self.scene().scene.nodes:
             if node.grNode.isSelected():
                 node.updateConnectedEdges()
         self._was_moved = True
 
     def mouseReleaseEvent(self, event):
-        """Overriden event to handle when we moved, selected or deselected this `Node`"""
+        """Event to handle when the node was moved, selected or deselected"""
+
         super().mouseReleaseEvent(event)
 
-        # handle when grNode moved
+        # When moved
         if self._was_moved:
             self._was_moved = False
             self.node.scene.history.storeHistory("Node moved", setModified=True)
 
             self.node.scene.resetLastSelectedStates()
-            self.doSelect()     # also trigger itemSelected when node was moved
+            self.do_select()  # Also trigger itemSelected when node was moved
 
-            # we need to store the last selected state, because moving does also select the nodes
+            # Store the last selected state, because moving does also select the nodes
             self.node.scene._last_selected_items = self.node.scene.getSelectedItems()
 
-            # now we want to skip storing selection
+            # Now we want to skip storing selection
             return
 
-        # handle when grNode was clicked on
+        # When clicked
         if self._last_selected_state != self.isSelected() or \
                 self.node.scene._last_selected_items != self.node.scene.getSelectedItems():
             self.node.scene.resetLastSelectedStates()
             self._last_selected_state = self.isSelected()
-            self.onSelected()
+            self.on_selected()
 
     def mouseDoubleClickEvent(self, event):
         """Overriden event for doubleclick. Resend to `Node::onDoubleClicked`"""
@@ -315,6 +344,6 @@ class QGraphicsNode(QGraphicsItem):
         painter.drawImage(QRectF(-12, -12, 24, 24), self.main_icon, QRectF(self.main_icon.rect()))
         status_icon_placement = QRectF(self.width - 12, -12, 24.0, 24.0)
         if self.node.isDirty():
-            painter.drawImage(status_icon_placement, self.icons, QRectF(0, 0, 24, 24))
+            painter.drawImage(status_icon_placement, self.status_icons, QRectF(0, 0, 24, 24))
         if self.node.isInvalid():
-            painter.drawImage(status_icon_placement, self.icons, QRectF(48, 0, 24, 24))
+            painter.drawImage(status_icon_placement, self.status_icons, QRectF(48, 0, 24, 24))
