@@ -22,11 +22,6 @@
 #
 #
 ###################################################################################
-from decimal import Decimal
-
-from qtpy.QtWidgets import QLineEdit
-from nodeeditor.node_content_widget import QDMNodeContentWidget
-
 from fcn_conf import register_node
 from fcn_default_node import FCNNodeModel  # FCNNodeContentView
 from fcn_locator import icon
@@ -42,10 +37,13 @@ class Test(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(6, "In", False)],
+                         inputs_init_list=[(6, "A", False), (6, "B", False)],
                          outputs_init_list=[(6, "Out", True)])
 
-    def eval_operation(self, sockets_input_data: list) -> list:
+        self.grNode.resize(100, 80, 10)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
+    def eval_operation(self, sockets_input_data: list) -> list:
         in_val: float = float(sockets_input_data[0][0])
         return [[in_val]]

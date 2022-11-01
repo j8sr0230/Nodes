@@ -26,7 +26,7 @@
 from collections import OrderedDict
 from typing import Optional
 
-from qtpy.QtGui import QImage, QColor, QPen, QBrush, QFont
+from qtpy.QtGui import QImage, QColor, QPen, QBrush, QFont, QFontMetrics
 from qtpy.QtCore import QRectF, Qt
 
 from nodeeditor.node_scene import Scene
@@ -44,12 +44,40 @@ DEBUG = False
 
 
 class FCNSocketView(QDMGraphicsSocket):
-    """View provider for FCNSocketModel."""
+    """View provider for FCNSocketModel.
+
+    Attributes:
+        _color_label (QColor): Label color
+        _pen_label (QPen): Label pen
+    """
+
+    _color_label: QColor
+    _pen_label: QPen
+
+    def initAssets(self):
+        """Overwritten from nodeeditor.node_graphics_socket.QDMGraphicsSocket."""
+        super().initAssets()
+
+        self._color_label = QColor("#fff")
+        self._pen_label = QPen(self._color_label)
 
     def paint(self, painter, option, widget=None):
         """Overwritten from nodeeditor.node_graphics_socket.QDMGraphicsSocket."""
 
         super().paint(painter, option, widget)
+
+        painter.setPen(self._color_label)
+        fm: QFontMetrics = QFontMetrics(painter.font())
+        label_width: int = fm.width(self.socket.socket_name)
+        font_height: int = fm.height()
+        y: int = (-font_height // 2) - 1
+
+        if self.socket.is_input:
+            painter.drawText(self.radius + 5, y, label_width, font_height,
+                             Qt.AlignVCenter, self.socket.socket_name)
+        else:
+            painter.drawText(-self.radius - label_width - 5, y, label_width, font_height,
+                             Qt.AlignRight | Qt.AlignVCenter, self.socket.socket_name)
 
 
 class FCNSocketModel(Socket):
@@ -135,7 +163,7 @@ class FCNNodeView(QDMGraphicsNode):
         self.edge_padding: int = 5
         self.title_height: int = 30
         self.title_horizontal_padding: int = 4
-        self.title_vertical_padding: int = 0
+        self.title_vertical_padding: int = 4
 
     def initAssets(self):
         """Overwritten rom nodeeditor.node_graphics_node.QDMGraphicsNode."""
@@ -143,6 +171,22 @@ class FCNNodeView(QDMGraphicsNode):
         super().initAssets()
 
         self.status_icons: QImage = QImage(locator.icon("fcn_status_icon.png"))
+
+    def resize(self, width: int, height: int, title_vertical_padding: int):
+        """Resizes the visual node representation.
+
+        :param width: New node width
+        :type width: int
+        :param height: New node height
+        :type height: int
+        :param title_vertical_padding: New node width
+        :type title_vertical_padding: int
+        """
+
+        self.width: int = width
+        self.height: int = height
+        self.title_vertical_padding = title_vertical_padding
+        self.update()
 
     def paint(self, painter, option, widget=None):
         """Overwritten from nodeeditor.node_graphics_node.QDMGraphicsNode."""
