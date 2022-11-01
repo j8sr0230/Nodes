@@ -48,7 +48,7 @@ class QDMGraphicsScene(QGraphicsScene):
 
     def initAssets(self):
         """Initialize ``QObjects`` like ``QColor``, ``QPen`` and ``QBrush``"""
-        self._color_background = QColor("#666666")  # QColor("#393939")
+        self._color_background = QColor("#393939")
         self._color_light = QColor("#2f2f2f")
         self._color_dark = QColor("#292929")
         self._color_state = QColor("#ccc")

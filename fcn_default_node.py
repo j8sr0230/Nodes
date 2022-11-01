@@ -44,10 +44,10 @@ DEBUG = False
 
 
 class FCNSocketView(QDMGraphicsSocket):
-    """View provider for the FCNSocketModel class."""
+    """View provider for FCNSocketModel."""
 
     def paint(self, painter, option, widget=None):
-        """Overwritten method of the class nodeeditor.node_graphics_socket.QDMGraphicsSocket."""
+        """Overwritten from nodeeditor.node_graphics_socket.QDMGraphicsSocket."""
 
         super().paint(painter, option, widget)
 
@@ -62,7 +62,7 @@ class FCNSocketModel(Socket):
     def __init__(self, node: Node, index: int = 0, position: int = LEFT_CENTER, socket_color: int = 1,
                  multi_edges: bool = True, count_on_this_node_side: int = 1, is_input: bool = False,
                  socket_name: str = ""):
-        """Overwritten constructor of the class nodeeditor.node_socket.Socket.
+        """Overwritten from nodeeditor.node_socket.Socket.
 
         :param socket_name: Socket name
         :type socket_name: str
@@ -73,14 +73,18 @@ class FCNSocketModel(Socket):
 
 
 class FCNNodeContentView(QDMNodeContentWidget):
+    """View provider (widget) for the node content."""
+
     def initUI(self):
+        """Overwritten from nodeeditor.node_content_widget.QDMNodeContentWidget."""
+
         # lbl = QLabel("Hello World!", self)
         # lbl.setObjectName(self.node.content_label_objname)
-        pass
+        self.setStyleSheet("background:transparent;")
 
 
 class FCNNodeView(QDMGraphicsNode):
-    """View provider for the FCNNodeModel class.
+    """View provider for FCNNodeModel.
 
     Attributes:
         width (int): Width of the node
@@ -90,7 +94,17 @@ class FCNNodeView(QDMGraphicsNode):
         title_height (int) Height of the node title
         title_horizontal_padding (int): Horizontal padding between node and node title
         title_vertical_padding (int): Vertical padding between node and node title
-        status_icons (QImage): Status icons of the node, that is displayed in the top left corner
+        _title_color (QColor): Title color
+        _title_font (QFont): Title font
+        _color (QColor): Border color
+        _color_selected (QColor): Border color if selected
+        _color_hovered (QColor): Border color if hovered
+        _pen_default (QPen): Default pen
+        _pen_selected (QPen): Pen if selected
+        _pen_hovered (QPen): Pen if hovered
+        _brush_title (QPen): Title pen
+        _brush_background (QBrush): Node background
+        status_icons (QImage): Status icons of the node (top right corner)
     """
 
     width: int
@@ -100,7 +114,6 @@ class FCNNodeView(QDMGraphicsNode):
     title_height: int
     title_horizontal_padding: int
     title_vertical_padding: int
-
     _title_color: QColor
     _title_font: QFont
     _color: QColor
@@ -114,40 +127,25 @@ class FCNNodeView(QDMGraphicsNode):
     status_icons: QImage
 
     def initSizes(self):
-        """Overwritten method of the class nodeeditor.node_graphics_node.QDMGraphicsNode."""
+        """Overwritten from nodeeditor.node_graphics_node.QDMGraphicsNode."""
 
-        self.width: int = 120
-        self.height: int = 120
-        self.edge_roundness: int = 10
-        self.edge_padding: int = 10
+        self.width: int = 100
+        self.height: int = 80
+        self.edge_roundness: int = 5
+        self.edge_padding: int = 5
         self.title_height: int = 30
         self.title_horizontal_padding: int = 4
-        self.title_vertical_padding: int = 4
+        self.title_vertical_padding: int = 0
 
     def initAssets(self):
-        """Overwritten method of the class nodeeditor.node_graphics_node.QDMGraphicsNode."""
+        """Overwritten rom nodeeditor.node_graphics_node.QDMGraphicsNode."""
 
-        self._title_color = Qt.white
-        self._title_font = QFont("Ubuntu", 10)
-
-        self._color = QColor("#7F000000")
-        self._color_selected = QColor("#FFFFA637")
-        self._color_hovered = QColor("#FF37A6FF")
-
-        self._pen_default = QPen(self._color)
-        self._pen_default.setWidthF(2.0)
-        self._pen_selected = QPen(self._color_selected)
-        self._pen_selected.setWidthF(2.0)
-        self._pen_hovered = QPen(self._color_hovered)
-        self._pen_hovered.setWidthF(3.0)
-
-        self._brush_title = QBrush(QColor("#FF313131"))
-        self._brush_background = QBrush(QColor("#E3212121"))
+        super().initAssets()
 
         self.status_icons: QImage = QImage(locator.icon("fcn_status_icon.png"))
 
     def paint(self, painter, option, widget=None):
-        """Overwritten method of the class nodeeditor.node_graphics_node.QDMGraphicsNode."""
+        """Overwritten from nodeeditor.node_graphics_node.QDMGraphicsNode."""
 
         super().paint(painter, option, widget)
 
@@ -172,13 +170,12 @@ class FCNNodeModel(Node):
      - Socket_class (Socket): Name of model class for the node sockets
 
      Attributes:
-        input_init_list (list): Definition of the input sockets
-        outputs_init_list (list): Definition of the output sockets
-        content (QDMNodeContentWidget): Reference to the node content widget
-        sockets_input_data (list): Data structure that contains all input data
-        output_data_cache (list): Storage for the node evaluation result
         input_socket_position (int): Initial position of the input sockets
         output_socket_position (int): Initial position of the output sockets
+        inputs (list): List of input sockets
+        outputs (list): List of output sockets
+        sockets_input_data (list): Data structure that contains all input data
+        output_data_cache (list): Storage for the node evaluation result
     """
 
     icon: str = ""
@@ -192,11 +189,13 @@ class FCNNodeModel(Node):
 
     input_socket_position: int
     output_socket_position: int
+    inputs: list
+    outputs: list
     sockets_input_data: list
     output_data_cache: list
 
     def __init__(self, scene: Scene, inputs_init_list: list = None, outputs_init_list: list = None):
-        """Overwritten constructor of the class nodeeditor.node_node.Node."""
+        """Overwritten from class nodeeditor.node_node.Node."""
 
         super().__init__(scene, self.__class__.op_title, inputs_init_list, outputs_init_list)
 
@@ -205,7 +204,7 @@ class FCNNodeModel(Node):
         self.eval()
 
     def initSettings(self):
-        """Overwritten method of the class nodeeditor.node_node.Node."""
+        """Overwritten from class nodeeditor.node_node.Node."""
 
         super().initSettings()
 
@@ -213,7 +212,7 @@ class FCNNodeModel(Node):
         self.output_socket_position: int = RIGHT_CENTER
 
     def initSockets(self, inputs: list, outputs: list, reset: bool = True):
-        """Overwritten method of the class nodeeditor.node_node.Node."""
+        """Overwritten from class nodeeditor.node_node.Node."""
 
         if reset:
             # Clear old sockets
@@ -242,7 +241,7 @@ class FCNNodeModel(Node):
             self.outputs.append(socket)
 
     def eval(self, index: int = 0) -> list:
-        """Overwritten method of the class nodeeditor.node_node.Node."""
+        """Overwritten from class nodeeditor.node_node.Node."""
 
         if not self.isDirty() and not self.isInvalid():
             # Return cached result for the indexed (desired) output socket
@@ -312,17 +311,17 @@ class FCNNodeModel(Node):
              [sN_e0, sN_e1, ..., sN_eN]],
              where s stands for input socket and e for connected edge.
 
-        :param sockets_input_data: Socket input data.
+        :param sockets_input_data: Socket input data
         :type sockets_input_data: list
-        :return: Calculated output data as a list with one sublist per output socket.
+        :return: Calculated output data as a list with one sublist per output socket
         :rtype: list
         """
 
-        # Default implementation
+        # Default implementation for two output sockets
         return [[0], [0]]
 
     def onInputChanged(self, socket: Socket):
-        """Overwritten method of the class nodeeditor.node_node.Node."""
+        """Overwritten from nodeeditor.node_node.Node."""
 
         super().onInputChanged(socket)
         self.eval()
@@ -330,19 +329,19 @@ class FCNNodeModel(Node):
             print("%s::__onInputChanged" % self.__class__.__name__, "self.output_data_cache = ", self.output_data_cache)
 
     def onDoubleClicked(self, event) -> None:
-        """Overwritten method of the class nodeeditor.node_node.Node."""
+        """Overwritten from nodeeditor.node_node.Node."""
 
         super().onDoubleClicked(event)
 
     def serialize(self) -> OrderedDict:
-        """Overwritten method of the class nodeeditor.node_node.Node."""
+        """Overwritten from nodeeditor.node_node.Node."""
 
         res = super().serialize()
         res['op_code'] = self.__class__.op_code
         return res
 
     def deserialize(self, data: dict, hashmap=None, restore_id: bool = True, *args, **kwargs) -> bool:
-        """Overwritten method of the class nodeeditor.node_node.Node."""
+        """Overwritten from nodeeditor.node_node.Node."""
 
         if hashmap is None:
             hashmap = {}

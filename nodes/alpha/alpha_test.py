@@ -42,8 +42,8 @@ class Test(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "In", False)],
-                         outputs_init_list=[(0, "Out", True)])
+                         inputs_init_list=[(6, "In", False)],
+                         outputs_init_list=[(6, "Out", True)])
 
     def eval_operation(self, sockets_input_data: list) -> list:
 
