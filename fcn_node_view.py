@@ -31,9 +31,12 @@ A module containing the view class (visual representation) of a node in the node
 """
 from typing import Optional
 
-from PySide2.QtCore import Qt, QRectF, QGraphicsSceneMouseEvent, QGraphicsSceneHoverEvent
-from PySide2.QtWidgets import QGraphicsItem, QWidget, QGraphicsTextItem, QGraphicsProxyWidget, QStyleOptionGraphicsItem
-from PySide2.QtGui import QFont, QColor, QPen, QBrush, QPainterPath, QPainter
+from qtpy.QtCore import Qt, QRectF  # QGraphicsSceneMouseEvent, QGraphicsSceneHoverEvent
+from qtpy.QtWidgets import QGraphicsItem, QWidget, QGraphicsTextItem, QGraphicsProxyWidget, QStyleOptionGraphicsItem, \
+    QGraphicsSceneMouseEvent, QGraphicsSceneHoverEvent
+from qtpy.QtGui import QFont, QColor, QPen, QBrush, QPainterPath, QPainter, QImage
+
+import fcn_locator as locator
 
 
 class QGraphicsNode(QGraphicsItem):
@@ -75,7 +78,7 @@ class QGraphicsNode(QGraphicsItem):
         _last_selected_state (bool): Indicates weather a node was selected
     """
 
-    node: nodeeditor.node_node.Node
+    node: 'nodeeditor.node_node.Node'
 
     width: int
     height: int
@@ -108,7 +111,7 @@ class QGraphicsNode(QGraphicsItem):
     _was_moved: bool
     _last_selected_state: bool
 
-    def __init__(self, node: nodeeditor.node_node.Node, parent: QWidget = None):
+    def __init__(self, node: 'nodeeditor.node_node.Node', parent: QWidget = None):
         """QGraphicsNode constructor
 
         :param node: Reference to QGraphicsNode model class
@@ -182,7 +185,7 @@ class QGraphicsNode(QGraphicsItem):
     def init_assets(self) -> None:
         """Initialize all necessary QGraphicsNode assets (colors, pens, brushes and icons)"""
 
-        self._title_color: QColor = Qt.white
+        self._title_color: Qt.GlobalColor = Qt.white
         self._title_font: QFont = QFont("Ubuntu", 10)
 
         self._color: QColor = QColor("#7F000000")

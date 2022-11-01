@@ -9,12 +9,16 @@ from nodeeditor.node_serializable import Serializable
 from nodeeditor.node_socket import Socket, LEFT_BOTTOM, LEFT_CENTER, LEFT_TOP, RIGHT_BOTTOM, RIGHT_CENTER, RIGHT_TOP
 from nodeeditor.utils_no_qt import dumpException, pp
 
+import fcn_locator as locator
+from fcn_conf import register_node
+
 from fcn_node_view import QGraphicsNode
 
-DEBUG = True
+DEBUG = False
 
 
-class Node(Serializable):
+@register_node
+class NodeMod(Serializable):
     """
     Class representing `Node` in the `Scene`.
     """
@@ -27,7 +31,7 @@ class Node(Serializable):
     op_category: str = "Alpha"
     content_label_objname: str = "fcn_node_bg"
 
-    def __init__(self, scene: 'Scene', title: str="Undefined Node", inputs: list=[], outputs: list=[]):
+    def __init__(self, scene: 'Scene', title: str="Undefined Node", inputs: list=[1], outputs: list=[1]):
         """
 
         :param scene: reference to the :class:`~nodeeditor.node_scene.Scene`
