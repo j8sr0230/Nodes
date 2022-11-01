@@ -20,16 +20,8 @@ from fcn_conf import NodesStore
 
 
 # Local validator to use string type
-def edge_cannot_connect_input_and_output_of_different_type(output_socket: FCNSocket, input_socket: FCNSocket):
-    check_res = [(fnmatch(out_type, in_type) or fnmatch(in_type, out_type))  # Hack: Allow wildcard typing on both sides
-                 for in_type in input_socket.socket_str_type
-                 for out_type in output_socket.socket_str_type]
-    return any(check_res)
-
-
 Edge.registerEdgeValidator(edge_cannot_connect_two_outputs_or_two_inputs)
 Edge.registerEdgeValidator(edge_cannot_connect_input_and_output_of_same_node)
-Edge.registerEdgeValidator(edge_cannot_connect_input_and_output_of_different_type)
 
 
 DEBUG = False

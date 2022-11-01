@@ -31,7 +31,7 @@ class FCNSubWindow(NodeEditorWidget):
         self.init_new_node_actions()
 
         self.gr_view: QDMGraphicsView = self.scene.getView()
-        self.gr_view.isSnappingEnabled = self.is_snapping_enabled
+        # self.gr_view.isSnappingEnabled = self.is_snapping_enabled
 
         self.scene.addHasBeenModifiedListener(self.setTitle)
         self.scene.history.addHistoryRestoredListener(self.on_history_restored)
@@ -278,6 +278,21 @@ class FCNSubWindow(NodeEditorWidget):
             return EDGE_SNAPPING if event else True
         else:
             return EDGE_SNAPPING and (event.modifiers() & Qt.CTRL) if event else True
+
+    def new_gr_scene_assets(self):
+        """Initialize ``QObjects`` like ``QColor``, ``QPen`` and ``QBrush``"""
+        self._color_background = QColor("#666666")  # QColor("#393939")
+        self._color_light = QColor("#2f2f2f")
+        self._color_dark = QColor("#292929")
+        self._color_state = QColor("#ccc")
+
+        self._pen_light = QPen(self._color_light)
+        self._pen_light.setWidth(1)
+        self._pen_dark = QPen(self._color_dark)
+        self._pen_dark.setWidth(2)
+
+        self._pen_state = QPen(self._color_state)
+        self._font_state = QFont("Ubuntu", 16)
 
 
 class NodeSearchWidget(QDialog):

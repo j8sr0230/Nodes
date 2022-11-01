@@ -28,7 +28,7 @@ from qtpy.QtWidgets import QLineEdit
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 
 from fcn_conf import register_node
-from fcn_default_node import FCNNodeModel, FCNNodeContentView
+from fcn_default_node import FCNNodeModel  # FCNNodeContentView
 from fcn_locator import icon
 
 
@@ -42,20 +42,10 @@ class Test(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "In", 1, 0, False, ('int', 'float'))],
-                         outputs_init_list=[(0, "Out", 0, 0, True, ('int', 'float'))],
-                         width=150)
-
-    def collapse_node(self, collapse: bool = False):
-        super().collapse_node(collapse)
-
-        if (collapse is True) and isinstance(self.sockets_input_data[0][0], (int, float)):
-            self.title: str = 'In: %.2E' % Decimal(str(self.sockets_input_data[0][0]))
-        else:
-            self.title: str = self.default_title
+                         inputs_init_list=[(0, "In", False)],
+                         outputs_init_list=[(0, "Out", True)])
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        self.collapse_node(self.content.isHidden())
 
         in_val: float = float(sockets_input_data[0][0])
         return [[in_val]]
