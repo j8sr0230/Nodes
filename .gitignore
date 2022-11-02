@@ -1,5 +1,5 @@
 /.idea/.gitignore
-/.idea/fc_nodes.iml
+/.idea/Nodes.iml
 /.idea/misc.xml
 /.idea/modules.xml
 /.idea/inspectionProfiles/profiles_settings.xml
@@ -7,3 +7,4 @@
 /__pycache__
 /nodes/__pycache__
 /qss/__pycache__
+/.idea/inspectionProfiles/Project_Default.xml

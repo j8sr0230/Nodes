@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
-  <name>FreeCAD Nodes</name>
-  <description>Visual scripting environment for FreeCAD</description>
+  <name>Nodes</name>
+  <description>Visual scripting workbench for FreeCAD</description>
   <version>0.1.0</version>
   <date>2022-09-28</date>
   <maintainer email="ronny.scharf08@gmail.com">j8sr0230</maintainer>
   <license file="LICENSE">LGPLv2.1</license>
-  <url type="repository" branch="main">https://github.com/j8sr0230/fc_nodes</url>
-  <url type="issues" branch="main">https://github.com/j8sr0230/fc_nodes/issues</url>
+  <url type="repository" branch="main">https://github.com/j8sr0230/Nodes</url>
+  <url type="issues" branch="main">https://github.com/j8sr0230/Nodes/issues</url>
   <icon>icons/fcn_wb_icon.svg</icon>
 
   <content>
     <workbench>
-      <name>FreeCAD Nodes</name>
+      <name>Nodes</name>
       <version>0.1.0</version>
-      <description>A visual scripting environment</description>
+      <description>Visual scripting workbench for FreeCAD</description>
       <classname>InitGui</classname>
       <subdirectory>./</subdirectory>
       <icon>icons/fcn_wb_icon.svg</icon>
       <tag>nodes</tag>
-      <tag>node-editor</tag>
-      <tag>scripting</tag>
+      <tag>node editor</tag>
       <tag>geometry nodes</tag>
+      <tag>scripting</tag>
 
       <depend>awkward</depend>
       <depend>blinker</depend>
