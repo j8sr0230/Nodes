@@ -27,6 +27,7 @@ from collections import OrderedDict
 from typing import Optional
 
 from qtpy.QtGui import QImage, QColor, QPen, QBrush, QFont, QFontMetrics
+from qtpy.QtWidgets import QGraphicsTextItem
 from qtpy.QtCore import QRectF, Qt
 
 from nodeeditor.node_scene import Scene
@@ -122,17 +123,8 @@ class FCNNodeView(QDMGraphicsNode):
         title_height (int) Height of the node title
         title_horizontal_padding (int): Horizontal padding between node and node title
         title_vertical_padding (int): Vertical padding between node and node title
-        _title_color (QColor): Title color
-        _title_font (QFont): Title font
-        _color (QColor): Border color
-        _color_selected (QColor): Border color if selected
-        _color_hovered (QColor): Border color if hovered
-        _pen_default (QPen): Default pen
-        _pen_selected (QPen): Pen if selected
-        _pen_hovered (QPen): Pen if hovered
-        _brush_title (QPen): Title pen
-        _brush_background (QBrush): Node background
         status_icons (QImage): Status icons of the node (top right corner)
+        title_item (QGraphicsTextItem): Node title widget
     """
 
     width: int
@@ -142,17 +134,8 @@ class FCNNodeView(QDMGraphicsNode):
     title_height: int
     title_horizontal_padding: int
     title_vertical_padding: int
-    _title_color: QColor
-    _title_font: QFont
-    _color: QColor
-    _color_selected: QColor
-    _color_hovered: QColor
-    _pen_default: QPen
-    _pen_selected: QPen
-    _pen_hovered: QPen
-    _brush_title: QPen
-    _brush_background: QBrush
     status_icons: QImage
+    title_item: QGraphicsTextItem
 
     def initSizes(self):
         """Overwritten from nodeeditor.node_graphics_node.QDMGraphicsNode."""
@@ -162,8 +145,8 @@ class FCNNodeView(QDMGraphicsNode):
         self.edge_roundness: int = 5
         self.edge_padding: int = 5
         self.title_height: int = 30
-        self.title_horizontal_padding: int = 4
-        self.title_vertical_padding: int = 4
+        self.title_horizontal_padding: int = 5
+        self.title_vertical_padding: int = 5
 
     def initAssets(self):
         """Overwritten rom nodeeditor.node_graphics_node.QDMGraphicsNode."""
@@ -171,6 +154,16 @@ class FCNNodeView(QDMGraphicsNode):
         super().initAssets()
 
         self.status_icons: QImage = QImage(locator.icon("fcn_status_icon.png"))
+
+    def initTitle(self):
+        """Overwritten rom nodeeditor.node_graphics_node.QDMGraphicsNode."""
+
+        self.title_item = QGraphicsTextItem(self)
+        self.title_item.node = self.node
+        self.title_item.setDefaultTextColor(self._title_color)
+        self.title_item.setFont(self._title_font)
+        self.title_item.setPos(self.title_horizontal_padding, self.title_vertical_padding)
+        self.title_item.setTextWidth(self.width - 2 * self.title_horizontal_padding)
 
     def resize(self, width: int, height: int, title_vertical_padding: int):
         """Resizes the visual node representation.

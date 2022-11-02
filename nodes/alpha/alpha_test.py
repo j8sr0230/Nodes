@@ -40,7 +40,7 @@ class Test(FCNNodeModel):
                          inputs_init_list=[(6, "A", False), (6, "B", False)],
                          outputs_init_list=[(6, "Out", True)])
 
-        self.grNode.resize(100, 80, 10)
+        self.grNode.resize(100, 80, 5)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 

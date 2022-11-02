@@ -27,6 +27,7 @@
       <depend>blinker</depend>
       <depend>numpy</depend>
       <depend>qtpy</depend>
+      <depend>nodeeditor</depend>
     </workbench>
   </content>
 
