@@ -12,13 +12,10 @@ A visual scripting workbench for [FreeCAD](https://www.freecad.org) using
 * FreeCAD >= v0.21
 
 ## Installation
-Download and install the Nodes workbench via the Addon Manager (**Tools → Addon Manager**). Since FreeCAD Nodes is 
-not yet an official FreeCAD Workbench, you previously have to add the FreeCAD Nodes Git repository as custom repository
-(**Edit → Settings → Addon Manager → Custom Repositories**). To do this, simply paste the following data into the 
-corresponding dialog fields. 
-
-* Repository URL: `https://github.com/j8sr0230/Nodes`
-* Branch name: `main`
+Download and install the Nodes workbench via the Addon Manager (**Tools → Addon Manager**). Make sure to start FreeCAD 
+as administrator at least for the installation, so that FreeCAD has the necessary rights to install all dependencies 
+automatically.
+![Nodes installation](https://github.com/j8sr0230/Nodes/blob/main/docs/nodes_installation.png)
 
 ## Usage
 ### Feature overview
