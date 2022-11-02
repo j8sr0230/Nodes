@@ -24,15 +24,15 @@
 ###################################################################################
 import awkward as ak
 
-from fcn_base_node import FCNNode
-from fcn_conf import register_node
-from fcn_locator import icon
+from editor.nodes_base_node import FCNNode
+from editor.nodes_conf import register_node
+from nodes_locator import icon
 
 
 @register_node
 class VectorIn(FCNNode):
 
-    icon: str = icon("fcn_default.png")
+    icon: str = icon("nodes_default.png")
     op_title: str = "Vector In"
     op_category: str = "Vector"
     content_label_objname: str = "fcn_node_bg"

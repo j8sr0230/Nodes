@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  fcn_locator.py
+#  nodes_locator.py
 #
 #  Copyright (c) 2021 Florian Foinant-Willig <ffw@2f2v.fr>
 #
@@ -27,15 +27,10 @@ import os
 import FreeCADGui
 
 PATH = os.path.dirname(__file__)
-LIB_PATH = os.path.join(PATH, 'lib')
 RESOURCES_PATH = os.path.join(PATH, 'resources')
 ICONS_PATH = os.path.join(PATH, 'icons')
 TRANSLATIONS_PATH = os.path.join(PATH, 'translations')
 NODES_PATH = os.path.join(PATH, 'nodes')
-
-
-def lib():
-    return LIB_PATH
 
 
 def icon(filename):
@@ -46,5 +41,5 @@ def resource(filename):
     return os.path.join(RESOURCES_PATH, filename)
 
 
-def getFCNodesWorkbench():
-    return FreeCADGui.getWorkbench('FCNodesWorkbench')
+def getNodesWorkbench():
+    return FreeCADGui.getWorkbench('NodesWorkbench')

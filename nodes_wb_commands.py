@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  fcn_wb_commands.py
+#  nodes_wb_commands.py
 #
 #  Copyright (c) 2022 Florian Foinant-Willig <ffw@2f2v.fr>
 #
@@ -24,7 +24,7 @@
 ###################################################################################
 import FreeCADGui
 
-import fcn_locator as locator
+import nodes_locator as locator
 
 
 # TODO: Class names should be CamelCase, function names should be lowercase (if possible).
@@ -34,25 +34,25 @@ def QT_TRANSLATE_NOOP(scope, text):
     return text
 
 
-class FCNodes_CommandShow:
-    """Show FCNodes window"""
+class Nodes_CommandShow:
+    """Show Nodes editor"""
 
     @staticmethod
     def GetResources():
-        return {'Pixmap': locator.icon('fcn_wb_icon.svg'),
-                'MenuText': QT_TRANSLATE_NOOP("FCNodes_Show", "Show FCNodes window"),
-                'ToolTip': QT_TRANSLATE_NOOP("FCNodes_Show", "Show FCNodes window")}
+        return {'Pixmap': locator.icon('nodes_wb_icon.svg'),
+                'MenuText': QT_TRANSLATE_NOOP("Nodes_Show", "Show Nodes editor"),
+                'ToolTip': QT_TRANSLATE_NOOP("Nodes_Show", "Show Nodes editor")}
 
     @staticmethod
     def Activated():
-        locator.getFCNodesWorkbench().window.show()
+        locator.getNodesWorkbench().window.show()
 
     @staticmethod
     def IsActive():
         return True
 
 
-FreeCADGui.addCommand('FCNodes_Show', FCNodes_CommandShow())
+FreeCADGui.addCommand('Nodes_Show', Nodes_CommandShow())
 
 
 class FCNodes_CommandRefresh:
@@ -60,13 +60,13 @@ class FCNodes_CommandRefresh:
 
     @staticmethod
     def GetResources():
-        return {'Pixmap': locator.icon('fcn_wb_icon.svg'),
+        return {'Pixmap': locator.icon('nodes_wb_icon.svg'),
                 'MenuText': QT_TRANSLATE_NOOP("FCNodes_Show", "Show FCNodes window"),
                 'ToolTip': QT_TRANSLATE_NOOP("FCNodes_Show", "Show FCNodes window")}
 
     @staticmethod
     def Activated():
-        from fcn_conf import NodesStore
+        from editor.nodes_conf import NodesStore
         NodesStore.refresh_nodes_list()
 
     @staticmethod

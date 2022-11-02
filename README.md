@@ -3,7 +3,7 @@
 A visual scripting workbench for [FreeCAD](https://www.freecad.org) using 
 [pyqt-node-editor](https://gitlab.com/pavel.krupala/pyqt-node-editor).
 
-![Nodes](https://github.com/j8sr0230/Nodes/blob/main/img/fcn_nested_array.png)
+![Nodes](https://github.com/j8sr0230/Nodes/blob/main/docs/nodes_nested_array.png)
 <!-- Add screenshots here -->
 
 ## Prerequisites
@@ -20,7 +20,7 @@ corresponding dialog fields.
 
 ## Usage
 ### Feature overview
-![Feature overview](https://github.com/j8sr0230/fc_nodes/blob/main/img/fcn_base_node_features.gif)
+![Feature overview](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_base_node_features.gif)
 Tutorials coming soon!
 
 ## License

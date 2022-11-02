@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  fcn_default_node.py
+#  nodes_default_node.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -38,7 +38,7 @@ from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.node_graphics_socket import QDMGraphicsSocket
 from nodeeditor.utils import dumpException
 
-import fcn_locator as locator
+import nodes_locator as locator
 
 
 DEBUG = False
@@ -153,7 +153,7 @@ class FCNNodeView(QDMGraphicsNode):
 
         super().initAssets()
 
-        self.status_icons: QImage = QImage(locator.icon("fcn_status_icon.png"))
+        self.status_icons: QImage = QImage(locator.icon("nodes_status_icon.png"))
 
     def initTitle(self):
         """Overwritten rom nodeeditor.node_graphics_node.QDMGraphicsNode."""

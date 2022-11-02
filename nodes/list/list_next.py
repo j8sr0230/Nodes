@@ -22,10 +22,10 @@
 #
 #
 ###################################################################################
-from fcn_conf import register_node
-from fcn_base_node import FCNNode
+from editor.nodes_conf import register_node
+from editor.nodes_base_node import FCNNode
 
-import fcn_locator as locator
+import nodes_locator as locator
 
 
 DEBUG = False
@@ -34,7 +34,7 @@ DEBUG = False
 @register_node
 class Next(FCNNode):
 
-    icon: str = locator.icon("fcn_default.png")
+    icon: str = locator.icon("nodes_default.png")
     op_title: str = "Next"
     op_category: str = "List"
     content_label_objname: str = "fcn_node_bg"

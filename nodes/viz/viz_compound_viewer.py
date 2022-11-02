@@ -26,16 +26,16 @@ import FreeCAD as App
 import FreeCADGui as Gui
 import Part
 
-from fcn_conf import register_node
-from fcn_base_node import FCNNode
-from fcn_locator import icon
-from fcn_utils import flatten
+from editor.nodes_conf import register_node
+from editor.nodes_base_node import FCNNode
+from nodes_locator import icon
+from editor.nodes_utils import flatten
 
 
 @register_node
 class CompoundViewer(FCNNode):
 
-    icon: str = icon("fcn_default.png")
+    icon: str = icon("nodes_default.png")
     op_title: str = "Compound Viewer"
     op_category: str = "Viz"
     content_label_objname: str = "fcn_node_bg"

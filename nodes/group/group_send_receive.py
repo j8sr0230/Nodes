@@ -24,14 +24,14 @@
 ###################################################################################
 from blinker import signal
 
-from fcn_conf import register_node
-from fcn_base_node import FCNNode
-from fcn_locator import icon
+from editor.nodes_conf import register_node
+from editor.nodes_base_node import FCNNode
+from nodes_locator import icon
 
 
 @register_node
 class Sender(FCNNode):
-    icon: str = icon("fcn_default.png")
+    icon: str = icon("nodes_default.png")
     op_title: str = "Sender"
     op_category: str = "Group"
     content_label_objname: str = "fcn_node_bg"
@@ -83,7 +83,7 @@ class Sender(FCNNode):
 @register_node
 class Receiver(FCNNode):
     data: list
-    icon: str = icon("fcn_default.png")
+    icon: str = icon("nodes_default.png")
     op_title: str = "Receiver"
     op_category: str = "Group"
     content_label_objname: str = "fcn_node_bg"

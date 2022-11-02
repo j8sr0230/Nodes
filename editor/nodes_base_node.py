@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  fcn_base_node.py
+#  nodes_base_node.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -51,7 +51,7 @@ from nodeeditor.node_socket import Socket, LEFT_BOTTOM, RIGHT_BOTTOM, LEFT_CENTE
 from nodeeditor.node_graphics_socket import QDMGraphicsSocket
 from nodeeditor.utils import dumpException
 
-import fcn_locator as locator
+import nodes_locator as locator
 
 DEBUG = False
 
@@ -463,7 +463,7 @@ class FCNNodeView(QDMGraphicsNode):
         """
 
         super().initAssets()
-        path: str = locator.icon("fcn_status_icon.png")
+        path: str = locator.icon("nodes_status_icon.png")
         self.icons: QImage = QImage(path)
         self.main_icon: QImage = QImage(self.node.icon)
 
@@ -493,7 +493,7 @@ class FCNNode(Node):
 
      General instance independent data is stored in class variables. These are:
      - icon (str): Path to the node image, displayed in the node list box (QListWidget).
-     - op_code (int): Unique index of the node, used to register the node in the app, referring to fcn_conf.py.
+     - op_code (int): Unique index of the node, used to register the node in the app, referring to nodes_conf.py.
      - op_title (str): Title of the node, display in the node header.
      - op_category (str): Node category used for structuring scenes context menu and node drop box.
      - content_label_objname (str): Label of the content widget, used by qss stylesheets.

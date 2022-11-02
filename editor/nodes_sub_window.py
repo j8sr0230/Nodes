@@ -12,8 +12,8 @@ from nodeeditor.node_edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER, EDGE_TYPE_S
 from nodeeditor.node_graphics_view import MODE_EDGE_DRAG
 from nodeeditor.utils import dumpException
 
-from fcn_conf import NodesStore, LISTBOX_MIMETYPE
-from fcn_drag_listbox import QDMDragListbox
+from editor.nodes_conf import NodesStore, LISTBOX_MIMETYPE
+from editor.nodes_drag_listbox import QDMDragListbox
 
 DEBUG = False
 DEBUG_CONTEXT = False

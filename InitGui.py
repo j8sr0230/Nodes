@@ -24,38 +24,38 @@
 ###################################################################################
 # TODO: Class names should be CamelCase, function names should be lowercase (if possible).
 
-class FCNodesWorkbench(Workbench):
+class NodesWorkbench(Workbench):
 
     import sys
-    import fcn_locator as locator
-    sys.path.append(locator.lib())
+    import nodes_locator as locator
+    # sys.path.append(locator.lib())
 
     def QT_TRANSLATE_NOOP(scope, text):
         return text
 
-    MenuText = "FCNodes"
-    ToolTip = QT_TRANSLATE_NOOP("FCNodes", "A visual scripting environment")
-    Icon = locator.icon('fcn_wb_icon.svg')
+    MenuText = "Nodes"
+    ToolTip = QT_TRANSLATE_NOOP("Nodes", "A visual scripting workbench or FreeCAD")
+    Icon = locator.icon('nodes_wb_icon.svg')
 
     def Initialize(self):
         # FC needs lazy import at this point
-        from fcn_window import FCNWindow
+        from editor.nodes_window import FCNWindow
 
         # Prepare the window
         self.window = FCNWindow()
 
         # command list
-        import fcn_wb_commands
-        self.commandList = ["FCNodes_Show"]
-        self.appendToolbar("FCNodes", self.commandList)   # creates a new toolbar
-        self.appendMenu("FCNodes", self.commandList)      # creates a new menu
+        import nodes_wb_commands
+        self.commandList = ["Nodes_Show"]
+        self.appendToolbar("Nodes", self.commandList)   # creates a new toolbar
+        self.appendMenu("Nodes", self.commandList)      # creates a new menu
 
     def ContextMenu(self, recipient):
         if recipient == "tree":
-            self.appendContextMenu("FCNodes", [])   # add commands to the context menu
+            self.appendContextMenu("Nodes", [])   # add commands to the context menu
 
     def GetClassName(self):
         return "Gui::PythonWorkbench"
 
 
-Gui.addWorkbench(FCNodesWorkbench())
+Gui.addWorkbench(NodesWorkbench())

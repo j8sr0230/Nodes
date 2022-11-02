@@ -3,7 +3,7 @@ import sys
 from os.path import dirname, basename, isfile, isdir, join
 from glob import glob
 
-import fcn_locator as locator
+import nodes_locator as locator
 
 LISTBOX_MIMETYPE = "application/x-item"
 DEBUG = False

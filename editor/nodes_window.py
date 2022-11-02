@@ -13,10 +13,10 @@ from nodeeditor.node_edge_validators import (  # Enabling edge validators
     edge_cannot_connect_input_and_output_of_same_node,
 )
 
-from fcn_base_node import FCNSocket
-from fcn_sub_window import FCNSubWindow
-from fcn_drag_listbox import QDMDragListbox
-from fcn_conf import NodesStore
+from editor.nodes_base_node import FCNSocket
+from editor.nodes_sub_window import FCNSubWindow
+from editor.nodes_drag_listbox import QDMDragListbox
+from editor.nodes_conf import NodesStore
 
 
 # Local validator to use string type
@@ -49,7 +49,7 @@ class FCNWindow(NodeEditorWindow):
     # noinspection PyUnresolvedReferences
     def initUI(self):
         self.name_company = 'j8sr0230'
-        self.name_product = 'FreeCAD Nodes (fc_nodes)'
+        self.name_product = 'Nodes editor'
         self.empty_icon = QIcon(".")
 
         NodesStore.refresh_nodes_list()
@@ -77,7 +77,7 @@ class FCNWindow(NodeEditorWindow):
         self.createStatusBar()
         self.update_menus()
         self.readSettings()
-        self.setWindowTitle("FreeCAD Nodes (fc_nodes)")
+        self.setWindowTitle("Nodes editor")
 
     def closeEvent(self, event):
         self.mdi_area.closeAllSubWindows()
@@ -147,11 +147,11 @@ class FCNWindow(NodeEditorWindow):
 
     # noinspection PyArgumentList
     def about(self):
-        QMessageBox.about(self, "FreeCAD Nodes by j8sr0230 et al.", "A visual scripting environment for "
+        QMessageBox.about(self, "Nodes by j8sr0230 et al.", "A visual scripting workbench for "
                           "<a href='https://www.freecad.org/'>FreeCAD</a> using "
-                          "<a href='https://gitlab.com/pavel.krupala/pyqt-node-editor'>pyqt-node-editor</a> "
-                          "from Pavel Křupala. For more information visit the "
-                          "<a href='https://github.com/j8sr0230/fc_nodes'>fc_nodes</a> project at github.")
+                          "<a href='https://gitlab.com/pavel.krupala/pyqt-node-editor'>pyqt-node-editor</a>. For more "
+                          "information visit the "
+                          "<a href='https://github.com/j8sr0230/Nodes'>Nodes</a> project at github.")
 
     # noinspection PyUnresolvedReferences
     def createMenus(self):

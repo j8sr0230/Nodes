@@ -22,15 +22,15 @@
 #
 #
 ###################################################################################
-from fcn_conf import register_node
-from fcn_default_node import FCNNodeModel  # FCNNodeContentView
-from fcn_locator import icon
+from editor.nodes_conf import register_node
+from editor.nodes_default_node import FCNNodeModel  # FCNNodeContentView
+from nodes_locator import icon
 
 
 @register_node
 class Test(FCNNodeModel):
 
-    icon: str = icon("fcn_default.png")
+    icon: str = icon("nodes_default.png")
     op_title: str = "Test"
     op_category: str = "Alpha"
     content_label_objname: str = "fcn_node_bg"

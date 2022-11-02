@@ -30,7 +30,7 @@ from qtpy.QtCore import Qt
 import FreeCAD
 import FreeCADGui
 
-from fcn_window import FCNWindow
+from editor.nodes_window import FCNWindow
 
 
 QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)  # Enable high dpi scaling

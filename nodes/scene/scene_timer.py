@@ -24,9 +24,9 @@
 ###################################################################################
 from qtpy import QtCore
 
-from fcn_conf import register_node
-from fcn_base_node import FCNNode
-import fcn_locator as locator
+from editor.nodes_conf import register_node
+from editor.nodes_base_node import FCNNode
+import nodes_locator as locator
 
 
 DEBUG = False
@@ -35,7 +35,7 @@ DEBUG = False
 @register_node
 class Timer(FCNNode):
 
-    icon: str = locator.icon("fcn_default.png")
+    icon: str = locator.icon("nodes_default.png")
     op_title: str = "Timer"
     op_category: str = "Scene"
     content_label_objname: str = "fcn_node_bg"

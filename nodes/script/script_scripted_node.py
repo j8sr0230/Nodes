@@ -24,15 +24,15 @@
 ###################################################################################
 from qtpy.QtWidgets import QSizePolicy, QTextEdit
 
-from fcn_conf import register_node
-from fcn_base_node import FCNNode
-from fcn_locator import icon
+from editor.nodes_conf import register_node
+from editor.nodes_base_node import FCNNode
+from nodes_locator import icon
 
 
 @register_node
 class ScriptedNode(FCNNode):
 
-    icon: str = icon("python_logo.png")
+    icon: str = icon("nodes_python_logo.png")
     op_title: str = "Scripted Node"
     op_category: str = "Script"
     content_label_objname: str = "fcn_node_bg"

@@ -25,16 +25,16 @@
 import Mesh
 import awkward as ak
 
-from fcn_conf import register_node
-from fcn_base_node import FCNNode
-from fcn_locator import icon
-from fcn_utils import simplify, map_objects
+from editor.nodes_conf import register_node
+from editor.nodes_base_node import FCNNode
+from nodes_locator import icon
+from editor.nodes_utils import simplify, map_objects
 
 
 @register_node
 class MeshBox(FCNNode):
 
-    icon: str = icon("fcn_default.png")
+    icon: str = icon("nodes_default.png")
     op_title: str = "Mesh Box"
     op_category: str = "Generator"
     content_label_objname: str = "fcn_node_bg"

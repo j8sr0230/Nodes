@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  fcn_utils.py
+#  nodes_utils.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
