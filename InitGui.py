@@ -28,7 +28,8 @@ class NodesWorkbench(Workbench):
 
     import sys
     import nodes_locator as locator
-    # sys.path.append(locator.lib())
+
+    sys.path.append(locator.LIB_PATH)
 
     def QT_TRANSLATE_NOOP(scope, text):
         return text
