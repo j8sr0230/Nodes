@@ -1,4 +1,6 @@
-# Nodes
+# FreeCAD Nodes Workbench
+
+![CodeQL](https://github.com/j8sr0230/Nodes/actions/workflows/codeql.yml/badge.svg)
 
 A visual scripting workbench for [FreeCAD](https://www.freecad.org) using 
 [pyqt-node-editor](https://gitlab.com/pavel.krupala/pyqt-node-editor).
