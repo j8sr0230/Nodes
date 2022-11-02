@@ -12,9 +12,8 @@ A visual scripting workbench for [FreeCAD](https://www.freecad.org) using
 * FreeCAD >= v0.21
 
 ## Installation
-Download and install the Nodes workbench via the Addon Manager (**Tools → Addon Manager**). Make sure to start FreeCAD 
-as administrator at least for the installation, so that FreeCAD has the necessary rights to install all dependencies 
-automatically.
+Download and install the Nodes workbench via the Addon Manager (**Tools → Addon
+
 ![Nodes installation](https://github.com/j8sr0230/Nodes/blob/main/docs/nodes_installation.png)
 
 ## Usage
