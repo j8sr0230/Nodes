@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  fcn_pivy_test.py
+#  alpha_test.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,40 +22,28 @@
 #
 #
 ###################################################################################
-"""Test module for exploring Coin3D.
-"""
-
-import FreeCADGui as Gui
-import pivy.coin as coin
+from fcn_conf import register_node
+from fcn_default_node import FCNNodeModel  # FCNNodeContentView
+from fcn_locator import icon
 
 
-def make_markers():
-    view = Gui.ActiveDocument.ActiveView
-    sg = view.getSceneGraph()
+@register_node
+class Test(FCNNodeModel):
 
-    marker = coin.SoMarkerSet()
-    marker.markerIndex = coin.SoMarkerSet.CIRCLE_FILLED_9_9
+    icon: str = icon("fcn_default.png")
+    op_title: str = "Test"
+    op_category: str = "Alpha"
+    content_label_objname: str = "fcn_node_bg"
 
-    data = coin.SoCoordinate3()
-    data.point.setValues(0, 2, [[0, 0, 0], [1., 1., 0.]])
+    def __init__(self, scene):
+        super().__init__(scene=scene,
+                         inputs_init_list=[(6, "A", False), (6, "B", False)],
+                         outputs_init_list=[(6, "Out", True)])
 
-    color = coin.SoMaterial()
-    color.diffuseColor = (1., 1., 1.)
+        self.grNode.resize(100, 80, 5)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
-    myCustomNode = coin.SoSeparator()
-    myCustomNode.addChild(color)
-    myCustomNode.addChild(data)
-    myCustomNode.addChild(marker)
-    sg.addChild(myCustomNode)
-
-    return myCustomNode
-
-
-def remove_node(node):
-    view = Gui.ActiveDocument.ActiveView
-    sg = view.getSceneGraph()
-    sg.removeChild(node)
-
-
-# node = make_markers()
-# remove_node(node)
+    def eval_operation(self, sockets_input_data: list) -> list:
+        in_val: float = float(sockets_input_data[0][0])
+        return [[in_val]]
