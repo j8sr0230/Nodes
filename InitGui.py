@@ -47,7 +47,7 @@ class NodesWorkbench(Workbench):
 
         # command list
         import nodes_wb_commands
-        self.commandList = ["Nodes_Show"]
+        self.commandList = ["Nodes_Show"]  # + ["Nodes_Refresh"]
         self.appendToolbar("Nodes", self.commandList)   # creates a new toolbar
         self.appendMenu("Nodes", self.commandList)      # creates a new menu
 

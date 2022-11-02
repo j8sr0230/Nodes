@@ -22,7 +22,6 @@
 #
 #
 ###################################################################################
-
 import os
 import FreeCADGui
 
@@ -42,5 +41,5 @@ def resource(filename):
     return os.path.join(RESOURCES_PATH, filename)
 
 
-def getNodesWorkbench():
+def get_nodes_workbench():
     return FreeCADGui.getWorkbench('NodesWorkbench')

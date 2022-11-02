@@ -40,12 +40,12 @@ class Nodes_CommandShow:
     @staticmethod
     def GetResources():
         return {'Pixmap': locator.icon('nodes_wb_icon.svg'),
-                'MenuText': QT_TRANSLATE_NOOP("Nodes_Show", "Show Nodes editor"),
-                'ToolTip': QT_TRANSLATE_NOOP("Nodes_Show", "Show Nodes editor")}
+                'MenuText': QT_TRANSLATE_NOOP("Nodes_Show", "Show"),
+                'ToolTip': QT_TRANSLATE_NOOP("Nodes_Show", "Show node editor")}
 
     @staticmethod
     def Activated():
-        locator.getNodesWorkbench().window.show()
+        locator.get_nodes_workbench().window.show()
 
     @staticmethod
     def IsActive():
@@ -55,14 +55,14 @@ class Nodes_CommandShow:
 FreeCADGui.addCommand('Nodes_Show', Nodes_CommandShow())
 
 
-class FCNodes_CommandRefresh:
+class Nodes_CommandRefresh:
     """Refresh nodes list"""
 
     @staticmethod
     def GetResources():
         return {'Pixmap': locator.icon('nodes_wb_icon.svg'),
-                'MenuText': QT_TRANSLATE_NOOP("FCNodes_Show", "Show FCNodes window"),
-                'ToolTip': QT_TRANSLATE_NOOP("FCNodes_Show", "Show FCNodes window")}
+                'MenuText': QT_TRANSLATE_NOOP("Nodes_Refresh", "Refresh"),
+                'ToolTip': QT_TRANSLATE_NOOP("Nodes_Refresh", "Refresh nodes list")}
 
     @staticmethod
     def Activated():
@@ -74,4 +74,4 @@ class FCNodes_CommandRefresh:
         return True
 
 
-FreeCADGui.addCommand('FCNodes_Refresh', FCNodes_CommandRefresh())
+FreeCADGui.addCommand('Nodes_Refresh', Nodes_CommandRefresh())
