@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  generator_point.py
+#  scene_shape_info.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,10 +22,7 @@
 #
 #
 ###################################################################################
-from typing import Union
-
-from FreeCAD import Vector
-import Part
+import FreeCAD
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
@@ -35,26 +32,37 @@ from nodes_locator import icon
 
 
 @register_node
-class Point(FCNNodeModel):
+class ShapeInfo(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Point"
-    op_category: str = "Generator"
+    op_title: str = "Shape Info"
+    op_category: str = "Scene"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Pos", True)],
-                         outputs_init_list=[("Point", True)])
+                         inputs_init_list=[("Shape", True)],
+                         outputs_init_list=[("Solids", True),
+                                            ("Shells", True), ("Faces", True),
+                                            ("Wires", True), ("Edges", True),
+                                            ("Vertexes", True)])
 
-    @staticmethod
-    def make_occ_point(position: Union[tuple, Vector]) -> Part.Shape:
-        if type(position) is tuple:
-            return Part.Point(Vector(position)).toShape()
-        else:
-            return Part.Point(position).toShape()
+        self.grNode.resize(120, 170)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        pos: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [(0, 0, 0)]
+        shape_list: list = sockets_input_data[0]
 
-        return [map_objects(pos, object, self.make_occ_point)]
+        if FreeCAD.ActiveDocument is not None:
+            solids: list = [map_objects(shape_list, object, lambda shape: shape.Solids)]
+            shells: list = [map_objects(shape_list, object, lambda shape: shape.Shells)]
+            faces: list = [map_objects(shape_list, object, lambda shape: shape.Faces)]
+            wires: list = [map_objects(shape_list, object, lambda shape: shape.Wires)]
+            edges: list = [map_objects(shape_list, object, lambda shape: shape.Edges)]
+            vertexes: list = [map_objects(shape_list, object, lambda shape: shape.Vertexes)]
+
+            return [solids, shells, faces, wires, edges, vertexes]
+
+        else:
+            raise ValueError("No Active Document")

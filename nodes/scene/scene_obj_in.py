@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  number_number.py
+#  scene_obj_in.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -27,6 +27,8 @@ from collections import OrderedDict
 from qtpy.QtWidgets import QLineEdit, QLayout, QVBoxLayout
 from qtpy.QtCore import Qt
 
+import FreeCAD
+
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 
@@ -47,8 +49,7 @@ class LineInputContent(QDMNodeContentWidget):
         self.layout.setContentsMargins(5, 5, 5, 5)
         self.setLayout(self.layout)
 
-        self.edit: QLineEdit = QLineEdit("1", self)
-        self.edit.setAlignment(Qt.AlignRight)
+        self.edit: QLineEdit = QLineEdit("Obj label", self)
         self.edit.setObjectName(self.node.content_label_objname)
 
         self.layout.addWidget(self.edit)
@@ -73,11 +74,11 @@ class LineInputContent(QDMNodeContentWidget):
 
 
 @register_node
-class Number(FCNNodeModel):
+class ObjectIn(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Number"
-    op_category: str = "Number"
+    op_title: str = "Object In"
+    op_category: str = "Scene"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
@@ -93,5 +94,13 @@ class Number(FCNNodeModel):
         self.content.edit.textChanged.connect(self.onInputChanged)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        in_val: float = float(self.content.edit.text())
-        return [[in_val]]
+        in_val: str = str(self.content.edit.text())
+
+        if FreeCAD.ActiveDocument is not None:
+            obj = FreeCAD.ActiveDocument.getObjectsByLabel(in_val)
+            if len(obj) > 0:
+                return [obj]
+            else:
+                raise ValueError("Unknown label")
+        else:
+            raise ValueError("No Active Document")

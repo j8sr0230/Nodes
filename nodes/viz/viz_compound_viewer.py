@@ -27,16 +27,17 @@ import FreeCADGui as Gui
 import Part
 
 from core.nodes_conf import register_node
-from core.nodes_base_node import FCNNode
-from nodes_locator import icon
+from core.nodes_default_node import FCNNodeModel
 from core.nodes_utils import flatten
+
+from nodes_locator import icon
 
 
 @register_node
-class CompoundViewer(FCNNode):
+class CompoundViewer(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Compound Viewer"
+    op_title: str = "CViewer"
     op_category: str = "Viz"
     content_label_objname: str = "fcn_node_bg"
 
@@ -45,10 +46,7 @@ class CompoundViewer(FCNNode):
             self.fc_obj = App.ActiveDocument.addObject("Part::Feature", "CViewer")
             self.fc_obj.setPropertyStatus("Shape", ["Transient", "Output"])
 
-        super().__init__(scene=scene,
-                         inputs_init_list=[(3, "In", 0, 0, True, ("shape", ))],
-                         outputs_init_list=[(3, "Out", 0, 0, True, ("shape", ))],
-                         width=170)
+        super().__init__(scene=scene, inputs_init_list=[("In", True)], outputs_init_list=[])
 
     def remove(self):
         super().remove()
@@ -58,7 +56,7 @@ class CompoundViewer(FCNNode):
                 App.ActiveDocument.removeObject(self.fc_obj.Name)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        shapes = flatten(sockets_input_data[0])
+        shapes = list(flatten(sockets_input_data[0]))
 
         if hasattr(Gui, "ActiveDocument"):
             if len(shapes) > 0:
