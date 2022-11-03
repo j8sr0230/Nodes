@@ -49,7 +49,6 @@ class DebugPrint(FCNNodeModel):
         super().__init__(scene=scene, inputs_init_list=[("Data", True)], outputs_init_list=[])
 
         self.grNode.resize(120, 70)
-        self.grNode.initContent()
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 

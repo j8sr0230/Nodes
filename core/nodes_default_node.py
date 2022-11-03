@@ -162,8 +162,10 @@ class FCNNodeView(QDMGraphicsNode):
 
         self.width: int = width
         self.height: int = height
-        self.title_item.setTextWidth(self.width- 2 * self.title_horizontal_padding)
-        self.update()
+        self.title_item.setTextWidth(self.width - 2 * self.title_horizontal_padding)
+        self.grContent.setGeometry(QRectF(self.edge_padding, self.title_height + self.edge_padding,
+                                          self.width - 2 * self.edge_padding,
+                                          self.height - 2 * self.edge_padding - self.title_height))
 
     def paint(self, painter, option, widget=None):
         """Overwritten from nodeeditor.node_graphics_node.QDMGraphicsNode."""

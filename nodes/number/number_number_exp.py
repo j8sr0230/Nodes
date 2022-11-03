@@ -84,7 +84,6 @@ class NumberExp(FCNNodeModel):
         super().__init__(scene=scene, inputs_init_list=[], outputs_init_list=[("", True)])
 
         self.grNode.resize(130, 70)
-        self.grNode.initContent()
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
