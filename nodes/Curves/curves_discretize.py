@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  scene_get_objects_data.py
+#  curves_discretize.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -23,48 +23,48 @@
 #
 ###################################################################################
 import FreeCAD
+import awkward as ak
 
 from core.nodes_conf import register_node
-from core.nodes_base_node import FCNNode
+from core.nodes_default_node import FCNNodeModel
+from core.nodes_utils import flatten, map_objects
+
 from nodes_locator import icon
 
 
 @register_node
-class GetObjectsData(FCNNode):
+class DiscretizeCurve(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Get Objects Data"
-    op_category: str = "Scene"
+    op_title: str = "Discretize"
+    op_category: str = "Curves"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(3, "In", 1, "Object label", True, ("str", ))],
-                         outputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", ))],
-                         width=170)
+                         inputs_init_list=[("Crv", True), ("Dist", True)],
+                         outputs_init_list=[("Vec", True)])
 
-    def collapse_node(self, collapse: bool = False):
-        super().collapse_node(collapse)
+        self.grNode.resize(100, 80)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
-        if collapse is True:
-            self.title = 'Obj: ' + str(self.sockets_input_data[0][0])
-        else:
-            self.title = self.default_title
+        self.crv_list = []
+        self.dist_list = []
+
+    def discretize_curve(self, curve) -> list:
+        vec_list = curve.discretize(self.dist_list.pop(0))
+        return vec_list
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        self.collapse_node(self.content.isHidden())
+        curves: list = sockets_input_data[0]
+        distances: list = sockets_input_data[1]
 
-        label_list: list = sockets_input_data[0]
-        obj_list: list = []
+        # Force array broadcast
+        self.crv_list: list = list(flatten(curves))
+        crv_idx_list: list = list(range(len(self.crv_list)))
+        crv_idx_list, distances = ak.broadcast_arrays(crv_idx_list, distances)
+        self.dist_list = ak.flatten(distances, axis=None).tolist()
 
-        if not (FreeCAD.ActiveDocument is None):
-            for label in label_list:
-                obj = FreeCAD.ActiveDocument.getObjectsByLabel(label)
-                if len(obj) == 1:
-                    obj_list.append(obj[0])
-                else:
-                    raise ValueError('Unknown object')
-        else:
-            raise Exception('No active document')
-
-        return [obj_list]
+        vectors: list = [map_objects(curves, object, self.discretize_curve)]
+        return [vectors]

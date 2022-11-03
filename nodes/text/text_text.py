@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  number_number_exp.py
+#  text_text.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -47,8 +47,7 @@ class LineInputContent(QDMNodeContentWidget):
         self.layout.setContentsMargins(5, 5, 5, 5)
         self.setLayout(self.layout)
 
-        self.edit: QLineEdit = QLineEdit("1", self)
-        self.edit.setAlignment(Qt.AlignRight)
+        self.edit: QLineEdit = QLineEdit("Enter text", self)
         self.edit.setObjectName(self.node.content_label_objname)
 
         self.layout.addWidget(self.edit)
@@ -73,17 +72,17 @@ class LineInputContent(QDMNodeContentWidget):
 
 
 @register_node
-class NumberExp(FCNNodeModel):
+class Text(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Number (exp.)"
-    op_category: str = "Number"
+    op_title: str = "Text"
+    op_category: str = "Text"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene, inputs_init_list=[], outputs_init_list=[("", True)])
 
-        self.grNode.resize(130, 70)
+        self.grNode.resize(100, 70)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
@@ -93,5 +92,5 @@ class NumberExp(FCNNodeModel):
         self.content.edit.textChanged.connect(self.onInputChanged)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        in_val: float = float(self.content.edit.text())
+        in_val: str = str(self.content.edit.text())
         return [[in_val]]
