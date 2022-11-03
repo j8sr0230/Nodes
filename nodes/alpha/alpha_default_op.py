@@ -40,10 +40,6 @@ class DefaultOp(FCNNodeModel):
                          inputs_init_list=[("A", False), ("B", False)],
                          outputs_init_list=[("Out", True)])
 
-        # self.grNode.resize(100, 80)
-        # for socket in self.inputs + self.outputs:
-        # socket.setSocketPosition()
-
     def eval_operation(self, sockets_input_data: list) -> list:
         in_val: float = float(sockets_input_data[0][0])
         return [[in_val]]

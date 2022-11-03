@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  number_number_exp_op.py
+#  text_debug_print.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -24,7 +24,7 @@
 ###################################################################################
 from collections import OrderedDict
 
-from qtpy.QtWidgets import QSlider, QLayout, QVBoxLayout
+from qtpy.QtWidgets import QLineEdit, QLayout, QVBoxLayout
 from qtpy.QtCore import Qt
 
 from nodeeditor.node_content_widget import QDMNodeContentWidget
@@ -37,63 +37,22 @@ from core.nodes_default_node import FCNNodeView
 from nodes_locator import icon
 
 
-class SliderInputContent(QDMNodeContentWidget):
-
-    layout: QLayout
-    edit: QSlider
-
-    def initUI(self):
-        self.layout: QLayout = QVBoxLayout()
-        self.layout.setContentsMargins(5, 5, 5, 5)
-        self.setLayout(self.layout)
-
-        self.edit: QSlider = QSlider(Qt.Horizontal, self)
-        self.edit.setMinimum(0)
-        self.edit.setMaximum(100)
-        self.edit.setValue(50)
-        self.edit.setObjectName(self.node.content_label_objname)
-
-        self.layout.addWidget(self.edit)
-
-    def serialize(self) -> OrderedDict:
-        res: OrderedDict = super().serialize()
-        res['value'] = self.edit.value()
-        return res
-
-    def deserialize(self, data: dict, hashmap=None, restore_id: bool = True) -> bool:
-        if hashmap is None:
-            hashmap = {}
-
-        res = super().deserialize(data, hashmap)
-        try:
-            value = data['value']
-            self.edit.setValue(value)
-            return True & res
-        except Exception as e:
-            dumpException(e)
-        return res
-
-
 @register_node
-class SliderExp(FCNNodeModel):
+class DebugPrint(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Slider (exp.)"
-    op_category: str = "Number"
+    op_title: str = "Debug Print"
+    op_category: str = "Text"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
-        super().__init__(scene=scene, inputs_init_list=[], outputs_init_list=[("", True)])
+        super().__init__(scene=scene, inputs_init_list=[("Data", True)], outputs_init_list=[])
 
-        self.grNode.resize(130, 70)
+        self.grNode.resize(120, 70)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def initInnerClasses(self):
-        self.content: QDMNodeContentWidget = SliderInputContent(self)
-        self.grNode: QDMGraphicsNode = FCNNodeView(self)
-        self.content.edit.valueChanged.connect(self.onInputChanged)
-
     def eval_operation(self, sockets_input_data: list) -> list:
-        in_val: float = float(self.content.edit.value())
-        return [[in_val]]
+        in_val = sockets_input_data[0]
+        print(in_val)
+        return [in_val]

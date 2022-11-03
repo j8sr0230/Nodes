@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  number_number_exp_op.py
+#  number_number_exp.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -84,7 +84,6 @@ class NumberExp(FCNNodeModel):
         super().__init__(scene=scene, inputs_init_list=[], outputs_init_list=[("", True)])
 
         self.grNode.resize(130, 70)
-        self.grNode.initContent()
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
