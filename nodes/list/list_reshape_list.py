@@ -22,10 +22,10 @@
 #
 #
 ###################################################################################
-from editor.nodes_conf import register_node
-from editor.nodes_base_node import FCNNode
+from core.nodes_conf import register_node
+from core.nodes_base_node import FCNNode
 from nodes_locator import icon
-from editor.nodes_utils import flatten, simplify, graft, graft_topology, unwrap, wrap
+from core.nodes_utils import flatten, simplify, graft, graft_topology, unwrap, wrap
 
 
 @register_node

@@ -35,13 +35,13 @@ def QT_TRANSLATE_NOOP(scope, text):
 
 
 class Nodes_CommandShow:
-    """Show Nodes editor"""
+    """Show Nodes core"""
 
     @staticmethod
     def GetResources():
         return {'Pixmap': locator.icon('nodes_wb_icon.svg'),
                 'MenuText': QT_TRANSLATE_NOOP("Nodes_Show", "Show"),
-                'ToolTip': QT_TRANSLATE_NOOP("Nodes_Show", "Show node editor")}
+                'ToolTip': QT_TRANSLATE_NOOP("Nodes_Show", "Show node core")}
 
     @staticmethod
     def Activated():
@@ -66,7 +66,7 @@ class Nodes_CommandRefresh:
 
     @staticmethod
     def Activated():
-        from editor.nodes_conf import NodesStore
+        from core.nodes_conf import NodesStore
         NodesStore.refresh_nodes_list()
 
     @staticmethod

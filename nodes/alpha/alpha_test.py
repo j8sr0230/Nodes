@@ -22,8 +22,8 @@
 #
 #
 ###################################################################################
-from editor.nodes_conf import register_node
-from editor.nodes_default_node import FCNNodeModel  # FCNNodeContentView
+from core.nodes_conf import register_node
+from core.nodes_default_node import FCNNodeModel  # FCNNodeContentView
 from nodes_locator import icon
 
 

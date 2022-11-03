@@ -32,7 +32,7 @@ class NodeEditorWindow(QMainWindow):
         self.createActions()
         self.createMenus()
 
-        # create node editor widget
+        # create node core widget
         self.nodeeditor = self.__class__.NodeEditorWidget_class(self)
         self.nodeeditor.scene.addHasBeenModifiedListener(self.setTitle)
         self.setCentralWidget(self.nodeeditor)
