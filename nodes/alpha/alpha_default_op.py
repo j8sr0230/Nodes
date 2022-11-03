@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  alpha_test.py
+#  alpha_default_op.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -28,21 +28,21 @@ from nodes_locator import icon
 
 
 @register_node
-class Test(FCNNodeModel):
+class DefaultOp(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Test"
+    op_title: str = "Default Op"
     op_category: str = "Alpha"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(6, "A", False), (6, "B", False)],
-                         outputs_init_list=[(6, "Out", True)])
+                         inputs_init_list=[("A", False), ("B", False)],
+                         outputs_init_list=[("Out", True)])
 
-        self.grNode.resize(100, 80, 5)
-        for socket in self.inputs + self.outputs:
-            socket.setSocketPosition()
+        # self.grNode.resize(100, 80)
+        # for socket in self.inputs + self.outputs:
+        # socket.setSocketPosition()
 
     def eval_operation(self, sockets_input_data: list) -> list:
         in_val: float = float(sockets_input_data[0][0])
