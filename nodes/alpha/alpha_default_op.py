@@ -31,7 +31,7 @@ from nodes_locator import icon
 class DefaultOp(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Default Op"
+    op_title: str = "Op"
     op_category: str = "Alpha"
     content_label_objname: str = "fcn_node_bg"
 
