@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  number_number_exp.py
+#  text_debug_print.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -37,62 +37,23 @@ from core.nodes_default_node import FCNNodeView
 from nodes_locator import icon
 
 
-class LineInputContent(QDMNodeContentWidget):
-
-    layout: QLayout
-    edit: QLineEdit
-
-    def initUI(self):
-        self.layout: QLayout = QVBoxLayout()
-        self.layout.setContentsMargins(5, 5, 5, 5)
-        self.setLayout(self.layout)
-
-        self.edit: QLineEdit = QLineEdit("1", self)
-        self.edit.setAlignment(Qt.AlignRight)
-        self.edit.setObjectName(self.node.content_label_objname)
-
-        self.layout.addWidget(self.edit)
-
-    def serialize(self) -> OrderedDict:
-        res: OrderedDict = super().serialize()
-        res['value'] = self.edit.text()
-        return res
-
-    def deserialize(self, data: dict, hashmap=None, restore_id: bool = True) -> bool:
-        if hashmap is None:
-            hashmap = {}
-
-        res = super().deserialize(data, hashmap)
-        try:
-            value = data['value']
-            self.edit.setText(value)
-            return True & res
-        except Exception as e:
-            dumpException(e)
-        return res
-
-
 @register_node
-class NumberExp(FCNNodeModel):
+class DebugPrint(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Number (exp.)"
-    op_category: str = "Number"
+    op_title: str = "Debug Print"
+    op_category: str = "Text"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
-        super().__init__(scene=scene, inputs_init_list=[], outputs_init_list=[("", True)])
+        super().__init__(scene=scene, inputs_init_list=[("Data", True)], outputs_init_list=[])
 
-        self.grNode.resize(130, 70)
+        self.grNode.resize(120, 70)
         self.grNode.initContent()
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def initInnerClasses(self):
-        self.content: QDMNodeContentWidget = LineInputContent(self)
-        self.grNode: QDMGraphicsNode = FCNNodeView(self)
-        self.content.edit.textChanged.connect(self.onInputChanged)
-
     def eval_operation(self, sockets_input_data: list) -> list:
-        in_val: float = float(self.content.edit.text())
-        return [[in_val]]
+        in_val = sockets_input_data[0]
+        print(in_val)
+        return [in_val]
