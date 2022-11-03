@@ -34,7 +34,7 @@ import nodes_locator as locator
 if locator.LIB_PATH not in sys.path:
     sys.path.append(locator.LIB_PATH)
 
-from editor.nodes_window import FCNWindow
+from core.nodes_window import FCNWindow
 
 
 QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)  # Enable high dpi scaling

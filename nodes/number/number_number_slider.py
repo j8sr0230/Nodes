@@ -28,8 +28,8 @@ from decimal import Decimal
 from qtpy.QtWidgets import QSlider
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 
-from editor.nodes_conf import register_node
-from editor.nodes_base_node import FCNNode, FCNNodeContentView
+from core.nodes_conf import register_node
+from core.nodes_base_node import FCNNode, FCNNodeContentView
 from nodes_locator import icon
 
 

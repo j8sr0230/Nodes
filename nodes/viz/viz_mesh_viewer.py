@@ -26,10 +26,10 @@ import FreeCAD as App
 import FreeCADGui as Gui
 import Mesh
 
-from editor.nodes_conf import register_node
-from editor.nodes_base_node import FCNNode
+from core.nodes_conf import register_node
+from core.nodes_base_node import FCNNode
 from nodes_locator import icon
-from editor.nodes_utils import flatten
+from core.nodes_utils import flatten
 
 
 @register_node

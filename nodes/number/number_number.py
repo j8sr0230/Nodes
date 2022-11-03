@@ -24,8 +24,8 @@
 ###################################################################################
 from decimal import Decimal
 
-from editor.nodes_conf import register_node
-from editor.nodes_base_node import FCNNode
+from core.nodes_conf import register_node
+from core.nodes_base_node import FCNNode
 from nodes_locator import icon
 
 

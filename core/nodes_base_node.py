@@ -31,8 +31,8 @@ This module contains all necessary classes to build custom nodes for the visual 
 - FCNNodeView (node view) and FCNNode (node model).
 
 It uses significantly the modules QtPy as abstraction layer for PyQt5 and PySide2 (https://pypi.org/project/QtPy, MIT
-license) and the pyqt-node-editor by Pavel Křupala (https://gitlab.com/pavel.krupala/pyqt-node-editor, MIT license) as
-node editor base framework.
+license) and the pyqt-node-core by Pavel Křupala (https://gitlab.com/pavel.krupala/pyqt-node-editor, MIT license) as
+node core base framework.
 """
 
 from collections import OrderedDict
@@ -57,7 +57,7 @@ DEBUG = False
 
 
 class FCNSocketView(QDMGraphicsSocket):
-    """Visual representation of a socket in the node editor scene.
+    """Visual representation of a socket in the node core scene.
 
     All sockets of a node have a label and an input/display widget. If the socket is not connected, the socket input
     value can be manipulated directly via the input widget. For connected sockets, this widget shows a corresponding
@@ -410,7 +410,7 @@ class FCNNodeContentView(QDMNodeContentWidget):
 
 
 class FCNNodeView(QDMGraphicsNode):
-    """Visual representation of a node in the node editor scene.
+    """Visual representation of a node in the node core scene.
 
     The visual node is a QGraphicsItem that is display in a QGraphicsScene instance. In addition, it serves as a
     container for the visual node content (see FCNNodeContentView class).The FCNNodeView class specifies all the
@@ -489,7 +489,7 @@ class FCNNode(Node):
 
      The FCNNode class contains the complete data model of a node. All necessary information is stored and managed
      either in class variables or attributes. This concerns not only the visual representation (ui) of the node in the
-     node editor scene including node content and sockets, but also the complete evaluation logic.
+     node core scene including node content and sockets, but also the complete evaluation logic.
 
      General instance independent data is stored in class variables. These are:
      - icon (str): Path to the node image, displayed in the node list box (QListWidget).

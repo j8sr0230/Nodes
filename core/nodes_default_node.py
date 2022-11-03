@@ -22,7 +22,7 @@
 #
 #
 ###################################################################################
-"""Module for a default node in the FreeCAD Nodes application."""
+"""Module containing a default node in the FreeCAD Nodes application."""
 from collections import OrderedDict
 from typing import Optional
 
@@ -69,16 +69,16 @@ class FCNSocketView(QDMGraphicsSocket):
 
         painter.setPen(self._color_label)
         fm: QFontMetrics = QFontMetrics(painter.font())
-        label_width: int = fm.width(self.socket.socket_name)
+        label_width: int = fm.width(self.socket.socket_label)
         font_height: int = fm.height()
         y: int = (-font_height // 2) - 1
 
         if self.socket.is_input:
             painter.drawText(self.radius + 5, y, label_width, font_height,
-                             Qt.AlignVCenter, self.socket.socket_name)
+                             Qt.AlignVCenter, self.socket.socket_label)
         else:
             painter.drawText(-self.radius - label_width - 5, y, label_width, font_height,
-                             Qt.AlignRight | Qt.AlignVCenter, self.socket.socket_name)
+                             Qt.AlignRight | Qt.AlignVCenter, self.socket.socket_label)
 
 
 class FCNSocketModel(Socket):
@@ -86,29 +86,27 @@ class FCNSocketModel(Socket):
 
     Socket_GR_Class = FCNSocketView
 
-    socket_name: str
+    socket_label: str
 
     def __init__(self, node: Node, index: int = 0, position: int = LEFT_CENTER, socket_color: int = 1,
                  multi_edges: bool = True, count_on_this_node_side: int = 1, is_input: bool = False,
-                 socket_name: str = ""):
+                 socket_label: str = ""):
         """Overwritten from nodeeditor.node_socket.Socket.
 
-        :param socket_name: Socket name
+        :param socket_name: Socket label
         :type socket_name: str
         """
 
         super().__init__(node, index, position, socket_color, multi_edges, count_on_this_node_side, is_input)
-        self.socket_name: str = socket_name
+        self.socket_label: str = socket_label
 
 
 class FCNNodeContentView(QDMNodeContentWidget):
-    """View provider (widget) for the node content."""
+    """View provider (node content widget) for the node content."""
 
     def initUI(self):
         """Overwritten from nodeeditor.node_content_widget.QDMNodeContentWidget."""
 
-        # lbl = QLabel("Hello World!", self)
-        # lbl.setObjectName(self.node.content_label_objname)
         self.setStyleSheet("background:transparent;")
 
 
@@ -124,7 +122,6 @@ class FCNNodeView(QDMGraphicsNode):
         title_horizontal_padding (int): Horizontal padding between node and node title
         title_vertical_padding (int): Vertical padding between node and node title
         status_icons (QImage): Status icons of the node (top right corner)
-        title_item (QGraphicsTextItem): Node title widget
     """
 
     width: int
@@ -135,50 +132,37 @@ class FCNNodeView(QDMGraphicsNode):
     title_horizontal_padding: int
     title_vertical_padding: int
     status_icons: QImage
-    title_item: QGraphicsTextItem
 
     def initSizes(self):
         """Overwritten from nodeeditor.node_graphics_node.QDMGraphicsNode."""
 
-        self.width: int = 100
-        self.height: int = 80
-        self.edge_roundness: int = 5
+        self.width: int = 80
+        self.height: int = 70
+        self.edge_roundness: int = 3
         self.edge_padding: int = 5
-        self.title_height: int = 30
+        self.title_height: int = 28
         self.title_horizontal_padding: int = 5
-        self.title_vertical_padding: int = 5
+        self.title_vertical_padding: int = 0
 
     def initAssets(self):
-        """Overwritten rom nodeeditor.node_graphics_node.QDMGraphicsNode."""
+        """Overwritten from nodeeditor.node_graphics_node.QDMGraphicsNode."""
 
         super().initAssets()
 
         self.status_icons: QImage = QImage(locator.icon("nodes_status_icon.png"))
 
-    def initTitle(self):
-        """Overwritten rom nodeeditor.node_graphics_node.QDMGraphicsNode."""
-
-        self.title_item = QGraphicsTextItem(self)
-        self.title_item.node = self.node
-        self.title_item.setDefaultTextColor(self._title_color)
-        self.title_item.setFont(self._title_font)
-        self.title_item.setPos(self.title_horizontal_padding, self.title_vertical_padding)
-        self.title_item.setTextWidth(self.width - 2 * self.title_horizontal_padding)
-
-    def resize(self, width: int, height: int, title_vertical_padding: int):
+    def resize(self, width: int, height: int) -> None:
         """Resizes the visual node representation.
 
         :param width: New node width
         :type width: int
         :param height: New node height
         :type height: int
-        :param title_vertical_padding: New node width
-        :type title_vertical_padding: int
         """
 
         self.width: int = width
         self.height: int = height
-        self.title_vertical_padding = title_vertical_padding
+        self.title_item.setTextWidth(self.width- 2 * self.title_horizontal_padding)
         self.update()
 
     def paint(self, painter, option, widget=None):
@@ -186,7 +170,7 @@ class FCNNodeView(QDMGraphicsNode):
 
         super().paint(painter, option, widget)
 
-        status_icon_placement = QRectF(self.width-12, -12, 24, 24)
+        status_icon_placement = QRectF(self.width-10, -10, 20, 20)
         if self.node.isDirty():
             painter.drawImage(status_icon_placement, self.status_icons, QRectF(0, 0, 24, 24))
         if self.node.isInvalid():
@@ -265,7 +249,7 @@ class FCNNodeModel(Node):
         for item in inputs:
             socket: FCNSocketModel = self.__class__.Socket_class(
                 node=self, index=counter, position=self.input_socket_position, count_on_this_node_side=len(inputs),
-                is_input=True, socket_color=item[0], socket_name=item[1], multi_edges=item[2])
+                is_input=True, socket_color=6, socket_label=item[0], multi_edges=item[1])
             counter += 1
             self.inputs.append(socket)
 
@@ -273,9 +257,28 @@ class FCNNodeModel(Node):
         for item in outputs:
             socket: FCNSocketModel = self.__class__.Socket_class(
                 node=self, index=counter, position=self.output_socket_position, count_on_this_node_side=len(outputs),
-                is_input=False, socket_color=item[0], socket_name=item[1], multi_edges=item[2])
+                is_input=False, socket_color=6, socket_label=item[0], multi_edges=item[1])
             counter += 1
             self.outputs.append(socket)
+
+    def getSocketPosition(self, index: int, position: int, num_out_of: int = 1) -> list:
+        """Overwritten from class nodeeditor.node_node.Node."""
+
+        x = self.socket_offsets[position] if position is LEFT_CENTER \
+            else self.grNode.width + self.socket_offsets[position]
+
+        y = 0
+        if position in (LEFT_CENTER, RIGHT_CENTER):
+            num_sockets = num_out_of
+            node_height = self.grNode.height
+            top_offset = self.grNode.title_height + self.grNode.edge_padding
+            available_height = node_height - top_offset - self.grNode.edge_padding
+            total_height_of_all_sockets = (num_sockets-1) * self.socket_spacing
+            new_top = (available_height - total_height_of_all_sockets) // 2
+
+            y = top_offset + new_top + index*self.socket_spacing + 1
+
+        return [x, y]
 
     def eval(self, index: int = 0) -> list:
         """Overwritten from class nodeeditor.node_node.Node."""
@@ -323,14 +326,16 @@ class FCNNodeModel(Node):
             self.sockets_input_data.append(socket_input_data)
 
         self.output_data_cache: list = self.eval_operation(self.sockets_input_data)  # Calculate socket output
+        self.grNode.setToolTip(str(self.output_data_cache))
+
         self.markDirty(False)
         self.markInvalid(False)
-        self.grNode.setToolTip(str(self.output_data_cache))
         self.markDescendantsDirty()
         self.evalChildren()
 
         if DEBUG:
             print("%s::__eval()" % self.__class__.__name__, "self.output_data_cache = ", self.output_data_cache)
+
         return self.output_data_cache
 
     def eval_operation(self, sockets_input_data: list) -> list:
@@ -354,13 +359,14 @@ class FCNNodeModel(Node):
         :rtype: list
         """
 
-        # Default implementation for two output sockets
-        return [[0], [0]]
+        # Default implementation
+        return [[0]]
 
     def onInputChanged(self, socket: Socket):
         """Overwritten from nodeeditor.node_node.Node."""
 
         super().onInputChanged(socket)
+
         self.eval()
         if DEBUG:
             print("%s::__onInputChanged" % self.__class__.__name__, "self.output_data_cache = ", self.output_data_cache)
