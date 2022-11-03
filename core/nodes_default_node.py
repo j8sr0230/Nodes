@@ -162,6 +162,7 @@ class FCNNodeView(QDMGraphicsNode):
 
         self.width: int = width
         self.height: int = height
+        self.title_item.setTextWidth(self.width- 2 * self.title_horizontal_padding)
         self.update()
 
     def paint(self, painter, option, widget=None):

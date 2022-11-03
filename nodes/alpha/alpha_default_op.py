@@ -23,7 +23,7 @@
 #
 ###################################################################################
 from core.nodes_conf import register_node
-from core.nodes_default_node import FCNNodeModel  # FCNNodeContentView
+from core.nodes_default_node import FCNNodeModel
 from nodes_locator import icon
 
 
