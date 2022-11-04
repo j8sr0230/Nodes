@@ -19,7 +19,6 @@ from core.nodes_drag_listbox import QDMDragListbox
 from core.nodes_conf import NodesStore
 
 
-# Local validator to use string type
 Edge.registerEdgeValidator(edge_cannot_connect_two_outputs_or_two_inputs)
 Edge.registerEdgeValidator(edge_cannot_connect_input_and_output_of_same_node)
 
@@ -49,7 +48,7 @@ class FCNWindow(NodeEditorWindow):
     # noinspection PyUnresolvedReferences
     def initUI(self):
         self.name_company = 'j8sr0230'
-        self.name_product = 'Nodes core'
+        self.name_product = 'Nodes'
         self.empty_icon = QIcon(".")
 
         NodesStore.refresh_nodes_list()
@@ -77,7 +76,7 @@ class FCNWindow(NodeEditorWindow):
         self.createStatusBar()
         self.update_menus()
         self.readSettings()
-        self.setWindowTitle("Nodes core")
+        self.setWindowTitle("Nodes")
 
     def closeEvent(self, event):
         self.mdi_area.closeAllSubWindows()
@@ -149,7 +148,7 @@ class FCNWindow(NodeEditorWindow):
     def about(self):
         QMessageBox.about(self, "Nodes by j8sr0230 et al.", "A visual scripting workbench for "
                           "<a href='https://www.freecad.org/'>FreeCAD</a> using "
-                          "<a href='https://gitlab.com/pavel.krupala/pyqt-node-editor'>pyqt-node-core</a>. For more "
+                          "<a href='https://gitlab.com/pavel.krupala/pyqt-node-editor'>pyqt-node-editor</a>. For more "
                           "information visit the "
                           "<a href='https://github.com/j8sr0230/Nodes'>Nodes</a> project at github.")
 

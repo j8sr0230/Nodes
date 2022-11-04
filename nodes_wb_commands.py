@@ -41,7 +41,7 @@ class Nodes_CommandShow:
     def GetResources():
         return {'Pixmap': locator.icon('nodes_wb_icon.svg'),
                 'MenuText': QT_TRANSLATE_NOOP("Nodes_Show", "Show"),
-                'ToolTip': QT_TRANSLATE_NOOP("Nodes_Show", "Show node core")}
+                'ToolTip': QT_TRANSLATE_NOOP("Nodes_Show", "Show node editor")}
 
     @staticmethod
     def Activated():
