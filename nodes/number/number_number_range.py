@@ -26,12 +26,12 @@ import awkward as ak
 import numpy as np
 
 from core.nodes_conf import register_node
-from core.nodes_base_node import FCNNode
+from core.nodes_default_node import FCNNodeModel
 from nodes_locator import icon
 
 
 @register_node
-class NumberRange(FCNNode):
+class NumberRange(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
     op_title: str = "Number Range"
@@ -40,17 +40,18 @@ class NumberRange(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Start", 1, 0, True, ('int', 'float')),
-                                           (0, "Stop", 1, 10, True, ('int', 'float')),
-                                           (0, "Step", 1, 1, False, ('int', 'float'))],
-                         outputs_init_list=[(0, "Out", 0, 0, True, ('int', 'float'))],
-                         width=150)
+                         inputs_init_list=[("Start", True), ("Stop", True), ("Step", 1, 1, False)],
+                         outputs_init_list=[("Out", True)])
+
+        self.grNode.resize(130, 100)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
     def eval_operation(self, sockets_input_data: list) -> list:
         # Inputs
-        start = sockets_input_data[0]
-        stop = sockets_input_data[1]
-        step = sockets_input_data[2][0]
+        start = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [0]
+        stop = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [10]
+        step = sockets_input_data[2][0] if len(sockets_input_data[2]) > 0 else 1
 
         # Force array broadcast
         start, stop = ak.broadcast_arrays(start, stop)
