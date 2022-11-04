@@ -22,15 +22,13 @@
 #
 #
 ###################################################################################
-from typing import Union
-
 from FreeCAD import Vector
 import Part
 import awkward as ak
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import simplify, flatten, map_objects
+from core.nodes_utils import flatten, map_objects
 
 from nodes_locator import icon
 
@@ -56,21 +54,18 @@ class SolidBox(FCNNodeModel):
         self.length_list: list = []
         self.height_list: list = []
 
-    def make_occ_box(self, position: Union[tuple, Vector]) -> Part.Shape:
+    def make_occ_box(self, position: Vector) -> Part.Shape:
         width, length, height = self.width_list.pop(0), self.length_list.pop(0), self.height_list.pop(0)
-        if type(position) is tuple:
-            return Part.makeBox(width, length, height, Vector(position))
-        else:
-            return Part.makeBox(width, length, height, position)
+        return Part.makeBox(width, length, height, position)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         width: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
         length: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [10]
         height: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [10]
-        pos: list = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [(0, 0, 0)]
+        pos: list = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [Vector(0, 0, 0)]
 
         # Force array broadcast
-        pos_list: list = list(simplify(pos)) if type(pos) is tuple else flatten(pos)
+        pos_list: list = list(flatten(pos))
         pos_idx_list: list = list(range(len(pos_list)))
         width, length, height, pos_idx_list = ak.broadcast_arrays(width, length, height, pos_idx_list)
 
@@ -78,4 +73,4 @@ class SolidBox(FCNNodeModel):
         self.length_list = ak.flatten(length, axis=None).tolist()
         self.height_list = ak.flatten(height, axis=None).tolist()
 
-        return [map_objects(pos, object, self.make_occ_box)]
+        return [map_objects(pos, Vector, self.make_occ_box)]

@@ -22,18 +22,19 @@
 #
 #
 ###################################################################################
-import FreeCAD as App
+from FreeCAD import Vector
 import Part
 import awkward as ak
 
 from core.nodes_conf import register_node
-from core.nodes_base_node import FCNNode
+from core.nodes_default_node import FCNNodeModel
+from core.nodes_utils import flatten, map_objects
+
 from nodes_locator import icon
-from core.nodes_utils import simplify, map_objects
 
 
 @register_node
-class Sphere(FCNNode):
+class Sphere(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
     op_title: str = "Solid Sphere"
@@ -41,26 +42,28 @@ class Sphere(FCNNode):
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
+        super().__init__(scene=scene,
+                         inputs_init_list=[("R", True, ), ("Pos", True, )],
+                         outputs_init_list=[("Sphere", True)])
+
         self.radius_list: list = []
 
-        super().__init__(scene=scene,
-                         inputs_init_list=[(0, "R", 1, "10.0", True, ("int", "float")),
-                                           (1, "Pos", 0, 0, True, ("vec", ))],
-                         outputs_init_list=[(3, "Sphere", 0, 0, True, ("shape", ))],
-                         width=150)
+        self.grNode.resize(120, 80)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
-    def make_occ_sphere(self, position: tuple) -> Part.Shape:
-        return Part.makeSphere(self.radius_list.pop(0), App.Vector(position))
+    def make_occ_sphere(self, position: Vector) -> Part.Shape:
+        return Part.makeSphere(self.radius_list.pop(0), position)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        radius: list = sockets_input_data[0]
-        pos: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [(0, 0, 0)]
+        radius: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
+        pos: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
 
         # Force array broadcast
-        pos_list: list = list(simplify(pos))
+        pos_list: list = list(flatten(pos))
         pos_idx_list: list = list(range(len(pos_list)))
         radius, pos_idx_list = ak.broadcast_arrays(radius, pos_idx_list)
 
         self.radius_list = ak.flatten(radius, axis=None).tolist()
 
-        return [map_objects(pos, tuple, self.make_occ_sphere)]
+        return [map_objects(pos, Vector, self.make_occ_sphere)]
