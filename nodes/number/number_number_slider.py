@@ -22,61 +22,119 @@
 #
 #
 ###################################################################################
-from math import floor
-from decimal import Decimal
+from collections import OrderedDict
 
-from qtpy.QtWidgets import QSlider
+from qtpy.QtWidgets import QSlider, QLineEdit, QLayout, QHBoxLayout
+from qtpy.QtCore import Qt
+
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 
 from core.nodes_conf import register_node
-from core.nodes_base_node import FCNNode, FCNNodeContentView
+from core.nodes_default_node import FCNNodeModel, FCNNodeView, FCNNodeContentView
+
 from nodes_locator import icon
 
 
-class NumberSliderContentView(FCNNodeContentView):
-    def update_content_ui(self, sockets_input_data: list) -> None:
-        slider_min: float = sockets_input_data[0][0]
-        slider_max: float = sockets_input_data[1][0]
-        slider_widget: QSlider = self.input_widgets[2]
+class SliderInputContent(QDMNodeContentWidget):
 
-        # Updates slider value according to the input values
-        slider_widget.blockSignals(True)  # Prevents signal loop
-        slider_widget.setRange(floor(slider_min), floor(slider_max))
-        slider_widget.setValue(sockets_input_data[2][0])
-        slider_widget.blockSignals(False)  # Reset signals
+    layout: QLayout
+    slider_edit: QSlider
+    min_edit: QLineEdit
+    max_edit: QLineEdit
+
+    def initUI(self):
+        self.layout: QLayout = QHBoxLayout()
+        self.layout.setContentsMargins(5, 5, 5, 5)
+        self.setLayout(self.layout)
+
+        self.min_edit: QLineEdit = QLineEdit("Min", self)
+        self.min_edit.setAlignment(Qt.AlignLeft)
+        self.min_edit.setObjectName(self.node.content_label_objname)
+
+        self.slider_edit: QSlider = QSlider(Qt.Horizontal, self)
+        self.slider_edit.setMinimum(0)
+        self.slider_edit.setMaximum(100)
+        self.slider_edit.setValue(50)
+        self.slider_edit.setObjectName(self.node.content_label_objname)
+
+        self.max_edit: QLineEdit = QLineEdit("Max", self)
+        self.max_edit.setAlignment(Qt.AlignRight)
+        self.max_edit.setObjectName(self.node.content_label_objname)
+
+        self.layout.addWidget(self.min_edit)
+        self.layout.addWidget(self.slider_edit)
+        self.layout.addWidget(self.max_edit)
+
+        self.min_edit.setMinimumWidth(30)
+        self.max_edit.setMinimumWidth(30)
+        self.layout.setStretchFactor(self.min_edit, 1)
+        self.layout.setStretchFactor(self.slider_edit, 10)
+        self.layout.setStretchFactor(self.max_edit, 1)
+
+    def set_slider_min(self, min_value: str) -> bool:
+        try:
+            self.slider_edit.setMinimum(int(min_value))
+            return True
+        except ValueError:
+            return False
+
+    def set_slider_max(self, max_value: str) -> bool:
+        try:
+            self.slider_edit.setMaximum(int(max_value))
+            return True
+        except ValueError:
+            return False
+
+    def serialize(self) -> OrderedDict:
+        res: OrderedDict = super().serialize()
+        res['value'] = self.slider_edit.value()
+        res['min'] = self.slider_edit.minimum()
+        res['max'] = self.slider_edit.maximum()
+        return res
+
+    def deserialize(self, data: dict, hashmap=None, restore_id: bool = True) -> bool:
+        if hashmap is None:
+            hashmap = {}
+
+        res = super().deserialize(data, hashmap)
+        try:
+            value = data['value']
+            self.slider_edit.setValue(value)
+            sld_min = data['min']
+            self.slider_edit.setMinimum(sld_min)
+            self.min_edit.setText(str(sld_min))
+            sld_max = data['max']
+            self.slider_edit.setMaximum(sld_max)
+            self.max_edit.setText(str(sld_max))
+            return True & res
+        except Exception as e:
+            dumpException(e)
+        return res
 
 
 @register_node
-class NumberSlider(FCNNode):
+class NumberSlider(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
     op_title: str = "Number Slider"
     op_category: str = "Number"
     content_label_objname: str = "fcn_node_bg"
 
-    NodeContent_class: QDMNodeContentWidget = NumberSliderContentView
-
     def __init__(self, scene):
-        super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Min", 1, 0, False, ("float", "int")),
-                                           (0, "Max", 1, 100, False, ("float", "int")),
-                                           (0, "Val", 2, (0, 100, 50), False, ("int", ))],
-                         outputs_init_list=[(0, "Out", 0, 0.0, True, ("int", ))],
-                         width=150)
+        super().__init__(scene=scene, inputs_init_list=[], outputs_init_list=[("", True)])
 
-    def collapse_node(self, collapse: bool = False) -> None:
-        super().collapse_node(collapse)
+        self.grNode.resize(250, 70)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
-        if collapse is True:
-            self.title = 'In: %.2E' % Decimal(str(self.sockets_input_data[2][0]))
-        else:
-            self.title = self.default_title
+    def initInnerClasses(self):
+        self.content: QDMNodeContentWidget = SliderInputContent(self)
+        self.grNode: QDMGraphicsNode = FCNNodeView(self)
+
+        self.content.min_edit.textChanged.connect(self.content.set_slider_min)
+        self.content.max_edit.textChanged.connect(self.content.set_slider_max)
+        self.content.slider_edit.valueChanged.connect(self.onInputChanged)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        self.collapse_node(self.content.isHidden())
-
-        min_val: float = sockets_input_data[0][0]
-        max_val: float = sockets_input_data[1][0]
-        clamped_val: float = max(min(sockets_input_data[2][0], int(max_val)), int(min_val))
-
-        return [[clamped_val]]
+        in_val: float = float(self.content.slider_edit.value())
+        return [[in_val]]
