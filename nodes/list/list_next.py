@@ -23,16 +23,13 @@
 #
 ###################################################################################
 from core.nodes_conf import register_node
-from core.nodes_base_node import FCNNode
+from core.nodes_default_node import FCNNodeModel
 
 import nodes_locator as locator
 
 
-DEBUG = False
-
-
 @register_node
-class Next(FCNNode):
+class Next(FCNNodeModel):
 
     icon: str = locator.icon("nodes_default.png")
     op_title: str = "Next"
@@ -40,23 +37,22 @@ class Next(FCNNode):
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
-        inputs: list = [(6, "List", 1, 0, True, ('*', )), (0, "Tick", 0, 0, False)]
-        outputs: list = [(6, "Item", 0, 0, True, ('*', ))]
-        width: int = 150
         self.index: int = 0
 
-        super().__init__(scene=scene, inputs_init_list=inputs, outputs_init_list=outputs, width=width)
+        super().__init__(scene=scene, inputs_init_list=[("List", True), ("Tick", False)],
+                         outputs_init_list=[("Item", True)])
+
+        self.grNode.resize(100, 70)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        input_array = sockets_input_data[0]
+        input_array = sockets_input_data[0] if len(sockets_input_data[0]) else [0]
 
         res = input_array[self.index]
         self.index += 1
 
         if self.index >= len(input_array):
             self.index = 0
-
-        if DEBUG:
-            print(res)
 
         return [[res]]
