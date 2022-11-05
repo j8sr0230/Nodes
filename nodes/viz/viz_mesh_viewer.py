@@ -27,16 +27,17 @@ import FreeCADGui as Gui
 import Mesh
 
 from core.nodes_conf import register_node
-from core.nodes_base_node import FCNNode
-from nodes_locator import icon
+from core.nodes_default_node import FCNNodeModel
 from core.nodes_utils import flatten
+
+from nodes_locator import icon
 
 
 @register_node
-class CompoundViewer(FCNNode):
+class CompoundViewer(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Mesh Viewer"
+    op_title: str = "MViewer"
     op_category: str = "Viz"
     content_label_objname: str = "fcn_node_bg"
 
@@ -45,9 +46,12 @@ class CompoundViewer(FCNNode):
             self.fc_obj = App.ActiveDocument.addObject("Mesh::Feature", "MViewer")
 
         super().__init__(scene=scene,
-                         inputs_init_list=[(3, "In", 0, 0, True, ("shape", ))],
-                         outputs_init_list=[(3, "Out", 0, 0, True, ("shape", ))],
-                         width=170)
+                         inputs_init_list=[("In", True)],
+                         outputs_init_list=[])
+
+        self.grNode.resize(90, 70)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
     def remove(self):
         super().remove()

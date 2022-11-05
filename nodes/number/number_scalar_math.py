@@ -22,15 +22,58 @@
 #
 #
 ###################################################################################
+from collections import OrderedDict
+
 import awkward as ak
+from qtpy.QtWidgets import QComboBox, QLayout, QVBoxLayout
+from qtpy.QtCore import Qt
+
+from nodeeditor.node_content_widget import QDMNodeContentWidget
+from nodeeditor.node_graphics_node import QDMGraphicsNode
 
 from core.nodes_conf import register_node
-from core.nodes_base_node import FCNNode
+from core.nodes_default_node import FCNNodeModel, FCNNodeView, FCNNodeContentView
+
 from nodes_locator import icon
 
 
+class ScalarMathInputContent(QDMNodeContentWidget):
+
+    layout: QLayout
+    edit: QComboBox
+
+    def initUI(self):
+        self.layout: QLayout = QVBoxLayout()
+        self.layout.setContentsMargins(5, 5, 5, 5)
+        self.setLayout(self.layout)
+
+        self.edit: QComboBox = QComboBox(self)
+        self.edit.addItems(["a+b", "a-b", "a*b", "a/b", "a^b"])
+        self.edit.setObjectName(self.node.content_label_objname)
+
+        self.layout.addWidget(self.edit)
+
+    def serialize(self) -> OrderedDict:
+        res: OrderedDict = super().serialize()
+        res['value'] = str(self.edit.currentIndex())
+        return res
+
+    def deserialize(self, data: dict, hashmap=None, restore_id: bool = True) -> bool:
+        if hashmap is None:
+            hashmap = {}
+
+        res = super().deserialize(data, hashmap)
+        try:
+            value = data['value']
+            self.edit.setCurrentIndex(int(value))
+            return True & res
+        except Exception as e:
+            dumpException(e)
+        return res
+
+
 @register_node
-class ScalarMath(FCNNode):
+class ScalarMath(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
     op_title: str = "Scalar Math"
@@ -39,25 +82,22 @@ class ScalarMath(FCNNode):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "Op", 3, ["a+b", "a-b", "a*b", "a/b", "a^b", ], False, ('int', )),
-                                           (0, "a", 1, 1, True, ('float', 'int')),
-                                           (0, "b", 1, 10, True, ('float', 'int'))],
-                         outputs_init_list=[(0, "Res", 0, 11, True, ('float', 'int'))],
-                         width=150)
+                         inputs_init_list=[("", True), ("", True)],
+                         outputs_init_list=[("", True)])
 
-    def collapse_node(self, collapse: bool = False):
-        super().collapse_node(collapse)
+        self.grNode.resize(120, 80)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
-        if collapse is True:
-            self.title = "Math: " + self.content.input_widgets[0].currentText()
-        else:
-            self.title = self.default_title
+    def initInnerClasses(self):
+        self.content: QDMNodeContentWidget = ScalarMathInputContent(self)
+        self.grNode: QDMGraphicsNode = FCNNodeView(self)
+        self.content.edit.currentIndexChanged.connect(self.onInputChanged)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        # Inputs
-        op_code: int = sockets_input_data[0][0]
-        a_array = ak.Array(sockets_input_data[1])
-        b_array = ak.Array(sockets_input_data[2])
+        op_code: int = self.content.edit.currentIndex()
+        a_array = ak.Array(sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [0])
+        b_array = ak.Array(sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [1])
 
         # Outputs
         if op_code == 0:  # Add

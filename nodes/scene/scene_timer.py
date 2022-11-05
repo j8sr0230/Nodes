@@ -22,61 +22,107 @@
 #
 #
 ###################################################################################
-from qtpy import QtCore
+from collections import OrderedDict
+
+from qtpy.QtWidgets import QLineEdit, QCheckBox, QLayout, QHBoxLayout
+from qtpy.QtCore import Qt, QTimer
+from nodeeditor.node_content_widget import QDMNodeContentWidget
 
 from core.nodes_conf import register_node
-from core.nodes_base_node import FCNNode
-import nodes_locator as locator
+from core.nodes_default_node import FCNNodeModel, FCNNodeView, FCNNodeContentView
+from nodes_locator import icon
 
 
 DEBUG = False
 
 
-@register_node
-class Timer(FCNNode):
+class TimerInputContent(QDMNodeContentWidget):
 
-    icon: str = locator.icon("nodes_default.png")
+    layout: QLayout
+    interval_edit: QLineEdit
+    run_checkbox: QCheckBox
+
+    def initUI(self):
+        self.layout: QLayout = QHBoxLayout()
+        self.layout.setContentsMargins(5, 5, 5, 5)
+        self.setLayout(self.layout)
+
+        self.interval_edit: QLineEdit = QLineEdit("1000", self)
+        self.layout.addWidget(self.interval_edit)
+
+        self.run_checkbox: QCheckBox = QCheckBox(self)
+        self.layout.addWidget(self.run_checkbox)
+
+        self.setObjectName(self.node.content_label_objname)
+
+    def serialize(self) -> OrderedDict:
+        res: OrderedDict = super().serialize()
+        res['value'] = self.interval_edit.text()
+        res['state'] = self.run_checkbox.isChecked()
+        return res
+
+    def deserialize(self, data: dict, hashmap=None, restore_id: bool = True) -> bool:
+        if hashmap is None:
+            hashmap = {}
+
+        res = super().deserialize(data, hashmap)
+        try:
+            value = data['value']
+            self.interval_edit.setText(value)
+            state = data['state']
+            self.run_checkbox.setChecked(state)
+
+            return True & res
+        except Exception as e:
+            dumpException(e)
+        return res
+
+
+@register_node
+class Timer(FCNNodeModel):
+
+    icon: str = icon("nodes_default.png")
     op_title: str = "Timer"
     op_category: str = "Scene"
     content_label_objname: str = "fcn_node_bg"
 
+    timer: QTimer
+
     def __init__(self, scene):
-        inputs: list = [(0, 'State', 3, ['Hold', 'Run'], False, ('int', )),
-                        (0, "Period", 1, 1000, False, ('int', 'float'))]
-        outputs: list = [(0, "Tick", 0, 0, True, ('int', 'float'))]
-        width: int = 150
+        super().__init__(scene=scene, inputs_init_list=[], outputs_init_list=[("Tick", True)])
 
-        self.timer = QtCore.QTimer()
-        self.timer.start(1000)
-        self.timer.timeout.connect(self.timer_callback)
+        self.grNode.resize(120, 80)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
-        super().__init__(scene=scene, inputs_init_list=inputs, outputs_init_list=outputs, width=width)
+    def initInnerClasses(self):
+        self.content: QDMNodeContentWidget = TimerInputContent(self)
+        self.grNode: QDMGraphicsNode = FCNNodeView(self)
+        self.content.interval_edit.textChanged.connect(self.onInputChanged)
+        self.content.run_checkbox.stateChanged.connect(self.onInputChanged)
 
     def timer_callback(self):
-        try:
-            self.markInvalid()
-            self.eval()
-        except AttributeError as e:
-            if DEBUG:
-                print(e)
+        self.markInvalid()
+        self.eval()
 
     def remove(self):
         super().remove()
         self.timer.stop()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        op_code: int = sockets_input_data[0][0]
-        period: float = float(sockets_input_data[1][0])
+        op_code: bool = self.content.run_checkbox.isChecked()
+        period: int = int(self.content.interval_edit.text())
 
-        if self.timer.interval != period:
-            self.timer.setInterval(period)
+        self.timer = QTimer()
+        self.timer.start(period)
+        self.timer.timeout.connect(self.timer_callback)
 
-        if op_code == 0:  # Hold
+        if not op_code:
             self.timer.stop()
-        elif op_code == 1:  # Run
+        else:
             self.timer.start()
 
         if DEBUG:
             print("Running timer no.:", self.timer.timerId())
 
-        return [[period]]
+        return [[self.timer.timerId()]]

@@ -25,12 +25,13 @@
 from blinker import signal
 
 from core.nodes_conf import register_node
-from core.nodes_base_node import FCNNode
+from core.nodes_default_node import FCNNodeModel
 from nodes_locator import icon
 
 
 @register_node
-class Sender(FCNNode):
+class Sender(FCNNodeModel):
+
     icon: str = icon("nodes_default.png")
     op_title: str = "Sender"
     op_category: str = "Group"
@@ -43,11 +44,14 @@ class Sender(FCNNode):
         self.pull_data_signal: signal = signal("pull")
 
         super().__init__(scene=scene,
-                         inputs_init_list=[(3, "Id", 1, "1", False, ('str', )), (6, "In", 0, 0, True, ('*', ))],
-                         outputs_init_list=[(3, "Id", 0, "1", True, ('str', )), (6, "Out", 0, 0, True, ('*', ))],
-                         width=150)
+                         inputs_init_list=[("Id", False), ("In", True)],
+                         outputs_init_list=[("Id", True), ("Out", True)])
 
         self.pull_data_signal.connect(self.on_pull)
+
+        self.grNode.resize(100, 80)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
     def on_pull(self, sender):
         try:
@@ -56,18 +60,8 @@ class Sender(FCNNode):
         except Exception as e:
             print(e, sender)
 
-    def collapse_node(self, collapse: bool = False):
-        super().collapse_node(collapse)
-        if collapse is True:
-            input_value = self.sockets_input_data[0][0]
-            self.title = 'Sender: ' + str(input_value)
-        else:
-            self.title = self.default_title
-
     def eval_operation(self, sockets_input_data: list) -> list:
-        self.collapse_node(self.content.isHidden())
-
-        signal_id = str(sockets_input_data[0][0])
+        signal_id = str(sockets_input_data[0][0] if len(sockets_input_data[0]) > 0 else 1)
         input_data = sockets_input_data[1]
 
         if self.signal_id != signal_id:
@@ -81,7 +75,8 @@ class Sender(FCNNode):
 
 
 @register_node
-class Receiver(FCNNode):
+class Receiver(FCNNodeModel):
+
     data: list
     icon: str = icon("nodes_default.png")
     op_title: str = "Receiver"
@@ -95,17 +90,11 @@ class Receiver(FCNNode):
         self.pull_data_signal: signal = signal("pull")
 
         super().__init__(scene=scene,
-                         inputs_init_list=[(3, "Id", 1, "1", False, ('str', ))],
-                         outputs_init_list=[(3, "Id", 0, "1", True, ('str', )), (6, "Out", 0, 0, True, ('*', ))],
-                         width=150)
+                         inputs_init_list=[("Id", False)], outputs_init_list=[("Id", True), ("Out", True)])
 
-    def collapse_node(self, collapse: bool = False):
-        super().collapse_node(collapse)
-        if collapse is True:
-            input_value = self.sockets_input_data[0][0]
-            self.title = 'Receiver: ' + str(input_value)
-        else:
-            self.title = self.default_title
+        self.grNode.resize(100, 80)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
     def on_push(self, data):
         try:
@@ -116,9 +105,7 @@ class Receiver(FCNNode):
             print(e, data)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        self.collapse_node(self.content.isHidden())
-
-        signal_id = str(sockets_input_data[0][0])
+        signal_id = str(sockets_input_data[0][0] if len(sockets_input_data[0]) > 0 else 1)
 
         if self.signal_id != signal_id:
             # New receiver signale id

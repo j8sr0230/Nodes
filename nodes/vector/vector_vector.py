@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  scene_set_objects_shape.py
+#  vector_vector.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,39 +22,41 @@
 #
 #
 ###################################################################################
-import FreeCAD
-import Part
+from FreeCAD import Vector
+import awkward as ak
 
+from core.nodes_default_node import FCNNodeModel
 from core.nodes_conf import register_node
-from core.nodes_base_node import FCNNode
+from core.nodes_utils import flatten, map_objects
+
 from nodes_locator import icon
 
 
 @register_node
-class SetObjectsShape(FCNNode):
+class VectorIn(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Set Objects Shape"
-    op_category: str = "Scene"
+    op_title: str = "Vector"
+    op_category: str = "Vector"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", )),
-                                           (5, "Shp", 0, "0", False, ("Shape", ))],
-                         outputs_init_list=[(4, "Obj", 0, 0, True, ("fc_obj", ))],
-                         width=170)
+                         inputs_init_list=[("X", True), ("Y", True), ("Z", True)],
+                         outputs_init_list=[("Vec", True)])
+
+        self.grNode.resize(100, 100)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        obj_list: list = sockets_input_data[0]
-        compound = Part.makeCompound(sockets_input_data[1])
+        # Inputs
+        x_in = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [1]
+        y_in = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [0]
+        z_in = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [0]
 
-        if not (FreeCAD.ActiveDocument is None):
-            for obj in obj_list:
-                obj.Shape = compound
+        # Broadcast an zip to vector
+        x_vector, y_vector, z_vector = ak.broadcast_arrays(x_in, y_in, z_in)
 
-            FreeCAD.ActiveDocument.recompute()
-        else:
-            raise Exception('No active document')
-
-        return [obj_list]
+        res = ak.zip([x_vector, y_vector, z_vector]).tolist()
+        return [map_objects(res, tuple, Vector)]

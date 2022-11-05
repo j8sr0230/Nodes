@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  vector_vector_in.py
+#  scene_set_shape.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,36 +22,44 @@
 #
 #
 ###################################################################################
-import awkward as ak
+import FreeCAD
+import Part
 
-from core.nodes_base_node import FCNNode
 from core.nodes_conf import register_node
+from core.nodes_default_node import FCNNodeModel
 from nodes_locator import icon
+from core.nodes_utils import flatten
 
 
 @register_node
-class VectorIn(FCNNode):
+class SetShape(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Vector In"
-    op_category: str = "Vector"
+    op_title: str = "Set Shape"
+    op_category: str = "Scene"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[(0, "X", 1, 1.0, True, ("int", "float")),
-                                           (0, "Y", 1, 0.0, True, ("int", "float")),
-                                           (0, "Z", 1, 0.0, True, ("int", "float"))],
-                         outputs_init_list=[(1, "Vec", 0, 0, True, ("vec", ))],
-                         width=150)
+                         inputs_init_list=[("Object", True), ("Shape", True)],
+                         outputs_init_list=[("Object", True)])
+
+        self.grNode.resize(120, 80)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        # Inputs
-        x_in = sockets_input_data[0]
-        y_in = sockets_input_data[1]
-        z_in = sockets_input_data[2]
+        obj_in: list = sockets_input_data[0]
 
-        # Broadcast an zip to vector
-        x_vector, y_vector, z_vector = ak.broadcast_arrays(x_in, y_in, z_in)
-        res = ak.zip([x_vector, y_vector, z_vector])
-        return [res.tolist()]
+        obj_list = list(flatten(obj_in))
+        shp_list = list(flatten(sockets_input_data[1]))
+
+        if hasattr(FreeCAD, "ActiveDocument") and FreeCAD.ActiveDocument:
+            for obj in obj_list:
+                obj.Shape = shp_list.pop(0)
+
+            FreeCAD.ActiveDocument.recompute()
+        else:
+            raise ValueError('No active document')
+
+        return [obj_in]
