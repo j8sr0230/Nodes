@@ -19,6 +19,9 @@ Download and install the Nodes workbench via the Addon Manager (**Tools → Addo
 ## Usage
 ### Feature overview
 ![Feature overview](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_base_node_features.gif)
+
+![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_animation.gif)
+
 Tutorials coming soon!
 
 ## License

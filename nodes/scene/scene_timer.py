@@ -89,7 +89,7 @@ class Timer(FCNNodeModel):
     timer: QTimer
 
     def __init__(self, scene):
-        super().__init__(scene=scene, inputs_init_list=[], outputs_init_list=[("Tick", True)])
+        super().__init__(scene=scene, inputs_init_list=[], outputs_init_list=[("", True)])
 
         self.grNode.resize(120, 80)
         for socket in self.inputs + self.outputs:
