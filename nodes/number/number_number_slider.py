@@ -27,6 +27,7 @@ from collections import OrderedDict
 from qtpy.QtWidgets import QSlider, QLineEdit, QLabel, QWidget, QLayout, QVBoxLayout, QHBoxLayout
 from qtpy.QtCore import Qt
 from nodeeditor.node_content_widget import QDMNodeContentWidget
+
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel, FCNNodeView, FCNNodeContentView
 from nodes_locator import icon
