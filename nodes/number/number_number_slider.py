@@ -24,14 +24,11 @@
 ###################################################################################
 from collections import OrderedDict
 
-from qtpy.QtWidgets import QSlider, QLineEdit, QLayout, QHBoxLayout
+from qtpy.QtWidgets import QSlider, QLineEdit, QLabel, QWidget, QLayout, QVBoxLayout, QHBoxLayout
 from qtpy.QtCore import Qt
-
 from nodeeditor.node_content_widget import QDMNodeContentWidget
-
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel, FCNNodeView, FCNNodeContentView
-
 from nodes_locator import icon
 
 
@@ -40,36 +37,47 @@ class SliderInputContent(QDMNodeContentWidget):
     layout: QLayout
     slider_edit: QSlider
     min_edit: QLineEdit
+    slider_value_lbl: QLabel
     max_edit: QLineEdit
 
     def initUI(self):
-        self.layout: QLayout = QHBoxLayout()
+        self.layout: QLayout = QVBoxLayout()
         self.layout.setContentsMargins(5, 5, 5, 5)
+        self.layout.setSpacing(0)
         self.setLayout(self.layout)
 
-        self.min_edit: QLineEdit = QLineEdit("Min", self)
-        self.min_edit.setAlignment(Qt.AlignLeft)
-        self.min_edit.setObjectName(self.node.content_label_objname)
-
+        # First row with slider
         self.slider_edit: QSlider = QSlider(Qt.Horizontal, self)
         self.slider_edit.setMinimum(0)
         self.slider_edit.setMaximum(100)
         self.slider_edit.setValue(50)
-        self.slider_edit.setObjectName(self.node.content_label_objname)
+        self.layout.addWidget(self.slider_edit)
+
+        # Second row with properties widget
+        slider_prop_widget: QWidget = QWidget()
+        slider_prop_layout: QLayout = QHBoxLayout()
+        slider_prop_layout.setContentsMargins(0, 0, 0, 0)
+        slider_prop_layout.setSpacing(0)
+        slider_prop_widget.setLayout(slider_prop_layout)
+        self.layout.addWidget(slider_prop_widget)
+
+        self.min_edit: QLineEdit = QLineEdit("Min", self)
+        self.min_edit.setAlignment(Qt.AlignLeft)
+        slider_prop_layout.addWidget(self.min_edit)
+
+        self.slider_value_lbl: QLineEdit = QLabel("Value", self)
+        self.slider_value_lbl.setAlignment(Qt.AlignCenter)
+        slider_prop_layout.addWidget(self.slider_value_lbl)
 
         self.max_edit: QLineEdit = QLineEdit("Max", self)
         self.max_edit.setAlignment(Qt.AlignRight)
-        self.max_edit.setObjectName(self.node.content_label_objname)
+        slider_prop_layout.addWidget(self.max_edit)
 
-        self.layout.addWidget(self.min_edit)
-        self.layout.addWidget(self.slider_edit)
-        self.layout.addWidget(self.max_edit)
+        slider_prop_layout.setStretchFactor(self.min_edit, 1)
+        slider_prop_layout.setStretchFactor(self.slider_value_lbl, 1)
+        slider_prop_layout.setStretchFactor(self.max_edit, 1)
 
-        self.min_edit.setMinimumWidth(30)
-        self.max_edit.setMinimumWidth(30)
-        self.layout.setStretchFactor(self.min_edit, 1)
-        self.layout.setStretchFactor(self.slider_edit, 10)
-        self.layout.setStretchFactor(self.max_edit, 1)
+        self.setObjectName(self.node.content_label_objname)
 
     def set_slider_min(self, min_value: str) -> bool:
         try:
@@ -123,7 +131,7 @@ class NumberSlider(FCNNodeModel):
     def __init__(self, scene):
         super().__init__(scene=scene, inputs_init_list=[], outputs_init_list=[("", True)])
 
-        self.grNode.resize(250, 70)
+        self.grNode.resize(200, 100)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
@@ -136,5 +144,8 @@ class NumberSlider(FCNNodeModel):
         self.content.slider_edit.valueChanged.connect(self.onInputChanged)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        in_val: float = float(self.content.slider_edit.value())
+        in_val: int = int(self.content.slider_edit.value())
+
+        self.content.slider_value_lbl.setText(str(in_val))
+
         return [[in_val]]
