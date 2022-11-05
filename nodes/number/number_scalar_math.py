@@ -97,7 +97,7 @@ class ScalarMath(FCNNodeModel):
     def eval_operation(self, sockets_input_data: list) -> list:
         op_code: int = self.content.edit.currentIndex()
         a_array = ak.Array(sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [0])
-        b_array = ak.Array(sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [0])
+        b_array = ak.Array(sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [1])
 
         # Outputs
         if op_code == 0:  # Add
