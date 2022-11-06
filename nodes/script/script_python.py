@@ -51,18 +51,18 @@ class CodeEditorDialog(QDialog):
         # Button row
         button_widget: QWidget = QWidget(self)
         button_widget_layout: QHBoxLayout = QHBoxLayout()
-        button_widget_layout.setSpacing(0)
+        button_widget_layout.setContentsMargins(0, 0, 0, 0)
         button_widget.setLayout(button_widget_layout)
         self.layout.addWidget(button_widget)
 
         self.ok_button: QPushButton = QPushButton("Ok")
+        self.ok_button.clicked.connect(lambda: print("New code"))
+
         self.cancel_button: QPushButton = QPushButton("Cancel")
+        self.cancel_button.clicked.connect(self.hide)
 
         button_widget_layout.addWidget(self.ok_button)
         button_widget_layout.addWidget(self.cancel_button)
-
-
-
 
 
 @register_node
