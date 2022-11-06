@@ -22,11 +22,47 @@
 #
 #
 ###################################################################################
-from qtpy.QtWidgets import QSizePolicy, QTextEdit
+from qtpy.QtWidgets import QSizePolicy, QDialog, QVBoxLayout, QHBoxLayout, QPushButton, QWidget
+from nodeeditor.node_content_widget import QTextEdit
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
 from nodes_locator import icon
+
+
+class CodeEditorDialog(QDialog):
+    layout: QVBoxLayout
+    code_input_widget: QTextEdit
+    ok_button: QPushButton
+    cancel_button: QPushButton
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.init_ui()
+
+    def init_ui(self):
+        self.layout: QVBoxLayout = QVBoxLayout()
+        self.setLayout(self.layout)
+
+        # Code input widget
+        self.code_input_widget: QTextEdit = QTextEdit("My code here", self)
+        self.layout.addWidget(self.code_input_widget)
+
+        # Button row
+        button_widget: QWidget = QWidget(self)
+        button_widget_layout: QHBoxLayout = QHBoxLayout()
+        button_widget_layout.setSpacing(0)
+        button_widget.setLayout(button_widget_layout)
+        self.layout.addWidget(button_widget)
+
+        self.ok_button: QPushButton = QPushButton("Ok")
+        self.cancel_button: QPushButton = QPushButton("Cancel")
+
+        button_widget_layout.addWidget(self.ok_button)
+        button_widget_layout.addWidget(self.cancel_button)
+
+
+
 
 
 @register_node
@@ -37,8 +73,14 @@ class Python(FCNNodeModel):
     op_category: str = "Script"
     content_label_objname: str = "fcn_node_bg"
 
+    code_dialog: QDialog
+
     def __init__(self, scene):
         super().__init__(scene=scene, inputs_init_list=[("In", True)], outputs_init_list=[("Out", True)])
+
+    def onDoubleClicked(self, event):
+        self.code_dialog = CodeEditorDialog(self.scene.getView())
+        self.code_dialog.show()
 
     def eval_operation(self, sockets_input_data: list) -> list:
         code: str = "output_data = input_data\nprint(output_data)"
