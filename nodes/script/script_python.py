@@ -35,17 +35,19 @@ class CodeEditorDialog(QDialog):
     code_input_widget: QTextEdit
     ok_button: QPushButton
     cancel_button: QPushButton
+    node: FCNNodeModel
 
-    def __init__(self, parent=None):
+    def __init__(self, node: FCNNodeModel = None, parent: QWidget = None):
         super().__init__(parent)
         self.init_ui()
+        self.node = node
 
     def init_ui(self):
         self.layout: QVBoxLayout = QVBoxLayout()
         self.setLayout(self.layout)
 
         # Code input widget
-        self.code_input_widget: QTextEdit = QTextEdit("My code here", self)
+        self.code_input_widget: QTextEdit = QTextEdit("output_data = input_data\nprint(output_data)", self)
         self.layout.addWidget(self.code_input_widget)
 
         # Button row
@@ -56,7 +58,7 @@ class CodeEditorDialog(QDialog):
         self.layout.addWidget(button_widget)
 
         self.ok_button: QPushButton = QPushButton("Ok")
-        self.ok_button.clicked.connect(lambda: print("New code"))
+        self.ok_button.clicked.connect(self.set_code)
 
         self.cancel_button: QPushButton = QPushButton("Cancel")
         self.cancel_button.clicked.connect(self.hide)
@@ -64,9 +66,14 @@ class CodeEditorDialog(QDialog):
         button_widget_layout.addWidget(self.ok_button)
         button_widget_layout.addWidget(self.cancel_button)
 
+    def set_code(self):
+        self.node.code = self.code_input_widget.toPlainText()
+        self.node.eval()
+        self.hide()
+
 
 @register_node
-class Python(FCNNodeModel):
+class PythonNode(FCNNodeModel):
 
     icon: str = icon("nodes_python_logo.png")
     op_title: str = "Python"
@@ -74,16 +81,17 @@ class Python(FCNNodeModel):
     content_label_objname: str = "fcn_node_bg"
 
     code_dialog: QDialog
+    code: str
 
     def __init__(self, scene):
+        self.code: srt = "output_data = input_data\nprint(output_data)"
         super().__init__(scene=scene, inputs_init_list=[("In", True)], outputs_init_list=[("Out", True)])
 
     def onDoubleClicked(self, event):
-        self.code_dialog = CodeEditorDialog(self.scene.getView())
+        self.code_dialog = CodeEditorDialog(node=self, parent=self.scene.getView())
         self.code_dialog.show()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        code: str = "output_data = input_data\nprint(output_data)"
         namespace = {'input_data': sockets_input_data[0], 'output_data': None}
-        exec(code, namespace)
+        exec(self.code, namespace)
         return [namespace['output_data']]
