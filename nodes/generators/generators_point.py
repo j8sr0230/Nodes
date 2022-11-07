@@ -22,8 +22,6 @@
 #
 #
 ###################################################################################
-from typing import Union
-
 from FreeCAD import Vector
 import Part
 
@@ -48,13 +46,10 @@ class Point(FCNNodeModel):
                          outputs_init_list=[("Point", True)])
 
     @staticmethod
-    def make_occ_point(position: Union[tuple, Vector]) -> Part.Shape:
-        if type(position) is tuple:
-            return Part.Point(Vector(position)).toShape()
-        else:
-            return Part.Point(position).toShape()
+    def make_occ_point(position: Vector) -> Part.Shape:
+        return Part.Point(position).toShape()
 
     def eval_operation(self, sockets_input_data: list) -> list:
         pos: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [(0, 0, 0)]
 
-        return [map_objects(pos, object, self.make_occ_point)]
+        return [map_objects(pos, Vector, self.make_occ_point)]

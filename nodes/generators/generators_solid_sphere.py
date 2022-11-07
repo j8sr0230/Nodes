@@ -48,7 +48,7 @@ class Sphere(FCNNodeModel):
 
         self.radius_list: list = []
 
-        self.grNode.resize(120, 80)
+        self.grNode.resize(100, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
