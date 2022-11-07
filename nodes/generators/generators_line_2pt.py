@@ -59,7 +59,7 @@ class Line2Pt(FCNNodeModel):
         try:
             return Part.makeLine(self.start_flat[start_idx], self.end_flat[self.end_idx.pop(0)])
         except Part.OCCError as e:
-            raise(ValueError(e.msg))
+            raise(ValueError(e))
 
     def eval_operation(self, sockets_input_data: list) -> list:
         start: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vector(0, 0, 0)]
