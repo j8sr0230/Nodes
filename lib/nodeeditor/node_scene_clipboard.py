@@ -121,7 +121,7 @@ class SceneClipboard():
 
         if DEBUG_PASTING:
             print (" *** PASTA:")
-            print("Copied boudaries:\n\tX:", minx, maxx, "   Y:", miny, maxy)
+            print("Copied boundaries:\n\tX:", minx, maxx, "   Y:", miny, maxy)
             print("\tbbox_center:", relbboxcenterx, relbboxcentery)
 
         # calculate the offset of the newly creating nodes

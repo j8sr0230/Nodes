@@ -145,7 +145,7 @@ class Edge(Serializable):
 
     @classmethod
     def validateEdge(cls, start_socket: 'Socket', end_socket: 'Socket') -> bool:
-        """Validate Edge agains all registered `Edge Validator Callbacks`
+        """Validate Edge against all registered `Edge Validator Callbacks`
 
         :param start_socket: Starting :class:`~nodeeditor.node_socket.Socket` of Edge to check
         :type start_socket: :class:`~nodeeditor.node_socket.Socket`
@@ -187,7 +187,7 @@ class Edge(Serializable):
 
         :param known_socket: Provide known :class:`~nodeeditor.node_socket.Socket` to be able to determine the opposite one.
         :type known_socket: :class:`~nodeeditor.node_socket.Socket`
-        :return: The oposite socket on this ``Edge`` or ``None``
+        :return: The opposite socket on this ``Edge`` or ``None``
         :rtype: :class:`~nodeeditor.node_socket.Socket` or ``None``
         """
         return self.start_socket if known_socket == self.end_socket else self.end_socket

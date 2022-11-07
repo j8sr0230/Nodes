@@ -270,7 +270,7 @@ class Scene(Serializable):
         """
         if node in self.nodes: self.nodes.remove(node)
         else:
-            if DEBUG_REMOVE_WARNINGS: print("!W:", "Scene::removeNode", "wanna remove nodeeditor", node,
+            if DEBUG_REMOVE_WARNINGS: print("!W:", "Scene::removeNode", "want to remove nodeeditor", node,
                                             "from self.nodes but it's not in the list!")
 
     def removeEdge(self, edge: Edge):
@@ -281,7 +281,7 @@ class Scene(Serializable):
         """
         if edge in self.edges: self.edges.remove(edge)
         else:
-            if DEBUG_REMOVE_WARNINGS: print("!W:", "Scene::removeEdge", "wanna remove edge", edge,
+            if DEBUG_REMOVE_WARNINGS: print("!W:", "Scene::removeEdge", "want to remove edge", edge,
                                             "from self.edges but it's not in the list!")
 
 
@@ -302,7 +302,7 @@ class Scene(Serializable):
         """
         with open(filename, "w") as file:
             file.write( json.dumps( self.serialize(), indent=4 ) )
-            print("saving to", filename, "was successfull.")
+            print("saving to", filename, "was successful.")
 
             self.has_been_modified = False
             self.filename = filename
