@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  curves_polyline.py
+#  curves_bspline.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -35,35 +35,42 @@ from nodes_locator import icon
 
 
 @register_node
-class Polyline(FCNNodeModel):
+class BSpline(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Polyline"
+    op_title: str = "BSpline"
     op_category: str = "Curves"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Pts", True)],
-                         outputs_init_list=[("Line", True)])
+                         inputs_init_list=[("Pts", True), ("Closed", False)],
+                         outputs_init_list=[("Curve", True)])
 
-        self.grNode.resize(100, 70)
+        self.grNode.resize(100, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
     @staticmethod
-    def make_occ_polyline(flat_points: list) -> Part.Shape:
+    def make_occ_closed_bspline(flat_points: list) -> Part.Shape:
         try:
-            segments = []
-            for i in range(len(flat_points)):
-                if i + 1 < len(flat_points):
-                    segments.append(Part.LineSegment(flat_points[i], flat_points[i + 1]))
-            return Part.Wire(Part.Shape(segments).Edges)
+            return Part.BSplineCurve(flat_points, None, None, True, 3, None, False)
         except Part.OCCError as e:
             raise (ValueError(e))
 
-    def eval_operation(self, sockets_input_data: list) -> list:
-        points: list = sockets_input_data[0] if len(list(flatten(sockets_input_data[0]))) > 1 else [Vector(0, 0, 0),
-                                                                                                    Vector(10, 10, 0)]
+    @staticmethod
+    def make_occ_open_bspline(flat_points: list) -> Part.Shape:
+        try:
+            return Part.BSplineCurve(flat_points, None, None, False, 3, None, False)
+        except Part.OCCError as e:
+            raise(ValueError(e))
 
-        return [[map_last_level(points, Vector, self.make_occ_polyline)]]
+    def eval_operation(self, sockets_input_data: list) -> list:
+        points: list = sockets_input_data[0] if len(list(flatten(sockets_input_data[0]))) > 2 else [Vector(0, 0, 0),
+                                                                                                    Vector(10, 0, 0),
+                                                                                                    Vector(10, 10, 0)]
+        is_closed: bool = bool(sockets_input_data[1][0] if len(sockets_input_data[1]) > 0 else 0)
+        if is_closed:
+            return [[map_last_level(points, Vector, self.make_occ_closed_bspline)]]
+        else:
+            return [[map_last_level(points, Vector, self.make_occ_open_bspline)]]
