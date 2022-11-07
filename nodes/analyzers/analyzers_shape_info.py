@@ -55,15 +55,11 @@ class ShapeInfo(FCNNodeModel):
     def eval_operation(self, sockets_input_data: list) -> list:
         shape_list: list = sockets_input_data[0]
 
-        if FreeCAD.ActiveDocument is not None:
-            solids: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Solids)]
-            shells: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Shells)]
-            faces: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Faces)]
-            wires: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Wires)]
-            edges: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Edges)]
-            vertexes: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Vertexes)]
+        solids: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Solids)]
+        shells: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Shells)]
+        faces: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Faces)]
+        wires: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Wires)]
+        edges: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Edges)]
+        vertexes: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Vertexes)]
 
-            return [solids, shells, faces, wires, edges, vertexes]
-
-        else:
-            raise ValueError("No Active Document")
+        return [solids, shells, faces, wires, edges, vertexes]

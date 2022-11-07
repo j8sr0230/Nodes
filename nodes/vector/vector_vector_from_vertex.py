@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  vector_vector.py
+#  vector_vector_from_vertex.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -23,6 +23,7 @@
 #
 ###################################################################################
 from FreeCAD import Vector
+from Part import Vertex
 import awkward as ak
 
 from core.nodes_default_node import FCNNodeModel
@@ -36,27 +37,20 @@ from nodes_locator import icon
 class VectorIn(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Vector"
+    op_title: str = "From Vertex"
     op_category: str = "Vector"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("X", True), ("Y", True), ("Z", True)],
+                         inputs_init_list=[("Vertex", True)],
                          outputs_init_list=[("Vector", True)])
 
-        self.grNode.resize(100, 100)
+        self.grNode.resize(120, 70)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        # Inputs
-        x_in = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [1]
-        y_in = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [0]
-        z_in = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [0]
+        vertex_in = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vertex(0, 0, 0)]
 
-        # Broadcast an zip to vector
-        x_vector, y_vector, z_vector = ak.broadcast_arrays(x_in, y_in, z_in)
-
-        res = ak.zip([x_vector, y_vector, z_vector]).tolist()
-        return [map_objects(res, tuple, Vector)]
+        return [map_objects(vertex_in, Vertex, lambda vertex: Vector(vertex.X, vertex.Y, vertex.Z))]
