@@ -89,7 +89,7 @@ class PyScript(FCNNodeModel):
     code_string: str
 
     def __init__(self, scene):
-        self.code_string: str = "output_data = input_data\nprint(output_data)"
+        self.code_string: str = "Out = In\nprint(Out)"
         super().__init__(scene=scene, inputs_init_list=[("In", True)], outputs_init_list=[("Out", True)])
 
         self.grNode.resize(90, 70)
@@ -101,9 +101,9 @@ class PyScript(FCNNodeModel):
         self.code_editor_dialog.show()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        namespace = {'input_data': sockets_input_data[0], 'output_data': None}
+        namespace = {'In': sockets_input_data[0], 'Out': None}
         exec(self.code_string, namespace)
-        return [namespace['output_data']]
+        return [namespace['Out']]
 
     def serialize(self) -> OrderedDict:
         res = super().serialize()
