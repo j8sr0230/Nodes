@@ -145,7 +145,7 @@ class NumberSlider(FCNNodeModel):
         self.content.slider_edit.valueChanged.connect(self.onInputChanged)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        in_val: int = int(self.content.slider_edit.value())
+        in_val: float = float(self.content.slider_edit.value())
 
         self.content.slider_value_lbl.setText(str(in_val))
 

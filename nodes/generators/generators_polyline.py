@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  vector_vector.py
+#  generators_polyline.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,41 +22,44 @@
 #
 #
 ###################################################################################
-from FreeCAD import Vector
 import awkward as ak
 
-from core.nodes_default_node import FCNNodeModel
+from FreeCAD import Vector
+import Part
+
 from core.nodes_conf import register_node
-from core.nodes_utils import flatten, map_objects
+from core.nodes_default_node import FCNNodeModel
+from core.nodes_utils import flatten, map_last_level
 
 from nodes_locator import icon
 
 
 @register_node
-class VectorIn(FCNNodeModel):
+class Polyline(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Vector"
-    op_category: str = "Vector"
+    op_title: str = "Polyline"
+    op_category: str = "Generators"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("X", True), ("Y", True), ("Z", True)],
-                         outputs_init_list=[("Vector", True)])
+                         inputs_init_list=[("Pts", True)],
+                         outputs_init_list=[("Line", True)])
 
-        self.grNode.resize(80, 100)
-        for socket in self.inputs + self.outputs:
-            socket.setSocketPosition()
+    @staticmethod
+    def make_occ_polyline(flat_points: list) -> Part.Shape:
+        try:
+            segments = []
+            for i in range(len(flat_points)):
+                if i+1 < len(flat_points):
+                    segments.append(Part.LineSegment(flat_points[i], flat_points[i+1]))
+            return Part.Wire(Part.Shape(segments).Edges)
+        except Part.OCCError as e:
+            raise(ValueError(e))
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        # Inputs
-        x_in = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [1]
-        y_in = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [0]
-        z_in = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [0]
+        points: list = sockets_input_data[0] if len(list(flatten(sockets_input_data[0]))) > 1 else [Vector(0, 0, 0),
+                                                                                                    Vector(10, 0, 0)]
 
-        # Broadcast an zip to vector
-        x_vector, y_vector, z_vector = ak.broadcast_arrays(x_in, y_in, z_in)
-
-        res = ak.zip([x_vector, y_vector, z_vector]).tolist()
-        return [map_objects(res, tuple, Vector)]
+        return [[map_last_level(points, Vector, self.make_occ_polyline)]]

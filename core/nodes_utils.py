@@ -179,6 +179,32 @@ def map_objects(nested_list: Iterable, object_type: type, callback: 'function') 
             return callback(nested_list)
 
 
+def map_last_level(nested_list: Iterable, object_type: type, callback: 'function') -> Iterable:
+    """Applies a callback function to every penultimate level of a nested list.
+
+    This function evaluates every penultimate level of a list containing only object_type elements with the specified
+    callback function and returns a list with the nested structure of the input list.
+
+    :param nested_list: Arbitrary nested input (data structure)
+    :type nested_list: Iterable
+    :param object_type: Only penultimate list levels contain object_type items are evaluated
+    :type object_type: type
+    :param callback: Function that performs some action to each penultimate list level
+    :type callback: 'function'
+    :return: Nested list with evaluated penultimate list levels
+    :rtype: Iterable
+    """
+
+    if isinstance(nested_list, list):
+        if all([isinstance(elem, object_type) for elem in nested_list]):
+            return callback(nested_list)
+        else:
+            temp_list: list = []
+            for sub_list in nested_list:
+                temp_list.append(map_last_level(sub_list, object_type, callback))
+            return temp_list
+
+
 def traverse_tuples(nested_list: Iterable) -> Iterable:
     """Generator to yield every tuple within an arbitrary nested iterable.
 
