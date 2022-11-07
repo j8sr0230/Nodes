@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  analyzers_shape_info.py
+#  vector_vector_from_vertex.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,44 +22,35 @@
 #
 #
 ###################################################################################
-import FreeCAD
-import Part
+from FreeCAD import Vector
+from Part import Vertex
+import awkward as ak
 
-from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import map_objects
+from core.nodes_conf import register_node
+from core.nodes_utils import flatten, map_objects
 
 from nodes_locator import icon
 
 
 @register_node
-class ShapeInfo(FCNNodeModel):
+class VectorIn(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Shape Info"
-    op_category: str = "Analyzers"
+    op_title: str = "From Vertex"
+    op_category: str = "Vector"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Shape", True)],
-                         outputs_init_list=[("Solids", True),
-                                            ("Shells", True), ("Faces", True),
-                                            ("Wires", True), ("Edges", True),
-                                            ("Vertexes", True)])
+                         inputs_init_list=[("Vertex", True)],
+                         outputs_init_list=[("Vector", True)])
 
-        self.grNode.resize(120, 170)
+        self.grNode.resize(120, 70)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        shape_list: list = sockets_input_data[0]
+        vertex_in = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vertex(0, 0, 0)]
 
-        solids: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Solids)]
-        shells: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Shells)]
-        faces: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Faces)]
-        wires: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Wires)]
-        edges: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Edges)]
-        vertexes: list = [map_objects(shape_list, Part.Shape, lambda shape: shape.Vertexes)]
-
-        return [solids, shells, faces, wires, edges, vertexes]
+        return [map_objects(vertex_in, Vertex, lambda vertex: Vector(vertex.X, vertex.Y, vertex.Z))]
