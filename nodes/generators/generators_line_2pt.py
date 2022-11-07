@@ -38,7 +38,7 @@ from nodes_locator import icon
 class Line2Pt(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Line (2 Pt)"
+    op_title: str = "Line (2Pt)"
     op_category: str = "Generators"
     content_label_objname: str = "fcn_node_bg"
 
@@ -51,7 +51,7 @@ class Line2Pt(FCNNodeModel):
                          inputs_init_list=[("Start", True), ("End", True)],
                          outputs_init_list=[("Line", True)])
 
-        self.grNode.resize(100, 100)
+        self.grNode.resize(100, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
