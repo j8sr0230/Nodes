@@ -81,7 +81,7 @@ class CodeEditorDialog(QDialog):
 class PyScript(FCNNodeModel):
 
     icon: str = icon("nodes_python_logo.png")
-    op_title: str = "Py Script"
+    op_title: str = "PyScript"
     op_category: str = "Script"
     content_label_objname: str = "fcn_node_bg"
 

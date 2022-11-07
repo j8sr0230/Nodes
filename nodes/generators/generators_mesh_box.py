@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  generator_solid_sphere.py
+#  generators_mesh_box.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -23,7 +23,7 @@
 #
 ###################################################################################
 from FreeCAD import Vector
-import Part
+import Mesh
 import awkward as ak
 
 from core.nodes_conf import register_node
@@ -34,36 +34,44 @@ from nodes_locator import icon
 
 
 @register_node
-class Sphere(FCNNodeModel):
+class MeshBox(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Solid Sphere"
-    op_category: str = "Generator"
+    op_title: str = "MBox"
+    op_category: str = "Generators"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("R", True, ), ("Pos", True, )],
-                         outputs_init_list=[("Sphere", True)])
+                         inputs_init_list=[("Width", True,), ("Length", True), ("Height", True), ("Pos", True)],
+                         outputs_init_list=[("Box", True)])
 
-        self.radius_list: list = []
-
-        self.grNode.resize(120, 80)
+        self.grNode.resize(100, 125)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_occ_sphere(self, position: Vector) -> Part.Shape:
-        return Part.makeSphere(self.radius_list.pop(0), position)
+        self.width_list: list = []
+        self.length_list: list = []
+        self.height_list: list = []
+
+    def make_mesh_box(self, position: Vector) -> Mesh.Mesh:
+        box = Mesh.createBox(self.width_list.pop(0), self.length_list.pop(0), self.height_list.pop(0))
+        box.translate(position[0], position[1], position[2])
+        return box
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        radius: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
-        pos: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
+        width: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
+        length: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [10]
+        height: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [10]
+        pos: list = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [Vector(0, 0, 0)]
 
         # Force array broadcast
         pos_list: list = list(flatten(pos))
         pos_idx_list: list = list(range(len(pos_list)))
-        radius, pos_idx_list = ak.broadcast_arrays(radius, pos_idx_list)
+        width, length, height, pos_idx_list = ak.broadcast_arrays(width, length, height, pos_idx_list)
 
-        self.radius_list = ak.flatten(radius, axis=None).tolist()
+        self.width_list = ak.flatten(width, axis=None).tolist()
+        self.length_list = ak.flatten(length, axis=None).tolist()
+        self.height_list = ak.flatten(height, axis=None).tolist()
 
-        return [map_objects(pos, Vector, self.make_occ_sphere)]
+        return [map_objects(pos, Vector, self.make_mesh_box)]

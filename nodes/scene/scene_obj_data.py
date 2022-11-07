@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  scene_set_shape.py
+#  scene_obj_data.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -23,43 +23,40 @@
 #
 ###################################################################################
 import FreeCAD
-import Part
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
+from core.nodes_utils import map_objects
+
 from nodes_locator import icon
-from core.nodes_utils import flatten
 
 
 @register_node
-class SetShape(FCNNodeModel):
+class ObjectData(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Set Shape"
+    op_title: str = "Object Data"
     op_category: str = "Scene"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Object", True), ("Shape", True)],
-                         outputs_init_list=[("Object", True)])
+                         inputs_init_list=[("Object", True)],
+                         outputs_init_list=[("ID", True), ("Shape", True), ("Placement", True)])
 
-        self.grNode.resize(120, 80)
+        self.grNode.resize(120, 100)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        obj_in: list = sockets_input_data[0]
+        obj_list: list = sockets_input_data[0]
 
-        obj_list = list(flatten(obj_in))
-        shp_list = list(flatten(sockets_input_data[1]))
+        if FreeCAD.ActiveDocument is not None:
+            obj_id: list = [map_objects(obj_list, object, lambda obj: obj.ID)]
+            shape: list = [map_objects(obj_list, object, lambda obj: obj.Shape)]
+            placement: list = [map_objects(obj_list, object, lambda obj: obj.Placement)]
 
-        if hasattr(FreeCAD, "ActiveDocument") and FreeCAD.ActiveDocument:
-            for obj in obj_list:
-                obj.Shape = shp_list.pop(0)
+            return [obj_id, shape, placement]
 
-            FreeCAD.ActiveDocument.recompute()
         else:
-            raise ValueError('No active document')
-
-        return [obj_in]
+            raise ValueError("No Active Document")

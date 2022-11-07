@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  generator_mesh_box.py
+#  generators_solid_box.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -23,7 +23,7 @@
 #
 ###################################################################################
 from FreeCAD import Vector
-import Mesh
+import Part
 import awkward as ak
 
 from core.nodes_conf import register_node
@@ -34,11 +34,11 @@ from nodes_locator import icon
 
 
 @register_node
-class MeshBox(FCNNodeModel):
+class SolidBox(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Mesh Box"
-    op_category: str = "Generator"
+    op_title: str = "Box"
+    op_category: str = "Generators"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
@@ -54,10 +54,9 @@ class MeshBox(FCNNodeModel):
         self.length_list: list = []
         self.height_list: list = []
 
-    def make_mesh_box(self, position: Vector) -> Mesh.Mesh:
-        box = Mesh.createBox(self.width_list.pop(0), self.length_list.pop(0), self.height_list.pop(0))
-        box.translate(position[0], position[1], position[2])
-        return box
+    def make_occ_box(self, position: Vector) -> Part.Shape:
+        width, length, height = self.width_list.pop(0), self.length_list.pop(0), self.height_list.pop(0)
+        return Part.makeBox(width, length, height, position)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         width: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
@@ -74,4 +73,4 @@ class MeshBox(FCNNodeModel):
         self.length_list = ak.flatten(length, axis=None).tolist()
         self.height_list = ak.flatten(height, axis=None).tolist()
 
-        return [map_objects(pos, Vector, self.make_mesh_box)]
+        return [map_objects(pos, Vector, self.make_occ_box)]

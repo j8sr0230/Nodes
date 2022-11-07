@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  scene_shape_info.py
+#  modifiers_set_shape.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -23,46 +23,43 @@
 #
 ###################################################################################
 import FreeCAD
+import Part
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import map_objects
-
 from nodes_locator import icon
+from core.nodes_utils import flatten
 
 
 @register_node
-class ShapeInfo(FCNNodeModel):
+class SetShape(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Shape Info"
-    op_category: str = "Scene"
+    op_title: str = "Set Shape"
+    op_category: str = "Modifiers"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Shape", True)],
-                         outputs_init_list=[("Solids", True),
-                                            ("Shells", True), ("Faces", True),
-                                            ("Wires", True), ("Edges", True),
-                                            ("Vertexes", True)])
+                         inputs_init_list=[("Object", True), ("Shape", True)],
+                         outputs_init_list=[("Object", True)])
 
-        self.grNode.resize(120, 170)
+        self.grNode.resize(120, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        shape_list: list = sockets_input_data[0]
+        obj_in: list = sockets_input_data[0]
 
-        if FreeCAD.ActiveDocument is not None:
-            solids: list = [map_objects(shape_list, object, lambda shape: shape.Solids)]
-            shells: list = [map_objects(shape_list, object, lambda shape: shape.Shells)]
-            faces: list = [map_objects(shape_list, object, lambda shape: shape.Faces)]
-            wires: list = [map_objects(shape_list, object, lambda shape: shape.Wires)]
-            edges: list = [map_objects(shape_list, object, lambda shape: shape.Edges)]
-            vertexes: list = [map_objects(shape_list, object, lambda shape: shape.Vertexes)]
+        obj_list = list(flatten(obj_in))
+        shp_list = list(flatten(sockets_input_data[1]))
 
-            return [solids, shells, faces, wires, edges, vertexes]
+        if hasattr(FreeCAD, "ActiveDocument") and FreeCAD.ActiveDocument:
+            for obj in obj_list:
+                obj.Shape = shp_list.pop(0)
 
+            FreeCAD.ActiveDocument.recompute()
         else:
-            raise ValueError("No Active Document")
+            raise ValueError('No active document')
+
+        return [obj_in]

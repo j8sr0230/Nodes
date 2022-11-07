@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  generator_point.py
+#  generators_point.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -39,7 +39,7 @@ class Point(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
     op_title: str = "Point"
-    op_category: str = "Generator"
+    op_category: str = "Generators"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
