@@ -305,6 +305,7 @@ class NodeSearchWidget(QDialog):
         self.init_ui()
 
     def init_ui(self):
+        self.setWindowTitle("Node Finder")
         self.layout = QVBoxLayout()
         self.search_input_widget = QLineEdit("")
         # noinspection PyUnresolvedReferences
