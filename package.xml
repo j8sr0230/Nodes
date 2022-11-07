@@ -13,7 +13,7 @@
   <content>
     <workbench>
       <name>Nodes</name>
-      <version>0.1.0</version>
+      <version>0.1.1</version>
       <description>Visual scripting workbench for FreeCAD</description>
       <classname>InitGui</classname>
       <subdirectory>./</subdirectory>
