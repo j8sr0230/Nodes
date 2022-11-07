@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  script_python.py
+#  script_py_script.py
 #
-#  Copyright (c) 2022 Florian Foinant-Willig <ffw@2f2v.fr>
+#  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
