@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  generators_polyline.py
+#  curves_polyline.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -35,26 +35,28 @@ from nodes_locator import icon
 
 
 @register_node
-class Polyline(FCNNodeModel):
+class BSpline(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Polyline"
-    op_category: str = "Generators"
+    op_title: str = "BSpline"
+    op_category: str = "Curves"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
                          inputs_init_list=[("Pts", True)],
-                         outputs_init_list=[("Line", True)])
+                         outputs_init_list=[("BSpline", True)])
+
+        self.grNode.resize(90, 70)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
 
     @staticmethod
-    def make_occ_polyline(flat_points: list) -> Part.Shape:
+    def make_occ_bspline(flat_points: list) -> Part.Shape:
         try:
-            segments = []
-            for i in range(len(flat_points)):
-                if i+1 < len(flat_points):
-                    segments.append(Part.LineSegment(flat_points[i], flat_points[i+1]))
-            return Part.Wire(Part.Shape(segments).Edges)
+            bspline = Part.BSplineCurve()
+            bspline.interpolate(flat_points)
+            return bspline
         except Part.OCCError as e:
             raise(ValueError(e))
 
@@ -62,4 +64,4 @@ class Polyline(FCNNodeModel):
         points: list = sockets_input_data[0] if len(list(flatten(sockets_input_data[0]))) > 1 else [Vector(0, 0, 0),
                                                                                                     Vector(10, 0, 0)]
 
-        return [[map_last_level(points, Vector, self.make_occ_polyline)]]
+        return [[map_last_level(points, Vector, self.make_occ_bspline)]]
