@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  generators_solid_sphere.py
+#  generators_line_2pt.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,9 +22,10 @@
 #
 #
 ###################################################################################
+import awkward as ak
+
 from FreeCAD import Vector
 import Part
-import awkward as ak
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
@@ -34,36 +35,41 @@ from nodes_locator import icon
 
 
 @register_node
-class Sphere(FCNNodeModel):
+class Line2Pt(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Sphere"
+    op_title: str = "Line (2 Pt)"
     op_category: str = "Generators"
     content_label_objname: str = "fcn_node_bg"
 
+    start_flat: list
+    end_flat: list
+    end_idx: list
+
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("R", True, ), ("Pos", True, )],
-                         outputs_init_list=[("Sphere", True)])
+                         inputs_init_list=[("Start", True), ("End", True)],
+                         outputs_init_list=[("Line", True)])
 
-        self.radius_list: list = []
-
-        self.grNode.resize(100, 80)
+        self.grNode.resize(100, 100)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_occ_sphere(self, position: Vector) -> Part.Shape:
-        return Part.makeSphere(self.radius_list.pop(0), position)
+    def make_occ_line(self, start_idx: int) -> Part.Shape:
+        return Part.makeLine(self.start_flat[start_idx], self.end_flat[self.end_idx.pop(0)])
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        radius: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
-        pos: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
+        start: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vector(0, 0, 0)]
+        self.start_flat = list(flatten(start))
+
+        end: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(10, 0, 0)]
+        self.end_flat = list(flatten(end))
 
         # Force array broadcast
-        pos_list: list = list(flatten(pos))
-        pos_idx_list: list = list(range(len(pos_list)))
-        radius, pos_idx_list = ak.broadcast_arrays(radius, pos_idx_list)
+        start_idx_nested = map_objects(start, Vector, lambda vec: self.start_flat.index(vec))
+        end_idx_flat = list(range(len(self.end_flat)))
 
-        self.radius_list = ak.flatten(radius, axis=None).tolist()
+        start_idx, end_idx = ak.broadcast_arrays(start_idx_nested, end_idx_flat)
+        self.end_idx = ak.flatten(end_idx, axis=None).tolist()
 
-        return [map_objects(pos, Vector, self.make_occ_sphere)]
+        return [map_objects(start_idx.tolist(), int, self.make_occ_line)]
