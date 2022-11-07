@@ -45,7 +45,7 @@ class VectorIn(FCNNodeModel):
                          inputs_init_list=[("X", True), ("Y", True), ("Z", True)],
                          outputs_init_list=[("Vector", True)])
 
-        self.grNode.resize(100, 100)
+        self.grNode.resize(80, 100)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
