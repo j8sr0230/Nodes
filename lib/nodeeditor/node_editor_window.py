@@ -172,7 +172,7 @@ class NodeEditorWindow(QMainWindow):
         return 'Graph (*.json);;All files (*)'
 
     def onFileNew(self):
-        """Hande File New operation"""
+        """Handle File New operation"""
         if self.maybeSave():
             self.getCurrentNodeEditorWidget().fileNew()
             self.setTitle()

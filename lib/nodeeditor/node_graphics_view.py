@@ -389,7 +389,7 @@ class QDMGraphicsView(QGraphicsView):
 
 
     def mouseMoveEvent(self, event: QMouseEvent):
-        """Overriden Qt's ``mouseMoveEvent`` handling Scene/View logic"""
+        """Overridden Qt's ``mouseMoveEvent`` handling Scene/View logic"""
         scenepos = self.mapToScene(event.pos())
 
         try:
@@ -434,7 +434,7 @@ class QDMGraphicsView(QGraphicsView):
         :type event: ``QKeyEvent``
         :return:
         """
-        # Use this code below if you wanna have shortcuts in this widget.
+        # Use this code below if you want to have shortcuts in this widget.
         # You want to use this, when you don't have a window which handles these shortcuts for you
 
         # if event.key() == Qt.Key_Delete:
@@ -473,7 +473,7 @@ class QDMGraphicsView(QGraphicsView):
             for edge in self.grScene.scene.edges.copy():
                 if edge.grEdge.intersectsWith(p1, p2):
                     edge.remove()
-        self.grScene.scene.history.storeHistory("Delete cutted edges", setModified=True)
+        self.grScene.scene.history.storeHistory("Delete cut edges", setModified=True)
 
 
     def setSocketHighlights(self, scenepos: QPointF, highlighted: bool = True, radius: float = 50):

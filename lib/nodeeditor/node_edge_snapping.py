@@ -26,7 +26,7 @@ class EdgeSnapping():
 
         :param scenepos: From which point should I snap?
         :type scenepos: ``QPointF``
-        :return: grSocket and Scene postion to nearest socket
+        :return: grSocket and Scene position to nearest socket
         """
         scanrect = QRectF(
             scenepos.x() - self.edge_snapping_radius, scenepos.y() - self.edge_snapping_radius,

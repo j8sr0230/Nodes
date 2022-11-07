@@ -300,7 +300,7 @@ class FCNNodeContentView(QDMNodeContentWidget):
         lists input_labels, input_widgets output_labels and output_widgets.
 
         Note:
-            To query the individual sockets, they must already be initiated. For this reason the call of this methode
+            To query the individual sockets, they must already be initiated. For this reason the call of this method
             does not take place in the initUI method of this class, but in the constructor of the FCNNode class after
             initiation of the node with its sockets.
        """
@@ -352,7 +352,7 @@ class FCNNodeContentView(QDMNodeContentWidget):
     def serialize(self) -> OrderedDict:
         """Serialises the node content to human-readable json file.
 
-        The serialise method adds the content (int, float, sting, ...) of each socket widget to a dictionary and returns
+        The serialise method adds the content (int, float, string, ...) of each socket widget to a dictionary and returns
         it. It is called by the serialise method of the parent node.
 
         :return: Serialised data as human-readable json file.

@@ -35,8 +35,8 @@ class Node(Serializable):
             - **scene** - reference to the :class:`~nodeeditor.node_scene.Scene`
             - **grNode** - Instance of :class:`~nodeeditor.node_graphics_node.QDMGraphicsNode` handling graphical representation in the ``QGraphicsScene``. Automatically created in the constructor
             - **content** - Instance of :class:`~nodeeditor.node_graphics_content.QDMGraphicsContent` which is child of ``QWidget`` representing container for all inner widgets inside of the Node. Automatically created in the constructor
-            - **inputs** - list containin Input :class:`~nodeeditor.node_socket.Socket` instances
-            - **outputs** - list containin Output :class:`~nodeeditor.node_socket.Socket` instances
+            - **inputs** - list containing Input :class:`~nodeeditor.node_socket.Socket` instances
+            - **outputs** - list containing Output :class:`~nodeeditor.node_socket.Socket` instances
 
         """
         super().__init__()
@@ -402,7 +402,7 @@ class Node(Serializable):
 
     def getChildrenNodes(self) -> 'List[Node]':
         """
-        Retreive all first-level children connected to this `Node` `Outputs`
+        Retrieve all first-level children connected to this `Node` `Outputs`
 
         :return: list of `Nodes` connected to this `Node` from all `Outputs`
         :rtype: List[:class:`~nodeeditor.node_node.Node`]
@@ -544,7 +544,7 @@ class Node(Serializable):
             # pp(data)
 
             # possible way to do it is reuse existing sockets...
-            # dont create new ones if not necessary
+            # don't create new ones if unnecessary
 
             for socket_data in data['inputs']:
                 found = None

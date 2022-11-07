@@ -155,7 +155,7 @@ class Socket(Serializable):
         if edge in self.edges: self.edges.remove(edge)
         else:
             if DEBUG_REMOVE_WARNINGS:
-                print("!W:", "Socket::removeEdge", "wanna remove edge", edge,
+                print("!W:", "Socket::removeEdge", "want to remove edge", edge,
                       "from self.edges but it's not in the list!")
 
     def removeAllEdges(self, silent: bool=False):

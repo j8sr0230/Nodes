@@ -62,9 +62,9 @@ class QDMGraphicsScene(QGraphicsScene):
         self._font_state = QFont("Ubuntu", 16)
 
 
-    # the drag events won't be allowed until dragMoveEvent is overriden
+    # the drag events won't be allowed until dragMoveEvent is overridden
     def dragMoveEvent(self, event):
-        """Overriden Qt's dragMoveEvent to enable Qt's Drag Events"""
+        """Overridden Qt's dragMoveEvent to enable Qt's Drag Events"""
         pass
 
     def setGrScene(self, width: int, height: int):

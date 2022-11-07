@@ -118,7 +118,7 @@ class QDMGraphicsNode(QGraphicsItem):
         self._was_moved = True
 
     def mouseReleaseEvent(self, event):
-        """Overriden event to handle when we moved, selected or deselected this `Node`"""
+        """Overridden event to handle when we moved, selected or deselected this `Node`"""
         super().mouseReleaseEvent(event)
 
         # handle when grNode moved
@@ -142,7 +142,7 @@ class QDMGraphicsNode(QGraphicsItem):
             self.onSelected()
 
     def mouseDoubleClickEvent(self, event):
-        """Overriden event for doubleclick. Resend to `Node::onDoubleClicked`"""
+        """Overridden event for doubleclick. Resend to `Node::onDoubleClicked`"""
         self.node.onDoubleClicked(event)
 
     def hoverEnterEvent(self, event: 'QGraphicsSceneHoverEvent') -> None:
@@ -191,7 +191,7 @@ class QDMGraphicsNode(QGraphicsItem):
 
 
     def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
-        """Painting the rounded rectanglar `Node`"""
+        """Painting the rounded rectangular `Node`"""
         # title
         path_title = QPainterPath()
         path_title.setFillRule(Qt.WindingFill)
