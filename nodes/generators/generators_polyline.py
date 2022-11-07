@@ -29,7 +29,7 @@ import Part
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import simplify, flatten, map_objects
+from core.nodes_utils import flatten, map_last_level
 
 from nodes_locator import icon
 
@@ -42,29 +42,24 @@ class Polyline(FCNNodeModel):
     op_category: str = "Generators"
     content_label_objname: str = "fcn_node_bg"
 
-    points_simple: list
-
     def __init__(self, scene):
         super().__init__(scene=scene,
                          inputs_init_list=[("Pts", True)],
                          outputs_init_list=[("Line", True)])
 
-    def make_occ_polyline(self, start_idx: int) -> Part.Shape:
+    @staticmethod
+    def make_occ_polyline(flat_points: list) -> Part.Shape:
         try:
-            return Part.makeLine(self.start_flat[start_idx], self.end_flat[self.end_idx.pop(0)])
+            segments = []
+            for i in range(len(flat_points)):
+                if i+1 < len(flat_points):
+                    segments.append(Part.LineSegment(flat_points[i], flat_points[i+1]))
+            return Part.Wire(Part.Shape(segments).Edges)
         except Part.OCCError as e:
             raise(ValueError(e))
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        points: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vector(0, 0, 0)]
-        self.points_simple: list = list(simplify(points))
+        points: list = sockets_input_data[0] if len(list(flatten(sockets_input_data[0]))) > 1 else [Vector(0, 0, 0),
+                                                                                                    Vector(10, 0, 0)]
 
-        # Force array broadcast
-        # start_idx_nested = map_objects(start, Vector, lambda vec: self.start_flat.index(vec))
-        # end_idx_flat = list(range(len(self.end_flat)))
-
-        # start_idx, end_idx = ak.broadcast_arrays(start_idx_nested, end_idx_flat)
-        # self.end_idx = ak.flatten(end_idx, axis=None).tolist()
-        #
-        # return [map_objects(start_idx.tolist(), int, self.make_occ_polyline)]
-        return [[0]]
+        return [[map_last_level(points, Vector, self.make_occ_polyline)]]
