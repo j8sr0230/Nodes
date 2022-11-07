@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  generators_line_2pt.py
+#  curves_line_2pt.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -39,7 +39,7 @@ class Line2Pt(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
     op_title: str = "Line (2Pt)"
-    op_category: str = "Generators"
+    op_category: str = "Curves"
     content_label_objname: str = "fcn_node_bg"
 
     start_flat: list
