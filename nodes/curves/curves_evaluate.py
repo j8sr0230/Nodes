@@ -57,7 +57,10 @@ class EvaluateCurve(FCNNodeModel):
         crv_idx = self.crv_list.index(curve)
 
         for param in self.param_list[crv_idx]:
-            res.append(Part.Edge(curve).valueAt(param))
+            if isinstance(curve, Part.BSplineCurve):
+                res.append(curve.value(param))
+            else:
+                res.append(curve.valueAt(param))
         return res
 
     def evaluate_tangent(self, curve) -> list:
@@ -65,7 +68,10 @@ class EvaluateCurve(FCNNodeModel):
         crv_idx = self.crv_list.index(curve)
 
         for param in self.param_list[crv_idx]:
-            res.append(Part.Edge(curve).tangentAt(param))
+            if isinstance(curve, Part.BSplineCurve):
+                res.append(curve.tangent(param))
+            else:
+                res.append(curve.tangentAt(param))
         return res
 
     def eval_operation(self, sockets_input_data: list) -> list:
@@ -78,7 +84,7 @@ class EvaluateCurve(FCNNodeModel):
         crv_idx_list, parameters = ak.broadcast_arrays(crv_idx_list, parameters)
         self.param_list = simplify(parameters.tolist())
 
-        pos_vector: list = [map_objects(curves, Part.Shape, self.evaluate_position)]
-        tangent_vectors: list = [map_objects(curves, Part.Shape, self.evaluate_tangent)]
+        pos_vector: list = [map_objects(curves, object, self.evaluate_position)]
+        tangent_vectors: list = [map_objects(curves, object, self.evaluate_tangent)]
 
         return [pos_vector, tangent_vectors]
