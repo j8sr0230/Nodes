@@ -27,7 +27,7 @@ import awkward as ak
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_objects
+from core.nodes_utils import flatten, simplify, map_objects
 
 from nodes_locator import icon
 
@@ -53,18 +53,32 @@ class EvaluateCurve(FCNNodeModel):
         self.param_list = []
 
     def evaluate_position(self, curve) -> list:
-        vec_list = curve.discretize(self.param_list.pop(0))
-        return vec_list
+        res = []
+        crv_idx = self.crv_list.index(curve)
+
+        for param in self.param_list[crv_idx]:
+            res.append(Part.Edge(curve).valueAt(param))
+        return res
+
+    def evaluate_tangent(self, curve) -> list:
+        res = []
+        crv_idx = self.crv_list.index(curve)
+
+        for param in self.param_list[crv_idx]:
+            res.append(Part.Edge(curve).tangentAt(param))
+        return res
 
     def eval_operation(self, sockets_input_data: list) -> list:
         parameters: list = sockets_input_data[0]
         curves: list = sockets_input_data[1]
 
         # Force array broadcast
-        crv_list: list = list(flatten(curves))
-        crv_idx_list: list = list(range(len(crv_list)))
+        self.crv_list: list = list(flatten(curves))
+        crv_idx_list: list = list(range(len(self.crv_list)))
         crv_idx_list, parameters = ak.broadcast_arrays(crv_idx_list, parameters)
-        self.param_list = ak.flatten(parameters, axis=None).tolist()
+        self.param_list = simplify(parameters.tolist())
 
-        pos_vectors: list = [map_objects(curves, Part.Shape, self.evaluate_position)]
-        return [pos_vectors, [None]]
+        pos_vector: list = [map_objects(curves, Part.Shape, self.evaluate_position)]
+        tangent_vectors: list = [map_objects(curves, Part.Shape, self.evaluate_tangent)]
+
+        return [pos_vector, tangent_vectors]
