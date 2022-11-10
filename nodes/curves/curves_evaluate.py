@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  curves_discretize.py
+#  curves_evaluate.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,49 +22,69 @@
 #
 #
 ###################################################################################
-import FreeCAD
+import Part
 import awkward as ak
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_objects
+from core.nodes_utils import flatten, simplify, map_objects
 
 from nodes_locator import icon
 
 
 @register_node
-class DiscretizeCurve(FCNNodeModel):
+class EvaluateCurve(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Discretize"
+    op_title: str = "Evaluate"
     op_category: str = "Curves"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Crv", True), ("Dist", True)],
-                         outputs_init_list=[("Pos", True)])
+                         inputs_init_list=[("Parameter", True), ("Crv", True), ],
+                         outputs_init_list=[("Pos", True), ("Tangent", True)])
 
-        self.grNode.resize(100, 80)
+        self.grNode.resize(120, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
         self.crv_list = []
-        self.dist_list = []
+        self.param_list = []
 
-    def discretize_curve(self, curve) -> list:
-        vec_list = curve.discretize(self.dist_list.pop(0))
-        return vec_list
+    def evaluate_position(self, idx_param: tuple) -> list:
+        curve = self.crv_list[idx_param[0]]
+        param = idx_param[1]
+
+        res = []
+        if isinstance(curve, Part.BSplineCurve):
+            res.append(curve.value(param))
+        else:
+            res.append(curve.valueAt(param))
+        return res
+
+    def evaluate_tangent(self, idx_param: tuple) -> list:
+        curve = self.crv_list[idx_param[0]]
+        param = idx_param[1]
+
+        res = []
+        if isinstance(curve, Part.BSplineCurve):
+            res.append(curve.tangent(param))
+        else:
+            res.append(curve.tangentAt(param))
+        return res
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        curves: list = sockets_input_data[0]
-        distances: list = sockets_input_data[1]
+        parameters: list = sockets_input_data[0]
+        curves: list = sockets_input_data[1]
 
-        # Force array broadcast
+        # Array broadcasting
         self.crv_list: list = list(flatten(curves))
         crv_idx_list: list = list(range(len(self.crv_list)))
-        crv_idx_list, distances = ak.broadcast_arrays(crv_idx_list, distances)
-        self.dist_list = ak.flatten(distances, axis=None).tolist()
+        crv_idx_list, parameters = ak.broadcast_arrays(crv_idx_list, parameters)
+        idx_param_zip: list = ak.zip([crv_idx_list, parameters], depth_limit=None).tolist()
 
-        vectors: list = [map_objects(curves, object, self.discretize_curve)]
-        return [vectors]
+        pos_vector: list = list(map_objects(idx_param_zip, tuple, self.evaluate_position))
+        tangent_vectors: list = list(map_objects(idx_param_zip, tuple, self.evaluate_tangent))
+
+        return [pos_vector, tangent_vectors]
