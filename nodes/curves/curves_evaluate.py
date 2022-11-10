@@ -52,39 +52,39 @@ class EvaluateCurve(FCNNodeModel):
         self.crv_list = []
         self.param_list = []
 
-    def evaluate_position(self, curve) -> list:
-        res = []
-        crv_idx = self.crv_list.index(curve)
+    def evaluate_position(self, idx_param: tuple) -> list:
+        curve = self.crv_list[idx_param[0]]
+        param = idx_param[1]
 
-        for param in self.param_list[crv_idx]:
-            if isinstance(curve, Part.BSplineCurve):
-                res.append(curve.value(param))
-            else:
-                res.append(curve.valueAt(param))
+        res = []
+        if isinstance(curve, Part.BSplineCurve):
+            res.append(curve.value(param))
+        else:
+            res.append(curve.valueAt(param))
         return res
 
-    def evaluate_tangent(self, curve) -> list:
-        res = []
-        crv_idx = self.crv_list.index(curve)
+    def evaluate_tangent(self, idx_param: tuple) -> list:
+        curve = self.crv_list[idx_param[0]]
+        param = idx_param[1]
 
-        for param in self.param_list[crv_idx]:
-            if isinstance(curve, Part.BSplineCurve):
-                res.append(curve.tangent(param))
-            else:
-                res.append(curve.tangentAt(param))
+        res = []
+        if isinstance(curve, Part.BSplineCurve):
+            res.append(curve.tangent(param))
+        else:
+            res.append(curve.tangentAt(param))
         return res
 
     def eval_operation(self, sockets_input_data: list) -> list:
         parameters: list = sockets_input_data[0]
         curves: list = sockets_input_data[1]
 
-        # Force array broadcast
+        # Array broadcasting
         self.crv_list: list = list(flatten(curves))
         crv_idx_list: list = list(range(len(self.crv_list)))
         crv_idx_list, parameters = ak.broadcast_arrays(crv_idx_list, parameters)
-        self.param_list = simplify(parameters.tolist())
+        idx_param_zip: list = ak.zip([crv_idx_list, parameters], depth_limit=None).tolist()
 
-        pos_vector: list = [map_objects(curves, object, self.evaluate_position)]
-        tangent_vectors: list = [map_objects(curves, object, self.evaluate_tangent)]
+        pos_vector: list = list(map_objects(idx_param_zip, tuple, self.evaluate_position))
+        tangent_vectors: list = list(map_objects(idx_param_zip, tuple, self.evaluate_tangent))
 
         return [pos_vector, tangent_vectors]
