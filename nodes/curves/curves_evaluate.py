@@ -50,7 +50,6 @@ class EvaluateCurve(FCNNodeModel):
             socket.setSocketPosition()
 
         self.crv_list = []
-        self.param_list = []
 
     def evaluate_position(self, idx_param: tuple) -> list:
         curve = self.crv_list[idx_param[0]]
