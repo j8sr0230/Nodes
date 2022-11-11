@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  curves_circle.py
+#  curves_arc_3pts.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -35,44 +35,47 @@ from nodes_locator import icon
 
 
 @register_node
-class Circle(FCNNodeModel):
+class Arc3Pts(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Circle"
+    op_title: str = "Arc (3 Pts)"
     op_category: str = "Curves"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Radius", True), ("Position", True), ("Direction", True)],
-                         outputs_init_list=[("Circle", True)])
+                         inputs_init_list=[("Point 1", True), ("Point 2", True), ("Point 3", True)],
+                         outputs_init_list=[("Arc", True)])
 
-        self.pos_list: list = []
-        self.dir_list: list = []
+        self.point_1: list = []
+        self.point_2: list = []
+        self.point_3: list = []
 
-        self.grNode.resize(120, 100)
+        self.grNode.resize(100, 100)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_occ_circle(self, r_pos_dir_zip: tuple) -> Part.Shape:
-        radius = r_pos_dir_zip[0]
-        position = self.pos_list[r_pos_dir_zip[1]]
-        direction = self.dir_list[r_pos_dir_zip[2]]
+    def make_occ_arc(self, parameter_zip: tuple) -> Part.Shape:
+        point_1 = self.point_1[parameter_zip[0]]
+        point_2 = self.point_2[parameter_zip[1]]
+        point_3 = self.point_3[parameter_zip[2]]
 
-        return Part.makeCircle(radius, position, direction)
+        return Part.Arc(point_1, point_2, point_3)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        radius: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
-        position: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
-        direction: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [Vector(0, 0, 1)]
+        point_1: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vector(-5, 0, 0)]
+        point_2: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 5, 0)]
+        point_3: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [Vector(5, 0, 0)]
 
         # Array broadcast
-        self.pos_list: list = list(flatten(position))
-        pos_idx_list: list = list(range(len(self.pos_list)))
-        self.dir_list: list = list(flatten(direction))
-        dir_idx_list: list = list(range(len(self.dir_list)))
+        self.point_1: list = list(flatten(point_1))
+        p1_idx_list = map_objects(point_1, Vector, lambda vec: self.point_1.index(vec))
+        self.point_2: list = list(flatten(point_2))
+        p2_idx_list: list = list(range(len(self.point_2)))
+        self.point_3: list = list(flatten(point_3))
+        p3_idx_list: list = list(range(len(self.point_3)))
 
-        radius, pos_idx_list, dir_idx_list = ak.broadcast_arrays(radius, pos_idx_list, dir_idx_list)
-        parameter_zip: list = ak.zip([radius, pos_idx_list, dir_idx_list], depth_limit=None).tolist()
+        p1_idx_list, p2_idx_list, p3_idx_list = ak.broadcast_arrays(p1_idx_list, p2_idx_list, p3_idx_list)
+        parameter_zip: list = ak.zip([p1_idx_list, p2_idx_list, p3_idx_list], depth_limit=None).tolist()
 
-        return [map_objects(parameter_zip, tuple, self.make_occ_circle)]
+        return [map_objects(parameter_zip, tuple, self.make_occ_arc)]
