@@ -56,7 +56,7 @@ class EvaluateCurve(FCNNodeModel):
         param = idx_param[1]
 
         res = []
-        if isinstance(curve, Part.BSplineCurve):
+        if isinstance(curve, Part.BSplineCurve) or isinstance(curve, Part.Arc):
             res.append(curve.value(param))
         else:
             res.append(curve.valueAt(param))
@@ -67,7 +67,7 @@ class EvaluateCurve(FCNNodeModel):
         param = idx_param[1]
 
         res = []
-        if isinstance(curve, Part.BSplineCurve):
+        if isinstance(curve, Part.BSplineCurve) or isinstance(curve, Part.Arc):
             res.append(curve.tangent(param))
         else:
             res.append(curve.tangentAt(param))
