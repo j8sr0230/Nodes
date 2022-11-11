@@ -38,6 +38,8 @@ from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.node_graphics_socket import QDMGraphicsSocket
 from nodeeditor.utils import dumpException
 
+from Part import OCCError
+
 import nodes_locator as locator
 
 
@@ -293,7 +295,8 @@ class FCNNodeModel(Node):
         try:
             # Run new evaluation and return the desired output socket (index)
             return self.eval_primer()[index]
-        except (ValueError, TypeError, SyntaxError, NameError, ZeroDivisionError, IndexError, AttributeError) as e:
+        except (ValueError, TypeError, SyntaxError, NameError, ZeroDivisionError, IndexError, AttributeError,
+                OCCError) as e:
             self.markInvalid()
             self.grNode.setToolTip(str(e))
             self.markDescendantsDirty()

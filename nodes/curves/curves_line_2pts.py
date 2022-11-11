@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  curves_line_2pt.py
+#  curves_line_2pts.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -35,10 +35,10 @@ from nodes_locator import icon
 
 
 @register_node
-class Line2Pt(FCNNodeModel):
+class Line2Pts(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Line (2Pt)"
+    op_title: str = "Line (2 Pts)"
     op_category: str = "Curves"
     content_label_objname: str = "fcn_node_bg"
 
@@ -51,7 +51,7 @@ class Line2Pt(FCNNodeModel):
                          inputs_init_list=[("Start", True), ("End", True)],
                          outputs_init_list=[("Line", True)])
 
-        self.grNode.resize(100, 80)
+        self.grNode.resize(110, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
