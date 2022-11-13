@@ -26,6 +26,7 @@ import awkward as ak
 
 from FreeCAD import Vector
 import Part
+import numpy as np
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
@@ -44,35 +45,34 @@ class Populate2D(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Surface", True), ("Seed", False)],
+                         inputs_init_list=[("Surface", True), ("Count", False), ("Seed", False)],
                          outputs_init_list=[("Points", True)])
 
-        self.pos_list: list = []
-        self.dir_list: list = []
+        self.seed: int = 0
+        self.count: int = 10
 
-        self.grNode.resize(130, 80)
+        self.grNode.resize(130, 100)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_occ_circle(self, r_pos_dir_zip: tuple) -> Part.Shape:
-        radius = r_pos_dir_zip[0]
-        position = self.pos_list[r_pos_dir_zip[1]]
-        direction = self.dir_list[r_pos_dir_zip[2]]
+    @staticmethod
+    def populate_points(surface: Part.Face) -> Part.Shape:
+        res = []
 
-        return Part.makeCircle(radius, position, direction)
+        # Get uv range of target face
+        u_range = np.array(surface.ParameterRange)[:2]
+        v_range = np.array(surface.ParameterRange)[2:]
+
+        # Generate random uv-points
+        u_list = np.interp(random_gen.beta(obj.UAlpha, obj.UBeta, number), [0, 1], uRange)
+        v_list = np.interp(random_gen.beta(obj.VAlpha, obj.VBeta, number), [0, 1], vRange)
+        print(u_range, v_range)
+
+        return res
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        radius: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
-        position: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
-        direction: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [Vector(0, 0, 1)]
+        surface: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [None]
+        self.count: int = int(sockets_input_data[1][0]) if len(sockets_input_data[1]) > 0 else 10
+        self.seed: int = int(sockets_input_data[2][0]) if len(sockets_input_data[2]) > 0 else 0
 
-        # Array broadcast
-        self.pos_list: list = list(flatten(position))
-        pos_idx_list: list = list(range(len(self.pos_list)))
-        self.dir_list: list = list(flatten(direction))
-        dir_idx_list: list = list(range(len(self.dir_list)))
-
-        radius, pos_idx_list, dir_idx_list = ak.broadcast_arrays(radius, pos_idx_list, dir_idx_list)
-        parameter_zip: list = ak.zip([radius, pos_idx_list, dir_idx_list], depth_limit=None).tolist()
-
-        return [map_objects(parameter_zip, tuple, self.make_occ_circle)]
+        return [map_objects(surface, Part.Face, self.populate_points)]
