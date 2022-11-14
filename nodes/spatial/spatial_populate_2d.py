@@ -23,6 +23,7 @@
 #
 ###################################################################################
 import awkward as ak
+from typing import Optional
 
 from FreeCAD import Vector
 import Part
@@ -46,33 +47,46 @@ class Populate2D(FCNNodeModel):
     def __init__(self, scene):
         super().__init__(scene=scene,
                          inputs_init_list=[("Surface", True), ("Count", False), ("Seed", False)],
-                         outputs_init_list=[("Points", True)])
+                         outputs_init_list=[("Positions", True), ("Normals", True)])
 
         self.seed: int = 0
         self.count: int = 10
+        self.rng: Optional[np.Generator] = None
 
         self.grNode.resize(130, 100)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    @staticmethod
-    def populate_points(surface: Part.Face) -> Part.Shape:
-        res = []
-
+    def populate_positions(self, surface: Part.Face) -> Part.Shape:
         # Get uv range of target face
-        u_range = np.array(surface.ParameterRange)[:2]
-        v_range = np.array(surface.ParameterRange)[2:]
+        u_range: list = np.array(surface.ParameterRange)[:2]
+        v_range: list = np.array(surface.ParameterRange)[2:]
 
         # Generate random uv-points
-        u_list = np.interp(random_gen.beta(obj.UAlpha, obj.UBeta, number), [0, 1], uRange)
-        v_list = np.interp(random_gen.beta(obj.VAlpha, obj.VBeta, number), [0, 1], vRange)
-        print(u_range, v_range)
+        u_list: list = list(self.rng.uniform(low=u_range[0], high=u_range[1], size=self.count))
+        v_list: list = list(self.rng.uniform(low=v_range[0], high=v_range[1], size=self.count))
+        uv_list = list(zip(u_list, v_list))
 
-        return res
+        return [surface.valueAt(uv[0], uv[1]) for uv in uv_list]
+
+    def populate_normals(self, surface: Part.Face) -> Part.Shape:
+        # Get uv range of target face
+        u_range: list = np.array(surface.ParameterRange)[:2]
+        v_range: list = np.array(surface.ParameterRange)[2:]
+
+        # Generate random uv-points
+        u_list: list = list(self.rng.uniform(low=u_range[0], high=u_range[1], size=self.count))
+        v_list: list = list(self.rng.uniform(low=v_range[0], high=v_range[1], size=self.count))
+        uv_list = list(zip(u_list, v_list))
+
+        return [surface.normalAt(uv[0], uv[1]) for uv in uv_list]
 
     def eval_operation(self, sockets_input_data: list) -> list:
         surface: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [None]
         self.count: int = int(sockets_input_data[1][0]) if len(sockets_input_data[1]) > 0 else 10
         self.seed: int = int(sockets_input_data[2][0]) if len(sockets_input_data[2]) > 0 else 0
 
-        return [map_objects(surface, Part.Face, self.populate_points)]
+        self.rng: np.Generator = np.random.default_rng(self.seed)
+
+        return [map_objects(surface, Part.Face, self.populate_positions),
+                map_objects(surface, Part.Face, self.populate_normals)]
