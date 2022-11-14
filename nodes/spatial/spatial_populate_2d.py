@@ -23,7 +23,6 @@
 #
 ###################################################################################
 import awkward as ak
-from typing import Optional
 
 from FreeCAD import Vector
 import Part
@@ -47,7 +46,7 @@ class Populate2D(FCNNodeModel):
     def __init__(self, scene):
         super().__init__(scene=scene,
                          inputs_init_list=[("Face", True), ("Count", False), ("Seed", False)],
-                         outputs_init_list=[("Positions", True), ("Normals", True)])
+                         outputs_init_list=[("Position", True), ("Normal", True)])
 
         self.seed: int = 0
         self.count: int = 10

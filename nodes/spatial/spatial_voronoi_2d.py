@@ -26,10 +26,11 @@ import awkward as ak
 
 from FreeCAD import Vector
 import Part
+from scipy.spatial import Voronoi
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_objects
+from core.nodes_utils import flatten, simplify, map_objects, map_last_level
 
 from nodes_locator import icon
 
@@ -44,35 +45,35 @@ class Voronoi2D(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Points", True), ("Surface", True)],
+                         inputs_init_list=[("Position", True), ("Face", True)],
                          outputs_init_list=[("Curve", True)])
 
         self.pos_list: list = []
-        self.dir_list: list = []
+        self.face_list: list = []
 
         self.grNode.resize(120, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_occ_circle(self, r_pos_dir_zip: tuple) -> Part.Shape:
-        radius = r_pos_dir_zip[0]
-        position = self.pos_list[r_pos_dir_zip[1]]
-        direction = self.dir_list[r_pos_dir_zip[2]]
+    def make_voronoi(self, vectors: list) -> Part.Shape:
+        vector_list = [[vec[0], vec[1], vec[2]] for vec in vectors]
+        print(vector_list)
 
-        return Part.makeCircle(radius, position, direction)
+        return Voronoi(vector_list)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        radius: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
-        position: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
-        direction: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [Vector(0, 0, 1)]
+        position: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vector(0, 0, 0)]
+        face: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [None]
 
         # Array broadcast
-        self.pos_list: list = list(flatten(position))
-        pos_idx_list: list = list(range(len(self.pos_list)))
-        self.dir_list: list = list(flatten(direction))
-        dir_idx_list: list = list(range(len(self.dir_list)))
+        #self.pos_list: list = list(flatten(position))
+        #pos_idx_list: list = list(range(len(self.pos_list)))
+        #self.face_list: list = list(flatten(face))
+        #face_idx_list: list = list(map_objects(face, Part.Face, lambda f: self.face_list.index(f)))
 
-        radius, pos_idx_list, dir_idx_list = ak.broadcast_arrays(radius, pos_idx_list, dir_idx_list)
-        parameter_zip: list = ak.zip([radius, pos_idx_list, dir_idx_list], depth_limit=None).tolist()
+        #pos_idx_list, face_idx_list = ak.broadcast_arrays(pos_idx_list, face_idx_list)
+        #print(pos_idx_list)
+        #parameter_zip: list = ak.zip([pos_idx_list, face_idx_list], depth_limit=None).tolist()
+        #print(parameter_zip)
 
-        return [map_objects(parameter_zip, tuple, self.make_occ_circle)]
+        return [map_last_level(position, Vector, self.make_voronoi)]
