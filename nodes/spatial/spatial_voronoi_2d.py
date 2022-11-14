@@ -23,6 +23,7 @@
 #
 ###################################################################################
 import awkward as ak
+import numpy as np
 
 from FreeCAD import Vector
 import Part
@@ -55,11 +56,11 @@ class Voronoi2D(FCNNodeModel):
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_voronoi(self, vectors: list) -> Part.Shape:
+    @staticmethod
+    def make_voronoi(vectors: list) -> Part.Shape:
         vector_list = [[vec[0], vec[1], vec[2]] for vec in vectors]
-        print(vector_list)
 
-        return Voronoi(vector_list)
+        return Voronoi(np.array(vector_list), qhull_options="QJ")
 
     def eval_operation(self, sockets_input_data: list) -> list:
         position: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vector(0, 0, 0)]
