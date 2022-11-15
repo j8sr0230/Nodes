@@ -26,7 +26,8 @@ import awkward as ak
 
 from FreeCAD import Vector
 import Part
-import MeshPart
+import Mesh
+from MeshPart import meshFromShape
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
@@ -48,37 +49,17 @@ class Triangulate(FCNNodeModel):
                          inputs_init_list=[("Shape", True), ("Quality", False)],
                          outputs_init_list=[("Mesh", True)])
 
-        self.point_1: list = []
-        self.point_2: list = []
-        self.point_3: list = []
+        self.quality: int = 0
 
         self.grNode.resize(110, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_mesh(self, parameter_zip: tuple) -> Part.Shape:
-        point_1 = self.point_1[parameter_zip[0]]
-        point_2 = self.point_2[parameter_zip[1]]
-        point_3 = self.point_3[parameter_zip[2]]
-
-        #Mesh = MeshPart.meshFromShape(Shape=__shape__, Fineness=3, SecondOrder=0, Optimize=1, AllowQuad=0)
-
-        return Part.Arc(point_1, point_2, point_3)
+    def make_mesh(self, shape: Part.Shape) -> Mesh.Mesh:
+        return MeshPart.meshFromShape(Shape=shape, Fineness=self.quality, SecondOrder=0, Optimize=1, AllowQuad=0)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        point_1: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vector(-5, 0, 0)]
-        point_2: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 5, 0)]
-        point_3: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [Vector(5, 0, 0)]
+        shape: list = sockets_input_data[0]
+        self.quality: int = int(sockets_input_data[1][0]) if len(sockets_input_data[1]) > 0 else 0
 
-        # Array broadcast
-        self.point_1: list = list(flatten(point_1))
-        p1_idx_list = map_objects(point_1, Vector, lambda vec: self.point_1.index(vec))
-        self.point_2: list = list(flatten(point_2))
-        p2_idx_list: list = list(range(len(self.point_2)))
-        self.point_3: list = list(flatten(point_3))
-        p3_idx_list: list = list(range(len(self.point_3)))
-
-        p1_idx_list, p2_idx_list, p3_idx_list = ak.broadcast_arrays(p1_idx_list, p2_idx_list, p3_idx_list)
-        parameter_zip: list = ak.zip([p1_idx_list, p2_idx_list, p3_idx_list], depth_limit=None).tolist()
-
-        return [map_objects(parameter_zip, tuple, self.make_mesh)]
+        return [map_objects(shape, Part.Shape, self.make_mesh)]
