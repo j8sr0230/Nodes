@@ -23,11 +23,9 @@
 #
 ###################################################################################
 import awkward as ak
-import numpy as np
 
 from FreeCAD import Vector
 import Part
-from scipy.spatial import Voronoi
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
@@ -46,35 +44,22 @@ class Voronoi2D(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Position", True), ("Face", True)],
+                         inputs_init_list=[("Mesh", True)],
                          outputs_init_list=[("Curve", True)])
 
         self.pos_list: list = []
         self.face_list: list = []
 
-        self.grNode.resize(120, 80)
+        self.grNode.resize(120, 70)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
     @staticmethod
     def make_voronoi(vectors: list) -> Part.Shape:
-        vector_list = [[vec[0], vec[1], vec[2]] for vec in vectors]
-
-        return Voronoi(np.array(vector_list), qhull_options="QJ")
+        pass
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        position: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vector(0, 0, 0)]
-        face: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [None]
+        mesh: list = sockets_input_data[0]
 
-        # Array broadcast
-        #self.pos_list: list = list(flatten(position))
-        #pos_idx_list: list = list(range(len(self.pos_list)))
-        #self.face_list: list = list(flatten(face))
-        #face_idx_list: list = list(map_objects(face, Part.Face, lambda f: self.face_list.index(f)))
-
-        #pos_idx_list, face_idx_list = ak.broadcast_arrays(pos_idx_list, face_idx_list)
-        #print(pos_idx_list)
-        #parameter_zip: list = ak.zip([pos_idx_list, face_idx_list], depth_limit=None).tolist()
-        #print(parameter_zip)
-
-        return [map_last_level(position, Vector, self.make_voronoi)]
+        # return [map_last_level(position, Vector, self.make_voronoi)]
+        return [mesh]
