@@ -22,6 +22,8 @@
 #
 #
 ###################################################################################
+import random
+
 import awkward as ak
 
 from FreeCAD import Vector
@@ -45,39 +47,87 @@ class PopulateSrf(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Face", True), ("Count", False), ("Seed", False)],
-                         outputs_init_list=[("Position", True), ("Normal", True)])
+                         inputs_init_list=[("Face", True), ("Count", False), ("Radius", False), ("Seed", False)],
+                         outputs_init_list=[("Position", True)])  # , ("Normal", True)])
 
         self.seed: int = 0
         self.count: int = 10
 
-        self.grNode.resize(130, 100)
+        self.grNode.resize(130, 120)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
+
+    @staticmethod
+    def _check_min_radius(point, old_points, old_radiuses, min_r):
+        if not old_points:
+            return True
+        old_points = np.array(old_points)
+        old_radiuses = np.array(old_radiuses)
+        point = np.array(point)
+        distances = np.linalg.norm(old_points - point, axis=1)
+        ok = (old_radiuses + min_r < distances).all()
+        return ok
 
     def populate_positions(self, face: Part.Face) -> Part.Shape:
         # Get uv range of target face
         u_range: list = np.array(face.ParameterRange)[:2]
         v_range: list = np.array(face.ParameterRange)[2:]
 
+        done = 0
+        generated_verts = []
+        generated_uv = []
+        generated_radiuses = []
+
+        while done < self.count:
+
+            batch_us = []
+            batch_vs = []
+            left = self.count - done
+            max_size = min(100, left)
+            for i in range(max_size):
+                u = random.uniform(u_range[0], u_range[1])
+                v = random.uniform(v_range[0], v_range[1])
+                batch_us.append(u)
+                batch_vs.append(v)
+            batch_us = np.array(batch_us)
+            batch_vs = np.array(batch_vs)
+            batch_ws = np.zeros_like(batch_us)
+            batch_uvs = np.stack((batch_us, batch_vs, batch_ws)).T
+
+            # surface.evaluate_array(batch_us, batch_vs)
+            batch_verts = [face.valueAt(batch_us[i], batch_vs[i]) for i in range(max_size)]
+            batch_verts = np.array([[v[0], v[1], v[2]] for v in batch_verts])
+            batch_xs = batch_verts[:, 0]
+            batch_ys = batch_verts[:, 1]
+            batch_zs = batch_verts[:, 2]
+
+            candidates = batch_verts
+            candidate_uvs = batch_uvs
+
+
+            print(candidates)
+            done = done + 10
+
+
         # Generate random uv-points
-        u_list: list = list(np.random.uniform(low=u_range[0], high=u_range[1], size=self.count))
-        v_list: list = list(np.random.uniform(low=v_range[0], high=v_range[1], size=self.count))
-        uv_list = list(zip(u_list, v_list))
+        # u_list: list = list(np.random.uniform(low=u_range[0], high=u_range[1], size=self.count))
+        # v_list: list = list(np.random.uniform(low=v_range[0], high=v_range[1], size=self.count))
+        # uv_list = list(zip(u_list, v_list))
+        #
+        # return [face.valueAt(uv[0], uv[1]) for uv in uv_list if face.isInside(face.valueAt(uv[0], uv[1]), 0.1, True)]
 
-        return [face.valueAt(uv[0], uv[1]) for uv in uv_list if face.isInside(face.valueAt(uv[0], uv[1]), 0.1, True)]
-
-    def populate_normals(self, face: Part.Face) -> Part.Shape:
-        # Get uv range of target face
-        u_range: list = np.array(face.ParameterRange)[:2]
-        v_range: list = np.array(face.ParameterRange)[2:]
-
-        # Generate random uv-points
-        u_list: list = list(np.random.uniform(low=u_range[0], high=u_range[1], size=self.count))
-        v_list: list = list(np.random.uniform(low=v_range[0], high=v_range[1], size=self.count))
-        uv_list = list(zip(u_list, v_list))
-
-        return [face.normalAt(uv[0], uv[1]) for uv in uv_list if face.isInside(face.valueAt(uv[0], uv[1]), 0.1, True)]
+    # def populate_normals(self, face: Part.Face) -> Part.Shape:
+    #     # Get uv range of target face
+    #     u_range: list = np.array(face.ParameterRange)[:2]
+    #     v_range: list = np.array(face.ParameterRange)[2:]
+    #
+    #     # Generate random uv-points
+    #     u_list: list = list(np.random.uniform(low=u_range[0], high=u_range[1], size=self.count))
+    #     v_list: list = list(np.random.uniform(low=v_range[0], high=v_range[1], size=self.count))
+    #     uv_list = list(zip(u_list, v_list))
+    #
+    #     return [face.normalAt(uv[0], uv[1]) for uv in uv_list if face.isInside(face.valueAt(uv[0], uv[1]), 0.1, True)]
+        return [[0]]
 
     def eval_operation(self, sockets_input_data: list) -> list:
         face: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [None]
@@ -86,5 +136,5 @@ class PopulateSrf(FCNNodeModel):
 
         np.random.seed(self.seed)
 
-        return [map_objects(face, Part.Face, self.populate_positions),
-                map_objects(face, Part.Face, self.populate_normals)]
+        return [map_objects(face, Part.Face, self.populate_positions)]  # ,
+                # map_objects(face, Part.Face, self.populate_normals)]
