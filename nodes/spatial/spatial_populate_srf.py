@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  spatial_populate_2d.py
+#  spatial_populate_srf.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -36,10 +36,10 @@ from nodes_locator import icon
 
 
 @register_node
-class Populate2D(FCNNodeModel):
+class PopulateSrf(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Populate (2D)"
+    op_title: str = "Populate (Srf)"
     op_category: str = "Spatial"
     content_label_objname: str = "fcn_node_bg"
 

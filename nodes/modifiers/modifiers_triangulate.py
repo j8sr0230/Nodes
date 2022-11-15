@@ -56,7 +56,7 @@ class Triangulate(FCNNodeModel):
             socket.setSocketPosition()
 
     def make_mesh(self, shape: Part.Shape) -> Mesh.Mesh:
-        return MeshPart.meshFromShape(Shape=shape, Fineness=self.quality, SecondOrder=0, Optimize=1, AllowQuad=0)
+        return meshFromShape(Shape=shape, Fineness=self.quality, SecondOrder=0, Optimize=1, AllowQuad=0)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         shape: list = sockets_input_data[0]
