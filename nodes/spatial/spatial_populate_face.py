@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  spatial_populate_srf.py
+#  spatial_populate_face.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -42,26 +42,28 @@ MAX_ITERATIONS = 1000
 
 
 @register_node
-class PopulateSrf(FCNNodeModel):
+class PopulateFace(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Populate (Srf)"
+    op_title: str = "Populate Face"
     op_category: str = "Spatial"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Face", True), ("Count", False), ("Radius", False), ("Seed", False)],
-                         outputs_init_list=[("Position", True)])  # , ("Normal", True)])
+                         inputs_init_list=[("Face", True), ("Count", False), ("Distance", False), ("Seed", False)],
+                         outputs_init_list=[("Position", True)])
 
         self.count: int = 10
-        self.radius: float = 1
+        self.radius: float = 0
         self.seed: int = 0
 
         self.grNode.resize(130, 120)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
+    ###################################################################################
+    # Based on https://github.com/nortikin/sverchok/blob/master/utils/surface/populate.py
     @staticmethod
     def check_min_radius(new_position: list, old_positions: list, min_radius: float) -> bool:
         if not old_positions:
@@ -114,11 +116,12 @@ class PopulateSrf(FCNNodeModel):
             done += len(good_positions)
 
         return [Vector(coordinates) for coordinates in generated_positions]
+    ###################################################################################
 
     def eval_operation(self, sockets_input_data: list) -> list:
         face: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [None]
         self.count: int = int(sockets_input_data[1][0]) if len(sockets_input_data[1]) > 0 else 10
-        self.radius: float = float(sockets_input_data[2][0]) if len(sockets_input_data[2]) > 0 else 1
+        self.radius: float = float(sockets_input_data[2][0]) if len(sockets_input_data[2]) > 0 else 0
         self.seed: int = int(sockets_input_data[3][0]) if len(sockets_input_data[3]) > 0 else 0
 
         np.random.seed(self.seed)
