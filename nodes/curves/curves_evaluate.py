@@ -42,8 +42,8 @@ class EvaluateCurve(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Parameter", True), ("Crv", True), ],
-                         outputs_init_list=[("Pos", True), ("Tangent", True)])
+                         inputs_init_list=[("Parameter", True), ("Curve", True), ],
+                         outputs_init_list=[("Point", True), ("Tangent", True)])
 
         self.grNode.resize(120, 80)
         for socket in self.inputs + self.outputs:

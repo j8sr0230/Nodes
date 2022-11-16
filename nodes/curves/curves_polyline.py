@@ -44,10 +44,10 @@ class Polyline(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Pts", True)],
-                         outputs_init_list=[("Line", True)])
+                         inputs_init_list=[("Point", True)],
+                         outputs_init_list=[("Shape", True)])
 
-        self.grNode.resize(100, 70)
+        self.grNode.resize(90, 70)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 

@@ -44,9 +44,9 @@ class ArcDeg(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Radius", True), ("Position", True), ("Direction", True),
+                         inputs_init_list=[("Radius", True), ("Point", True), ("Direction", True),
                                            ("Angle 1", True), ("Angle 2", True)],
-                         outputs_init_list=[("Arc", True)])
+                         outputs_init_list=[("Shape", True)])
 
         self.pos_list: list = []
         self.dir_list: list = []

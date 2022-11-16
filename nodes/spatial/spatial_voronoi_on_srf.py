@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  vector_vector_from_vertex.py
+#  spatial_voronoi_on_srf.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,35 +22,46 @@
 #
 #
 ###################################################################################
-from FreeCAD import Vector
-from Part import Vertex
 import awkward as ak
+import numpy as np
+from scipy.spatial import Voronoi
 
-from core.nodes_default_node import FCNNodeModel
+from FreeCAD import Vector
+import Part
+
 from core.nodes_conf import register_node
-from core.nodes_utils import flatten, map_objects
+from core.nodes_default_node import FCNNodeModel
+from core.nodes_utils import map_objects
 
 from nodes_locator import icon
 
 
 @register_node
-class VectorIn(FCNNodeModel):
+class VoronoiOnSrf(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "From Vertex"
-    op_category: str = "Vector"
+    op_title: str = "Voronoi on Srf"
+    op_category: str = "Spatial"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Vertex", True)],
-                         outputs_init_list=[("Point", True)])
+                         inputs_init_list=[("Face", True), ("Point", True), ("Scale", False)],
+                         outputs_init_list=[("Wire", True)])
 
-        self.grNode.resize(120, 70)
+        self.scale: float = 1
+
+        self.grNode.resize(130, 100)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def eval_operation(self, sockets_input_data: list) -> list:
-        vertex_in = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vertex(0, 0, 0)]
+    @staticmethod
+    def make_voronoi(face: Part.Face) -> Part.Shape:
+        return face
 
-        return [map_objects(vertex_in, Vertex, lambda vertex: Vector(vertex.X, vertex.Y, vertex.Z))]
+    def eval_operation(self, sockets_input_data: list) -> list:
+        face: list = sockets_input_data[0]
+        point: list = sockets_input_data[1]
+        self.scale: float = float(sockets_input_data[1][0]) if len(sockets_input_data[1]) > 0 else 1
+
+        return [map_objects(face, Part.Face, self.make_voronoi)]

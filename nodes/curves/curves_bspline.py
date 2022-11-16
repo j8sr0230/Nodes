@@ -44,7 +44,7 @@ class BSpline(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Pts", True), ("Closed", False)],
+                         inputs_init_list=[("Point", True), ("Closed", False)],
                          outputs_init_list=[("Curve", True)])
 
         self.grNode.resize(100, 80)

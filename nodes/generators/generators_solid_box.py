@@ -43,8 +43,8 @@ class SolidBox(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Width", True,), ("Length", True), ("Height", True), ("Pos", True)],
-                         outputs_init_list=[("Box", True)])
+                         inputs_init_list=[("Width", True,), ("Length", True), ("Height", True), ("Point", True)],
+                         outputs_init_list=[("Shape", True)])
 
         self.grNode.resize(100, 125)
         for socket in self.inputs + self.outputs:

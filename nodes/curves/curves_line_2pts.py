@@ -48,8 +48,8 @@ class Line2Pts(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Start", True), ("End", True)],
-                         outputs_init_list=[("Line", True)])
+                         inputs_init_list=[("Point 1", True), ("Point 2", True)],
+                         outputs_init_list=[("Shape", True)])
 
         self.grNode.resize(110, 80)
         for socket in self.inputs + self.outputs:

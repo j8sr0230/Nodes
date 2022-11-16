@@ -45,7 +45,7 @@ class Arc3Pts(FCNNodeModel):
     def __init__(self, scene):
         super().__init__(scene=scene,
                          inputs_init_list=[("Point 1", True), ("Point 2", True), ("Point 3", True)],
-                         outputs_init_list=[("Arc", True)])
+                         outputs_init_list=[("Shape", True)])
 
         self.point_1: list = []
         self.point_2: list = []

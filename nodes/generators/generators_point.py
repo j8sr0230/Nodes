@@ -42,8 +42,8 @@ class Point(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Pos", True)],
-                         outputs_init_list=[("Point", True)])
+                         inputs_init_list=[("Point", True)],
+                         outputs_init_list=[("Shape", True)])
 
     @staticmethod
     def make_occ_point(position: Vector) -> Part.Shape:
