@@ -107,14 +107,14 @@ class SliderInputContent(QDMNodeContentWidget):
 
         res = super().deserialize(data, hashmap)
         try:
-            value = data['value']
-            self.slider_edit.setValue(value)
             sld_min = data['min']
             self.slider_edit.setMinimum(sld_min)
             self.min_edit.setText(str(sld_min))
             sld_max = data['max']
             self.slider_edit.setMaximum(sld_max)
             self.max_edit.setText(str(sld_max))
+            value = data['value']
+            self.slider_edit.setValue(value)
             return True & res
         except Exception as e:
             dumpException(e)
