@@ -31,7 +31,7 @@ import Part
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import map_objects
+from core.nodes_utils import map_last_level, map_objects, flatten, simplify
 
 from nodes_locator import icon
 
@@ -50,18 +50,32 @@ class VoronoiOnSrf(FCNNodeModel):
                          outputs_init_list=[("Wire", True)])
 
         self.scale: float = 1
+        self.face_list: list = []
+        self.point_list: list = []
 
         self.grNode.resize(130, 100)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    @staticmethod
-    def make_voronoi(face: Part.Face) -> Part.Shape:
-        return face
+    def make_voronoi(self, parameter_zip: tuple) -> Part.Shape:
+        face: Part.Face = self.face_list[parameter_zip[0]]
+        points: list = self.point_list[parameter_zip[1]]
+
+        point_array: np.array = np.array([[vector.x, vector.y] for vector in points])
+        vor = Voronoi(point_array)
+        return [Vector(v[0], v[1], 0) for v in vor.vertices]
 
     def eval_operation(self, sockets_input_data: list) -> list:
         face: list = sockets_input_data[0]
         point: list = sockets_input_data[1]
-        self.scale: float = float(sockets_input_data[1][0]) if len(sockets_input_data[1]) > 0 else 1
+        self.scale: float = float(sockets_input_data[2][0]) if len(sockets_input_data[2]) > 0 else 1
 
-        return [map_objects(face, Part.Face, self.make_voronoi)]
+        self.face_list: list = list(flatten(face))
+        face_idx_list: list = list(map_objects(face, Part.Face, lambda f: self.face_list.index(f)))
+        self.point_list: list = list(simplify(point))
+        point_idx_list: list = list(range(len(self.point_list)))
+
+        face_idx_list, point_idx_list = ak.broadcast_arrays(face_idx_list, point_idx_list)
+        parameter_zip: list = ak.zip([face_idx_list, point_idx_list], depth_limit=None).tolist()
+
+        return [map_objects(parameter_zip, tuple, self.make_voronoi)]
