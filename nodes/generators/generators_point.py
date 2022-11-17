@@ -45,6 +45,10 @@ class Point(FCNNodeModel):
                          inputs_init_list=[("Point", True)],
                          outputs_init_list=[("Shape", True)])
 
+        self.grNode.resize(100, 70)
+        for socket in self.inputs + self.outputs:
+            socket.setSocketPosition()
+
     @staticmethod
     def make_occ_point(position: Vector) -> Part.Shape:
         return Part.Point(position).toShape()
