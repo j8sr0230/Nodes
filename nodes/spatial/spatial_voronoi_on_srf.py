@@ -47,7 +47,7 @@ class VoronoiOnSrf(FCNNodeModel):
     def __init__(self, scene):
         super().__init__(scene=scene,
                          inputs_init_list=[("Face", True), ("Point", True), ("Scale", False)],
-                         outputs_init_list=[("Wire", True)])
+                         outputs_init_list=[("Point", True)])
 
         self.scale: float = 1
         self.face_list: list = []
@@ -61,9 +61,15 @@ class VoronoiOnSrf(FCNNodeModel):
         face: Part.Face = self.face_list[parameter_zip[0]]
         points: list = self.point_list[parameter_zip[1]]
 
-        point_array: np.array = np.array([[vector.x, vector.y] for vector in points])
-        vor = Voronoi(point_array)
-        return [Vector(v[0], v[1], 0) for v in vor.vertices]
+        uvs: np.array = np.array([face.Surface.parameter(vector) for vector in points])
+        vor: Voronoi = Voronoi(uvs)
+
+        vor_points = np.array([face.valueAt(uv[0], uv[1]) for uv in vor.vertices])
+        vor_regions = [vor_points[region].tolist() for region in vor.regions
+                       if all([-1 not in region]) and len(region) > 0]
+        vector_regions = map_last_level(vor_regions, float, lambda v: Vector(v[0], v[1], v[2]))
+
+        return vector_regions
 
     def eval_operation(self, sockets_input_data: list) -> list:
         face: list = sockets_input_data[0]
