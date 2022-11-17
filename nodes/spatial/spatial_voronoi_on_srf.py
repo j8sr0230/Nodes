@@ -64,12 +64,26 @@ class VoronoiOnSrf(FCNNodeModel):
         uvs: np.array = np.array([face.Surface.parameter(vector) for vector in points])
         vor: Voronoi = Voronoi(uvs)
 
+        # Filter region for valid vectors
         vor_points = np.array([face.valueAt(uv[0], uv[1]) for uv in vor.vertices])
         vor_regions = [vor_points[region].tolist() for region in vor.regions
                        if all([-1 not in region]) and len(region) > 0]
         vector_regions = map_last_level(vor_regions, float, lambda v: Vector(v[0], v[1], v[2]))
 
-        return vector_regions
+        # Check if region is on face
+        valid_regions: list = []
+        for region in vector_regions:
+            valid_sub_region: list = []
+            for vector in region:
+                if face.isInside(vector, 1, True):
+                    valid_sub_region.append(vector)
+                else:
+                    break
+
+            if len(valid_sub_region) > 3:
+                valid_regions.append(valid_sub_region)
+
+        return valid_regions
 
     def eval_operation(self, sockets_input_data: list) -> list:
         face: list = sockets_input_data[0]
