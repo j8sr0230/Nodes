@@ -43,7 +43,7 @@ class DiscretizeCurve(FCNNodeModel):
     def __init__(self, scene):
         super().__init__(scene=scene,
                          inputs_init_list=[("Crv", True), ("Dist", True)],
-                         outputs_init_list=[("Pos", True)])
+                         outputs_init_list=[("Point", True)])
 
         self.grNode.resize(100, 80)
         for socket in self.inputs + self.outputs:

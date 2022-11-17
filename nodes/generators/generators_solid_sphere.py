@@ -43,12 +43,12 @@ class Sphere(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("R", True, ), ("Pos", True, )],
-                         outputs_init_list=[("Sphere", True)])
+                         inputs_init_list=[("Radius", True, ), ("Point", True, )],
+                         outputs_init_list=[("Shape", True)])
 
         self.radius_list: list = []
 
-        self.grNode.resize(100, 80)
+        self.grNode.resize(110, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 

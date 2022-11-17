@@ -44,8 +44,8 @@ class Circle(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Radius", True), ("Position", True), ("Direction", True)],
-                         outputs_init_list=[("Circle", True)])
+                         inputs_init_list=[("Radius", True), ("Point", True), ("Direction", True)],
+                         outputs_init_list=[("Shape", True)])
 
         self.pos_list: list = []
         self.dir_list: list = []

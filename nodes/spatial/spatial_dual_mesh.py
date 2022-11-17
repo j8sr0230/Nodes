@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  spatial_voronoi_srf.py
+#  spatial_dual_mesh.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -37,10 +37,10 @@ from nodes_locator import icon
 
 
 @register_node
-class VoronoiSrf(FCNNodeModel):
+class DualMesh(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Voronoi (Srf)"
+    op_title: str = "Dual Mesh"
     op_category: str = "Spatial"
     content_label_objname: str = "fcn_node_bg"
 
@@ -51,11 +51,11 @@ class VoronoiSrf(FCNNodeModel):
 
         self.scale: float = 1
 
-        self.grNode.resize(120, 70)
+        self.grNode.resize(110, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_voronoi(self, mesh: Mesh.Mesh) -> Part.Shape:
+    def make_dual_mesh(self, mesh: Mesh.Mesh) -> Part.Shape:
         # Generate list of all faces linked to the same mesh vertex
         linked_faces = []
         for point in mesh.Points:
@@ -103,4 +103,4 @@ class VoronoiSrf(FCNNodeModel):
         mesh: list = sockets_input_data[0]
         self.scale: float = float(sockets_input_data[1][0]) if len(sockets_input_data[1]) > 0 else 1
 
-        return [map_objects(mesh, Mesh.Mesh, self.make_voronoi)]
+        return [map_objects(mesh, Mesh.Mesh, self.make_dual_mesh)]
