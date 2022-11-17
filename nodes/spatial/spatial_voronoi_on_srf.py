@@ -46,14 +46,14 @@ class VoronoiOnSrf(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Face", True), ("Point", True), ("Scale", False)],
+                         inputs_init_list=[("Face", True), ("Point", True)],
                          outputs_init_list=[("Point", True)])
 
         self.scale: float = 1
         self.face_list: list = []
         self.point_list: list = []
 
-        self.grNode.resize(130, 100)
+        self.grNode.resize(130, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
