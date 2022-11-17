@@ -49,7 +49,6 @@ class VoronoiOnSrf(FCNNodeModel):
                          inputs_init_list=[("Face", True), ("Point", True)],
                          outputs_init_list=[("Point", True)])
 
-        self.scale: float = 1
         self.face_list: list = []
         self.point_list: list = []
 
@@ -78,7 +77,6 @@ class VoronoiOnSrf(FCNNodeModel):
     def eval_operation(self, sockets_input_data: list) -> list:
         face: list = sockets_input_data[0]
         point: list = sockets_input_data[1]
-        self.scale: float = float(sockets_input_data[2][0]) if len(sockets_input_data[2]) > 0 else 1
 
         self.face_list: list = list(flatten(face))
         face_idx_list: list = list(map_objects(face, Part.Face, lambda f: self.face_list.index(f)))
