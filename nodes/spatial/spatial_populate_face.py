@@ -37,6 +37,7 @@ from core.nodes_utils import flatten, map_objects
 from nodes_locator import icon
 
 
+DEBUG = True
 BATCH_SIZE = 100
 MAX_ITERATIONS = 1000
 
@@ -87,7 +88,9 @@ class PopulateFace(FCNNodeModel):
 
         while done < self.count:
             iterations += 1
-            print("Iteration no.:", iterations)
+
+            if DEBUG:
+                print("Iteration no.:", iterations)
 
             if iterations > MAX_ITERATIONS:
                 raise ValueError("Maximum number of iterations reached.", MAX_ITERATIONS)
@@ -103,7 +106,6 @@ class PopulateFace(FCNNodeModel):
                                      face.isInside(face.valueAt(uv[0], uv[1]), 0.1, True)]
             candidates: list = [[v[0], v[1], v[2]] for v in batch_positions]
 
-            good_positions: list = []
             if len(candidates) > 0:
                 if self.radius == 0:
                     good_positions: list = candidates
@@ -114,8 +116,8 @@ class PopulateFace(FCNNodeModel):
                                                  self.radius):
                             good_positions.append(candidate)
 
-            generated_positions.extend(good_positions)
-            done += len(good_positions)
+                generated_positions.extend(good_positions)
+                done += len(good_positions)
 
         return [Vector(coordinates) for coordinates in generated_positions]
     ###################################################################################
