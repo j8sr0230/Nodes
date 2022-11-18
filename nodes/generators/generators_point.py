@@ -54,6 +54,6 @@ class Point(FCNNodeModel):
         return Part.Point(position).toShape()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        pos: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [(0, 0, 0)]
+        pos: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vector(0, 0, 0)]
 
         return [map_objects(pos, Vector, self.make_occ_point)]

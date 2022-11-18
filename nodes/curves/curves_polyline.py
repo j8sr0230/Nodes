@@ -44,26 +44,29 @@ class Polyline(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Point", True)],
+                         inputs_init_list=[("Point", True), ("Closed", False)],
                          outputs_init_list=[("Shape", True)])
 
-        self.grNode.resize(90, 70)
+        self.grNode.resize(100, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    @staticmethod
-    def make_occ_polyline(flat_points: list) -> Part.Shape:
-        try:
-            segments = []
-            for i in range(len(flat_points)):
-                if i + 1 < len(flat_points):
-                    segments.append(Part.LineSegment(flat_points[i], flat_points[i + 1]))
-            return Part.Wire(Part.Shape(segments).Edges)
-        except Part.OCCError as e:
-            raise (ValueError(e))
+        self.is_closed = 0
+
+    def make_occ_polyline(self, flat_points: list) -> Part.Shape:
+        segments = []
+        for i in range(len(flat_points)):
+            if i + 1 < len(flat_points):
+                segments.append(Part.LineSegment(flat_points[i], flat_points[i + 1]))
+
+        if self.is_closed:
+            segments.append(Part.LineSegment(flat_points[-1], flat_points[0]))
+
+        return Part.Wire(Part.Shape(segments).Edges)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         points: list = sockets_input_data[0] if len(list(flatten(sockets_input_data[0]))) > 1 else [Vector(0, 0, 0),
                                                                                                     Vector(10, 10, 0)]
+        self.is_closed: bool = bool(sockets_input_data[1][0] if len(sockets_input_data[1]) > 0 else 0)
 
         return [[map_last_level(points, Vector, self.make_occ_polyline)]]

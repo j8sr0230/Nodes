@@ -43,7 +43,7 @@ class VectorIn(FCNNodeModel):
     def __init__(self, scene):
         super().__init__(scene=scene,
                          inputs_init_list=[("X", True), ("Y", True), ("Z", True)],
-                         outputs_init_list=[("Point", True)])
+                         outputs_init_list=[("Out", True)])
 
         self.grNode.resize(80, 100)
         for socket in self.inputs + self.outputs:

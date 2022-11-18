@@ -52,9 +52,9 @@ class ObjectData(FCNNodeModel):
         obj_list: list = sockets_input_data[0]
 
         if FreeCAD.ActiveDocument is not None:
-            obj_id: list = [map_objects(obj_list, object, lambda obj: obj.ID)]
-            shape: list = [map_objects(obj_list, object, lambda obj: obj.Shape)]
-            placement: list = [map_objects(obj_list, object, lambda obj: obj.Placement)]
+            obj_id: list = list(map_objects(obj_list, object, lambda obj: obj.ID))
+            shape: list = list(map_objects(obj_list, object, lambda obj: obj.Shape))
+            placement: list = list(map_objects(obj_list, object, lambda obj: obj.Placement))
 
             return [obj_id, shape, placement]
 

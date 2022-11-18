@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  surfaces_face_from_wire.py
+#  surfaces_crv_to_face.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -35,27 +35,27 @@ from nodes_locator import icon
 
 
 @register_node
-class FaceFromWire(FCNNodeModel):
+class CrvToFace(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "From Wire"
+    op_title: str = "Crv to Face"
     op_category: str = "Surfaces"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Wire", True)],
+                         inputs_init_list=[("Crv", True)],
                          outputs_init_list=[("Face", True)])
 
-        self.grNode.resize(100, 70)
+        self.grNode.resize(110, 70)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
     @staticmethod
-    def make_occ_face(wire: Part.Wire) -> Part.Shape:
-        return Part.makeFilledFace(wire.Edges)
+    def make_occ_face(wire: object) -> Part.Shape:
+        return Part.makeFilledFace(wire)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        wires: list = sockets_input_data[0]
+        curves: list = sockets_input_data[0]
 
-        return [map_objects(wires, Part.Wire, self.make_occ_face)]
+        return [map_objects(curves, object, self.make_occ_face)]

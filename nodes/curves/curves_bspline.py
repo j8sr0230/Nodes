@@ -53,17 +53,11 @@ class BSpline(FCNNodeModel):
 
     @staticmethod
     def make_occ_closed_bspline(flat_points: list) -> Part.Shape:
-        try:
-            return Part.BSplineCurve(flat_points, None, None, True, 3, None, False)
-        except Part.OCCError as e:
-            raise (ValueError(e))
+        return Part.BSplineCurve(flat_points, None, None, True, 3, None, False)
 
     @staticmethod
     def make_occ_open_bspline(flat_points: list) -> Part.Shape:
-        try:
-            return Part.BSplineCurve(flat_points, None, None, False, 3, None, False)
-        except Part.OCCError as e:
-            raise(ValueError(e))
+        return Part.BSplineCurve(flat_points, None, None, False, 3, None, False)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         points: list = sockets_input_data[0] if len(list(flatten(sockets_input_data[0]))) > 2 else [Vector(0, 0, 0),
