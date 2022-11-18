@@ -22,7 +22,6 @@
 #
 #
 ###################################################################################
-import awkward as ak
 import numpy as np
 from scipy.spatial import Voronoi
 
@@ -56,9 +55,10 @@ class VoronoiOnSrf(FCNNodeModel):
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_voronoi(self, parameter_zip: tuple) -> Part.Shape:
-        face: Part.Face = self.face_list[parameter_zip[0]]
-        points: list = self.point_list[parameter_zip[1]]
+    @staticmethod
+    def make_voronoi(object_zip: tuple) -> Part.Shape:
+        face: Part.Face = object_zip[0]
+        points: list = object_zip[1]
 
         uvs: np.array = np.array([face.Surface.parameter(vector) for vector in points])
         uv_vor: Voronoi = Voronoi(uvs)
@@ -78,12 +78,8 @@ class VoronoiOnSrf(FCNNodeModel):
         face: list = sockets_input_data[0]
         point: list = sockets_input_data[1]
 
-        self.face_list: list = list(flatten(face))
-        face_idx_list: list = list(map_objects(face, Part.Face, lambda f: self.face_list.index(f)))
-        self.point_list: list = list(simplify(point))
-        point_idx_list: list = list(range(len(self.point_list)))
+        face_list: list = list(flatten(face))
+        point_list: list = list(simplify(point))
+        object_zip: list = list(zip(face_list, point_list))
 
-        face_idx_list, point_idx_list = ak.broadcast_arrays(face_idx_list, point_idx_list)
-        parameter_zip: list = ak.zip([face_idx_list, point_idx_list], depth_limit=None).tolist()
-
-        return [map_objects(parameter_zip, tuple, self.make_voronoi)]
+        return [map_objects(object_zip, tuple, self.make_voronoi)]
