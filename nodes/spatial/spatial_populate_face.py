@@ -87,6 +87,8 @@ class PopulateFace(FCNNodeModel):
 
         while done < self.count:
             iterations += 1
+            print("Iteration no.:", iterations)
+
             if iterations > MAX_ITERATIONS:
                 raise ValueError("Maximum number of iterations reached.", MAX_ITERATIONS)
 
