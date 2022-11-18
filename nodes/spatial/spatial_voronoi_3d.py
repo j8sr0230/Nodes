@@ -24,6 +24,7 @@
 ###################################################################################
 import numpy as np
 from scipy.spatial import Voronoi
+from scipy import rand
 
 from FreeCAD import Vector
 import Part
@@ -60,7 +61,10 @@ class Voronoi3D(FCNNodeModel):
         face: Part.Face = object_zip[0]
         points: list = object_zip[1]
 
-        vor: Voronoi = Voronoi(np.array(points), qhull_options="QJ")
+        base_pts = rand(20, 3) * 100
+        vor = Voronoi(points=base_pts)
+        #vor: Voronoi = Voronoi(np.array(points), qhull_options="QJ")
+        print(vor.vertices)
 
         # Filter region for valid vectors
         # vor_points = vor.vertices
