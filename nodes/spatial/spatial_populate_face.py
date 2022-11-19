@@ -77,10 +77,9 @@ class PopulateFace(FCNNodeModel):
 
         return ok
 
-    def populate_positions(self, face: Part.Face) -> Part.Shape:
+    def populate_positions(self, face: Part.Face) -> list:
         done: int = 0
         iterations: int = 0
-        old_positions: list = []
         generated_positions: list = []
 
         u_range: list = np.array(face.ParameterRange)[:2]
@@ -112,7 +111,7 @@ class PopulateFace(FCNNodeModel):
                 else:
                     good_positions: list = []
                     for candidate in candidates:
-                        if self.check_min_radius(candidate, old_positions + generated_positions + good_positions,
+                        if self.check_min_radius(candidate, generated_positions + good_positions,
                                                  self.radius):
                             good_positions.append(candidate)
 

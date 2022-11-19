@@ -64,7 +64,7 @@ class PopulateSolid(FCNNodeModel):
             socket.setSocketPosition()
 
     ###################################################################################
-    # Based on https://github.com/nortikin/sverchok/blob/master/utils/surface/populate.py
+    # Based on https://github.com/nortikin/sverchok/blob/master/utils/field/probe.py
     @staticmethod
     def check_min_radius(new_position: list, old_positions: list, min_radius: float) -> bool:
         if not old_positions:
@@ -77,14 +77,16 @@ class PopulateSolid(FCNNodeModel):
 
         return ok
 
-    def populate_positions(self, face: Part.Face) -> Part.Shape:
+    def populate_positions(self, solid: Part.Solid) -> list:
+        box = solid.BoundBox
+        bbox = ((box.XMin, box.YMin, box.ZMin), (box.XMax, box.YMax, box.ZMax))
+        b1, b2 = bbox
+        x_min, y_min, z_min = b1
+        x_max, y_max, z_max = b2
+
         done: int = 0
         iterations: int = 0
-        old_positions: list = []
         generated_positions: list = []
-
-        u_range: list = np.array(face.ParameterRange)[:2]
-        v_range: list = np.array(face.ParameterRange)[2:]
 
         while done < self.count:
             iterations += 1
@@ -98,13 +100,12 @@ class PopulateSolid(FCNNodeModel):
             left: int = self.count - done
             batch_size: int = min(BATCH_SIZE, left)
 
-            batch_us: list = list(np.random.uniform(low=u_range[0], high=u_range[1], size=batch_size))
-            batch_vs: list = list(np.random.uniform(low=v_range[0], high=v_range[1], size=batch_size))
-            batch_uvs: list = list(zip(batch_us, batch_vs))
+            batch_x: list = list(np.random.uniform(low=x_min, high=x_max, size=batch_size))
+            batch_y: list = list(np.random.uniform(low=y_min, high=y_max, size=batch_size))
+            batch_z: list = list(np.random.uniform(low=z_min, high=z_max, size=batch_size))
+            batch: list = list(zip(batch_x, batch_y, batch_z))
 
-            batch_positions: list = [face.valueAt(uv[0], uv[1]) for uv in batch_uvs if
-                                     face.isInside(face.valueAt(uv[0], uv[1]), 0.1, True)]
-            candidates: list = [[v[0], v[1], v[2]] for v in batch_positions]
+            candidates: list = [coordinate for coordinate in batch if solid.isInside(Vector(coordinate), 0.1, True)]
 
             if len(candidates) > 0:
                 if self.radius == 0:
@@ -112,7 +113,7 @@ class PopulateSolid(FCNNodeModel):
                 else:
                     good_positions: list = []
                     for candidate in candidates:
-                        if self.check_min_radius(candidate, old_positions + generated_positions + good_positions,
+                        if self.check_min_radius(candidate, generated_positions + good_positions,
                                                  self.radius):
                             good_positions.append(candidate)
 
@@ -123,11 +124,11 @@ class PopulateSolid(FCNNodeModel):
     ###################################################################################
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        face: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [None]
+        solid: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [None]
         self.count: int = int(sockets_input_data[1][0]) if len(sockets_input_data[1]) > 0 else 10
         self.radius: float = float(sockets_input_data[2][0]) if len(sockets_input_data[2]) > 0 else 0
         self.seed: int = int(sockets_input_data[3][0]) if len(sockets_input_data[3]) > 0 else 0
 
         np.random.seed(self.seed)
 
-        return [map_objects(face, Part.Face, self.populate_positions)]
+        return [map_objects(solid, Part.Solid, self.populate_positions)]
