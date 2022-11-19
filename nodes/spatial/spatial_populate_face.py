@@ -52,7 +52,7 @@ class PopulateFace(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Face", True), ("Count", False), ("Distance", False), ("Seed", False)],
+                         inputs_init_list=[("Shape", True), ("Count", False), ("Distance", False), ("Seed", False)],
                          outputs_init_list=[("Point", True)])
 
         self.count: int = 10

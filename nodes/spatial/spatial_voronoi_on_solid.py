@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  spatial_voronoi_3d.py
+#  spatial_voronoi_on_solid.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -38,16 +38,16 @@ from nodes_locator import icon
 
 
 @register_node
-class Voronoi3D(FCNNodeModel):
+class VoronoiOnSolid(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Voronoi (3D)"
+    op_title: str = "Voronoi on Sld"
     op_category: str = "Spatial"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Face", True), ("Point", True)],
+                         inputs_init_list=[("Shape", True), ("Point", True)],
                          outputs_init_list=[("Point", True)])
 
         self.face_list: list = []
