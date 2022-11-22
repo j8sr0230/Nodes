@@ -65,17 +65,32 @@ class VoronoiOnSolid(FCNNodeModel):
         solid: Part.Solid = object_zip[0]
         points: list = object_zip[1]
 
-        all_points = np.array(points).tolist()
+        all_points: list = points
         box = solid.BoundBox
 
         x_min, x_max = box.XMin, box.XMax
         y_min, y_max = box.YMin, box.YMax
         z_min, z_max = box.ZMin, box.ZMax
-        bounds = list(itertools.product([x_min, x_max], [y_min, y_max], [z_min, z_max]))
+        bounds = map_objects(list(itertools.product([x_min, x_max], [y_min, y_max], [z_min, z_max])), tuple,
+                             lambda t: [t[0], t[1], t[2]])
         all_points.extend(bounds)
-        print(all_points)
 
-        return [None]
+        vor = Voronoi(all_points)
+        faces_per_solid = defaultdict(list)
+
+        n_ridges = len(vor.ridge_points)
+        for ridge_idx in range(n_ridges):
+            site_idx_1, site_idx_2 = vor.ridge_points[ridge_idx]
+            face = vor.ridge_vertices[ridge_idx]
+            if -1 not in face:
+                faces_per_solid[site_idx_1].append(face)
+                faces_per_solid[site_idx_2].append(face)
+
+        for solid_idx in sorted(faces_per_solid.keys()):
+            for face in faces_per_solid[solid_idx]:
+                print(solid_idx, face)
+
+        return faces_per_solid
 
     def eval_operation(self, sockets_input_data: list) -> list:
         solid: list = sockets_input_data[0]
