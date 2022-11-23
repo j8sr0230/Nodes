@@ -29,7 +29,7 @@ from collections import defaultdict
 import itertools
 
 
-from FreeCAD import Vector
+from FreeCAD import Vector, Matrix
 import Part
 
 from core.nodes_conf import register_node
@@ -65,15 +65,17 @@ class VoronoiOnSolid(FCNNodeModel):
         solid: Part.Solid = object_zip[0]
         points: list = object_zip[1]
 
-        all_points: list = points
         box = solid.BoundBox
-
         x_min, x_max = box.XMin, box.XMax
         y_min, y_max = box.YMin, box.YMax
         z_min, z_max = box.ZMin, box.ZMax
-        bounds = map_objects(list(itertools.product([x_min, x_max], [y_min, y_max], [z_min, z_max])), tuple,
-                             lambda t: [t[0], t[1], t[2]])
-        all_points.extend(bounds)
+        offset = 10
+        bounds = map_objects(list(itertools.product([x_min - offset, x_max + offset],
+                                                    [y_min - offset, y_max + offset],
+                                                    [z_min - offset, z_max + offset])), tuple,
+                             lambda t: Vector(t[0], t[1], t[2]))
+
+        all_points: np.ndarray = np.vstack((points, bounds))
 
         vor = Voronoi(all_points)
         faces_per_solid = defaultdict(list)
@@ -86,11 +88,38 @@ class VoronoiOnSolid(FCNNodeModel):
                 faces_per_solid[site_idx_1].append(face)
                 faces_per_solid[site_idx_2].append(face)
 
+        occ_solids: list = []
         for solid_idx in sorted(faces_per_solid.keys()):
+            occ_faces: list = []
             for face in faces_per_solid[solid_idx]:
-                print(solid_idx, face)
+                face_vertices = vor.vertices[face].tolist()
+                face_vectors = list(map_last_level(face_vertices, float, lambda v: Vector(v[0], v[1], v[2])))
 
-        return faces_per_solid
+                segments = []
+                for i in range(len(face_vectors)):
+                    if i + 1 < len(face_vectors):
+                        segments.append(Part.LineSegment(face_vectors[i], face_vectors[i + 1]))
+                segments.append(Part.LineSegment(face_vectors[-1], face_vectors[0]))
+                occ_faces.append(Part.Face(Part.Wire(Part.Shape(segments).Edges)))
+
+            occ_solid = Part.Solid(Part.Shell(occ_faces))
+            if occ_solid.isValid():
+                occ_solids.append(occ_solid)
+
+        common = solid.common(Part.makeCompound(occ_solids))
+        difference = solid.cut(common)
+        voronoi_solids = difference.Solids + common.Solids
+
+        scaled_voronoi_solids: list = []
+        scale_matrix = Matrix()
+        scale_matrix.scale(0.9, 0.9, 0.9)
+        for solid in voronoi_solids:
+            center: Vector = solid.CenterOfGravity
+            solid.translate(-center)
+            scaled_solid = solid.transformGeometry(scale_matrix)
+            scaled_solid.translate(center)
+            scaled_voronoi_solids.append(scaled_solid)
+        return scaled_voronoi_solids
 
     def eval_operation(self, sockets_input_data: list) -> list:
         solid: list = sockets_input_data[0]
