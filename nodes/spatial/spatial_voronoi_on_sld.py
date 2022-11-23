@@ -111,17 +111,25 @@ class VoronoiOnSolid(FCNNodeModel):
 
         if self.shell:
             voronoi_shapes = BOPTools.SplitAPI.slice(solid.Shells[0], vor_solids, "Split").SubShapes
-            # if not self.inner:
-            #     voronoi_shapes = solid.Shells[0].cut(Part.makeCompound(voronoi_shapes)).SubShapes
-
         else:
             common = solid.common(Part.makeCompound(vor_solids))
             difference = solid.cut(common)
             voronoi_shapes = common.Solids + difference.Solids
-            # if not self.inner:
-            #     voronoi_shapes = solid.cut(Part.makeCompound(voronoi_shapes)).SubShapes
 
         scaled_voronoi_shapes: list = [solid.scale(self.scale, solid.CenterOfGravity) for solid in voronoi_shapes]
+
+        if not self.inner:
+            if not self.shell:
+                base = Part.Solid(solid)
+                base.scale(self.scale, base.CenterOfGravity)
+                cutter = Part.makeCompound(voronoi_shapes)
+                scaled_voronoi_shapes = base.cut(cutter).SubShapes
+            else:
+                base = Part.Shell(solid.Shells[0])
+                base.scale(self.scale, base.CenterOfGravity)
+                cutter = Part.makeCompound(voronoi_shapes)
+                scaled_voronoi_shapes = base.cut(cutter).SubShapes
+
         return scaled_voronoi_shapes
 
     def eval_operation(self, sockets_input_data: list) -> list:
