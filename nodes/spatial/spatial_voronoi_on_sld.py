@@ -22,6 +22,8 @@
 #
 #
 ###################################################################################
+from math import fabs
+
 import numpy as np
 from scipy.spatial import Voronoi
 from scipy import rand
@@ -31,6 +33,7 @@ import itertools
 
 from FreeCAD import Vector, Matrix
 import Part
+import BOPTools.SplitAPI
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
@@ -49,19 +52,21 @@ class VoronoiOnSolid(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Shape", True), ("Point", True), ("Inset", False)],
+                         inputs_init_list=[("Shape", True), ("Point", True), ("Shell", False), ("Inner", False),
+                                           ("Scale", False)],
                          outputs_init_list=[("Point", True)])
 
         self.solid_list: list = []
         self.point_list: list = []
-        self.inset: float = 0
+        self.shell: int = 1
+        self.inner: int = 1
+        self.scale: float = 0.9
 
-        self.grNode.resize(130, 100)
+        self.grNode.resize(130, 150)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    @staticmethod
-    def make_voronoi(object_zip: tuple) -> list:
+    def make_voronoi(self, object_zip: tuple) -> list:
         solid: Part.Solid = object_zip[0]
         points: list = object_zip[1]
 
@@ -69,15 +74,13 @@ class VoronoiOnSolid(FCNNodeModel):
         x_min, x_max = box.XMin, box.XMax
         y_min, y_max = box.YMin, box.YMax
         z_min, z_max = box.ZMin, box.ZMax
-        offset = 10
-        bounds = map_objects(list(itertools.product([x_min - offset, x_max + offset],
-                                                    [y_min - offset, y_max + offset],
-                                                    [z_min - offset, z_max + offset])), tuple,
-                             lambda t: Vector(t[0], t[1], t[2]))
-
+        x_offset, y_offset, z_offset = fabs(x_max - x_min), fabs(y_max - y_min), fabs(z_max - z_min)
+        bounds = list(itertools.product([x_min - x_offset, x_max + x_offset], [y_min - y_offset, y_max + y_offset],
+                                        [z_min - z_offset, z_max + z_offset]))
+        bounds = map_objects(bounds, tuple, lambda t: Vector(t[0], t[1], t[2]))
         all_points: np.ndarray = np.vstack((points, bounds))
 
-        vor = Voronoi(all_points)
+        vor: Voronoi = Voronoi(all_points)
         faces_per_solid = defaultdict(list)
 
         n_ridges = len(vor.ridge_points)
@@ -88,11 +91,11 @@ class VoronoiOnSolid(FCNNodeModel):
                 faces_per_solid[site_idx_1].append(face)
                 faces_per_solid[site_idx_2].append(face)
 
-        occ_solids: list = []
+        vor_solids: list = []
         for solid_idx in sorted(faces_per_solid.keys()):
-            occ_faces: list = []
+            vor_faces: list = []
             for face in faces_per_solid[solid_idx]:
-                face_vertices = vor.vertices[face].tolist()
+                face_vertices: list = vor.vertices[face].tolist()
                 face_vectors = list(map_last_level(face_vertices, float, lambda v: Vector(v[0], v[1], v[2])))
 
                 segments = []
@@ -100,31 +103,33 @@ class VoronoiOnSolid(FCNNodeModel):
                     if i + 1 < len(face_vectors):
                         segments.append(Part.LineSegment(face_vectors[i], face_vectors[i + 1]))
                 segments.append(Part.LineSegment(face_vectors[-1], face_vectors[0]))
-                occ_faces.append(Part.Face(Part.Wire(Part.Shape(segments).Edges)))
+                vor_faces.append(Part.Face(Part.Wire(Part.Shape(segments).Edges)))
 
-            occ_solid = Part.Solid(Part.Shell(occ_faces))
-            if occ_solid.isValid():
-                occ_solids.append(occ_solid)
+            vor_solid: Part.Shape = Part.Solid(Part.Shell(vor_faces))
+            if vor_solid.isValid():
+                vor_solids.append(vor_solid)
 
-        common = solid.common(Part.makeCompound(occ_solids))
-        difference = solid.cut(common)
-        voronoi_solids = difference.Solids + common.Solids
+        if self.shell:
+            voronoi_shapes = BOPTools.SplitAPI.slice(solid.Shells[0], vor_solids, "Split").SubShapes
+            # if not self.inner:
+            #     voronoi_shapes = solid.Shells[0].cut(Part.makeCompound(voronoi_shapes)).SubShapes
 
-        scaled_voronoi_solids: list = []
-        scale_matrix = Matrix()
-        scale_matrix.scale(0.9, 0.9, 0.9)
-        for solid in voronoi_solids:
-            center: Vector = solid.CenterOfGravity
-            solid.translate(-center)
-            scaled_solid = solid.transformGeometry(scale_matrix)
-            scaled_solid.translate(center)
-            scaled_voronoi_solids.append(scaled_solid)
-        return scaled_voronoi_solids
+        else:
+            common = solid.common(Part.makeCompound(vor_solids))
+            difference = solid.cut(common)
+            voronoi_shapes = common.Solids + difference.Solids
+            # if not self.inner:
+            #     voronoi_shapes = solid.cut(Part.makeCompound(voronoi_shapes)).SubShapes
+
+        scaled_voronoi_shapes: list = [solid.scale(self.scale, solid.CenterOfGravity) for solid in voronoi_shapes]
+        return scaled_voronoi_shapes
 
     def eval_operation(self, sockets_input_data: list) -> list:
         solid: list = sockets_input_data[0]
         point: list = sockets_input_data[1]
-        self.inset: float = float(sockets_input_data[2][0]) if len(sockets_input_data[2]) > 0 else 0
+        self.shell: int = int(sockets_input_data[2][0]) if len(sockets_input_data[2]) > 0 else 1
+        self.inner: int = int(sockets_input_data[3][0]) if len(sockets_input_data[3]) > 0 else 1
+        self.scale: float = float(sockets_input_data[4][0]) if len(sockets_input_data[4]) > 0 else 0.9
 
         solid_list: list = list(flatten(solid))
         point_list: list = list(simplify(point))
