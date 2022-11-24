@@ -67,6 +67,8 @@ class VoronoiOnSolid(FCNNodeModel):
         solid: Part.Solid = object_zip[0]
         points: list = object_zip[1]
 
+        ###################################################################################
+        # Based on https://github.com/nortikin/sverchok/blob/master/utils/voronoi3d.py
         box = solid.BoundBox
         x_min, x_max = box.XMin, box.XMax
         y_min, y_max = box.YMin, box.YMax
@@ -96,6 +98,7 @@ class VoronoiOnSolid(FCNNodeModel):
             for face in faces_per_solid[solid_idx]:
                 face_vertices: list = vor.vertices[face].tolist()
                 face_vectors = list(map_last_level(face_vertices, float, lambda v: Vector(v[0], v[1], v[2])))
+        ###################################################################################
 
                 segments = []
                 for i in range(len(face_vectors)):
