@@ -31,9 +31,8 @@ from collections import defaultdict
 import itertools
 
 
-from FreeCAD import Vector, Matrix
+from FreeCAD import Vector
 import Part
-import BOPTools.SplitAPI
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
