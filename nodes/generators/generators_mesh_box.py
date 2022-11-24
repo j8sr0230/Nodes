@@ -36,7 +36,7 @@ from nodes_locator import icon
 @register_node
 class MeshBox(FCNNodeModel):
 
-    icon: str = icon("Mesh_Cube.svg")
+    icon: str = icon("nodes_mesh_cube.svg")
     op_title: str = "MBox"
     op_category: str = "Generators"
     content_label_objname: str = "fcn_node_bg"

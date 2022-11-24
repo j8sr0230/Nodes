@@ -37,7 +37,7 @@ from nodes_locator import icon
 @register_node
 class Arc3Pts(FCNNodeModel):
 
-    icon: str = icon("Sketcher_Create3PointArc.svg")
+    icon: str = icon("nodes_arc_3_pt.svg")
     op_title: str = "Arc (3 Pts)"
     op_category: str = "Curves"
     content_label_objname: str = "fcn_node_bg"

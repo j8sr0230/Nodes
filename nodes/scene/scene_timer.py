@@ -81,7 +81,7 @@ class TimerInputContent(QDMNodeContentWidget):
 @register_node
 class Timer(FCNNodeModel):
 
-    icon: str = icon("Nodes_Timer.svg")
+    icon: str = icon("nodes_timer.svg")
     op_title: str = "Timer"
     op_category: str = "Scene"
     content_label_objname: str = "fcn_node_bg"

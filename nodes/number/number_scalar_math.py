@@ -75,7 +75,7 @@ class ScalarMathInputContent(QDMNodeContentWidget):
 @register_node
 class ScalarMath(FCNNodeModel):
 
-    icon: str = icon("Nodes_Math.svg")
+    icon: str = icon("nodes_math.svg")
     op_title: str = "Scalar Math"
     op_category: str = "Number"
     content_label_objname: str = "fcn_node_bg"

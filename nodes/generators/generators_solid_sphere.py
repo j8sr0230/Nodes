@@ -36,7 +36,7 @@ from nodes_locator import icon
 @register_node
 class Sphere(FCNNodeModel):
 
-    icon: str = icon("Tree_Part_Sphere_Parametric.svg")
+    icon: str = icon("nodes_sphere.svg")
     op_title: str = "Sphere"
     op_category: str = "Generators"
     content_label_objname: str = "fcn_node_bg"

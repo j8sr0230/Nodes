@@ -37,7 +37,7 @@ from nodes_locator import icon
 @register_node
 class Line2Pts(FCNNodeModel):
 
-    icon: str = icon("Sketcher_CreateLine.svg")
+    icon: str = icon("nodes_line.svg")
     op_title: str = "Line (2 Pts)"
     op_category: str = "Curves"
     content_label_objname: str = "fcn_node_bg"

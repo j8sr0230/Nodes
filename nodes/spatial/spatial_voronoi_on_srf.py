@@ -38,7 +38,7 @@ from nodes_locator import icon
 @register_node
 class VoronoiOnSrf(FCNNodeModel):
 
-    icon: str = icon("Nodes_Voronoi2D.svg")
+    icon: str = icon("nodes_voronoi_on_srf.svg")
     op_title: str = "Voronoi on Srf"
     op_category: str = "Spatial"
     content_label_objname: str = "fcn_node_bg"

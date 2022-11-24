@@ -37,7 +37,7 @@ from nodes_locator import icon
 @register_node
 class Polyline(FCNNodeModel):
 
-    icon: str = icon("Sketcher_CreatePolyline.svg")
+    icon: str = icon("nodes_polyline.svg")
     op_title: str = "Polyline"
     op_category: str = "Curves"
     content_label_objname: str = "fcn_node_bg"

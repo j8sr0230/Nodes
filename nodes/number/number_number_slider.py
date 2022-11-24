@@ -124,7 +124,7 @@ class SliderInputContent(QDMNodeContentWidget):
 @register_node
 class NumberSlider(FCNNodeModel):
 
-    icon: str = icon("Nodes_NumberSlider.svg")
+    icon: str = icon("nodes_number_slider.svg")
     op_title: str = "Number Slider"
     op_category: str = "Number"
     content_label_objname: str = "fcn_node_bg"

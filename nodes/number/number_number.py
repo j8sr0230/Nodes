@@ -75,7 +75,7 @@ class LineInputContent(QDMNodeContentWidget):
 @register_node
 class Number(FCNNodeModel):
 
-    icon: str = icon("Nodes_Number.svg")
+    icon: str = icon("nodes_number.svg")
     op_title: str = "Number"
     op_category: str = "Number"
     content_label_objname: str = "fcn_node_bg"

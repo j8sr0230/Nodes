@@ -45,7 +45,7 @@ MAX_ITERATIONS = 1000
 @register_node
 class PopulateFace(FCNNodeModel):
 
-    icon: str = icon("Nodes_Populate2D.svg")
+    icon: str = icon("nodes_populate_2d.svg")
     op_title: str = "Populate Face"
     op_category: str = "Spatial"
     content_label_objname: str = "fcn_node_bg"
