@@ -64,12 +64,12 @@ class VoronoiOnSrf(FCNNodeModel):
         uv_vor: Voronoi = Voronoi(uvs)
 
         # Filter region for valid vectors
-        uv_vor_points = np.array([face.valueAt(uv[0], uv[1]) for uv in uv_vor.vertices])
-        uv_vor_regions = [uv_vor_points[region].tolist() for region in uv_vor.regions
+        vor_vertices_uv = np.array([face.valueAt(uv[0], uv[1]) for uv in uv_vor.vertices])
+        vor_regions_uv = [vor_vertices_uv[region].tolist() for region in uv_vor.regions
                           if all([-1 not in region]) and len(region) > 0]
-        vector_vor_regions = map_last_level(uv_vor_regions, float, lambda v: Vector(v[0], v[1], v[2]))
+        vor_regions_vector = map_last_level(vor_regions_uv, float, lambda v: Vector(v[0], v[1], v[2]))
 
-        valid_vector_regions: list = [[region] for region in vector_vor_regions
+        valid_vector_regions: list = [[region] for region in vor_regions_vector
                                       if all([face.isInside(vector, 1, True) for vector in region])]
 
         return valid_vector_regions
