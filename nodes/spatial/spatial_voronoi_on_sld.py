@@ -52,17 +52,15 @@ class VoronoiOnSolid(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Shape", True), ("Point", True), ("Shell", False), ("Inner", False),
-                                           ("Scale", False)],
-                         outputs_init_list=[("Point", True)])
+                         inputs_init_list=[("Shape", True), ("Point", True), ("Mode", False), ("Scale", False)],
+                         outputs_init_list=[("Shape", True)])
 
         self.solid_list: list = []
         self.point_list: list = []
-        self.shell: int = 1
-        self.inner: int = 1
+        self.mode: int = 0
         self.scale: float = 0.9
 
-        self.grNode.resize(130, 150)
+        self.grNode.resize(130, 120)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
@@ -81,9 +79,11 @@ class VoronoiOnSolid(FCNNodeModel):
         all_points: np.ndarray = np.vstack((points, bounds))
 
         vor: Voronoi = Voronoi(all_points)
-        faces_per_solid = defaultdict(list)
 
+        # Generate voronoi solids from scipy.spatial.Voronoi data
+        faces_per_solid = defaultdict(list)
         n_ridges = len(vor.ridge_points)
+
         for ridge_idx in range(n_ridges):
             site_idx_1, site_idx_2 = vor.ridge_points[ridge_idx]
             face = vor.ridge_vertices[ridge_idx]
@@ -109,35 +109,41 @@ class VoronoiOnSolid(FCNNodeModel):
             if vor_solid.isValid():
                 vor_solids.append(vor_solid)
 
-        if self.shell:
-            voronoi_shapes = BOPTools.SplitAPI.slice(solid.Shells[0], vor_solids, "Split").SubShapes
+        # Inner voronoi solids
+        common: Part.Shape = solid.common(Part.makeCompound(vor_solids))
+        difference: Part.Shape = solid.cut(common)
+        inner_voronoi_solids: list = common.Solids + difference.Solids
+        scaled_voronoi_solids: list = [solid.scale(self.scale, solid.CenterOfGravity) for solid in inner_voronoi_solids]
+
+        if self.mode == 0:
+            # Inner voronoi solids
+            result: list = scaled_voronoi_solids
+        elif self.mode == 1:
+            # Inverse of inner voronoi solids
+            base: Part.Shape = Part.Solid(solid)
+            base.scale(self.scale, base.CenterOfGravity)
+            cutter: Part.Shape = Part.makeCompound(scaled_voronoi_solids)
+            result: list = base.cut(cutter).SubShapes
+        elif self.mode == 2:
+            # Inner voronoi faces
+            base: Part.Shape = Part.Solid(solid).Shells[0]
+            base.scale(self.scale, base.CenterOfGravity)
+            cutter: Part.Shape = Part.makeCompound(scaled_voronoi_solids)
+            result: list = base.common(cutter).SubShapes
         else:
-            common = solid.common(Part.makeCompound(vor_solids))
-            difference = solid.cut(common)
-            voronoi_shapes = common.Solids + difference.Solids
+            # Inverse of inner voronoi faces
+            base: Part.Shape = Part.Solid(solid).Shells[0]
+            base.scale(self.scale, base.CenterOfGravity)
+            cutter: Part.Shape = Part.makeCompound(scaled_voronoi_solids)
+            result: list = base.cut(cutter).SubShapes
 
-        scaled_voronoi_shapes: list = [solid.scale(self.scale, solid.CenterOfGravity) for solid in voronoi_shapes]
-
-        if not self.inner:
-            if not self.shell:
-                base = Part.Solid(solid)
-                base.scale(self.scale, base.CenterOfGravity)
-                cutter = Part.makeCompound(voronoi_shapes)
-                scaled_voronoi_shapes = base.cut(cutter).SubShapes
-            else:
-                base = Part.Shell(solid.Shells[0])
-                base.scale(self.scale, base.CenterOfGravity)
-                cutter = Part.makeCompound(voronoi_shapes)
-                scaled_voronoi_shapes = base.cut(cutter).SubShapes
-
-        return scaled_voronoi_shapes
+        return result
 
     def eval_operation(self, sockets_input_data: list) -> list:
         solid: list = sockets_input_data[0]
         point: list = sockets_input_data[1]
-        self.shell: int = int(sockets_input_data[2][0]) if len(sockets_input_data[2]) > 0 else 1
-        self.inner: int = int(sockets_input_data[3][0]) if len(sockets_input_data[3]) > 0 else 1
-        self.scale: float = float(sockets_input_data[4][0]) if len(sockets_input_data[4]) > 0 else 0.9
+        self.mode: int = int(sockets_input_data[2][0]) if len(sockets_input_data[2]) > 0 else 0
+        self.scale: float = float(sockets_input_data[3][0]) if len(sockets_input_data[3]) > 0 else 0.9
 
         solid_list: list = list(flatten(solid))
         point_list: list = list(simplify(point))
