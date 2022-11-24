@@ -35,7 +35,7 @@ from nodes_locator import icon
 @register_node
 class ShapeInfo(FCNNodeModel):
 
-    icon: str = icon("nodes_default.png")
+    icon: str = icon("Nodes_ShapeInfo.svg")
     op_title: str = "Shape Info"
     op_category: str = "Analyzers"
     content_label_objname: str = "fcn_node_bg"

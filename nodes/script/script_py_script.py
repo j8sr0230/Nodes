@@ -80,7 +80,7 @@ class CodeEditorDialog(QDialog):
 @register_node
 class PyScript(FCNNodeModel):
 
-    icon: str = icon("nodes_python_logo.png")
+    icon: str = icon("Nodes_Python.svg")
     op_title: str = "PyScript"
     op_category: str = "Script"
     content_label_objname: str = "fcn_node_bg"

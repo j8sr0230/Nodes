@@ -36,7 +36,7 @@ from nodes_locator import icon
 @register_node
 class SolidBox(FCNNodeModel):
 
-    icon: str = icon("nodes_default.png")
+    icon: str = icon("Tree_Part_Box_Parametric.svg")
     op_title: str = "Box"
     op_category: str = "Generators"
     content_label_objname: str = "fcn_node_bg"
