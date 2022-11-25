@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  number_scalar_math.py
+#  vector_math.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -28,16 +28,19 @@ import awkward as ak
 from qtpy.QtWidgets import QComboBox, QLayout, QVBoxLayout
 from qtpy.QtCore import Qt
 
+from FreeCAD import Vector
+
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 
 from core.nodes_conf import register_node
+from core.nodes_utils import map_last_level
 from core.nodes_default_node import FCNNodeModel, FCNNodeView, FCNNodeContentView
 
 from nodes_locator import icon
 
 
-class ScalarMathInputContent(QDMNodeContentWidget):
+class VectorMathInputContent(QDMNodeContentWidget):
 
     layout: QLayout
     edit: QComboBox
@@ -73,11 +76,11 @@ class ScalarMathInputContent(QDMNodeContentWidget):
 
 
 @register_node
-class ScalarMath(FCNNodeModel):
+class VectorMath(FCNNodeModel):
 
-    icon: str = icon("nodes_math.svg")
-    op_title: str = "Scalar Math"
-    op_category: str = "Number"
+    icon: str = icon("nodes_default.png")
+    op_title: str = "Vector Math"
+    op_category: str = "Vector"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
@@ -90,27 +93,27 @@ class ScalarMath(FCNNodeModel):
             socket.setSocketPosition()
 
     def initInnerClasses(self):
-        self.content: QDMNodeContentWidget = ScalarMathInputContent(self)
+        self.content: QDMNodeContentWidget = VectorMathInputContent(self)
         self.grNode: QDMGraphicsNode = FCNNodeView(self)
         self.content.edit.currentIndexChanged.connect(self.onInputChanged)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         op_code: int = self.content.edit.currentIndex()
-        a_array = ak.Array(sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [0])
-        b_array = ak.Array(sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [1])
+        vector_a = ak.Array(sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [1., 0., 0.])
+        vector_b = ak.Array(sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [0., 1., 0.])
 
         # Outputs
         if op_code == 0:  # Add
-            res = a_array + b_array
+            res = vector_a + vector_b
         elif op_code == 1:  # Sub
-            res = a_array - b_array
+            res = vector_a - vector_b
         elif op_code == 2:  # Mul
-            res = a_array * b_array
+            res = vector_a * vector_b
         elif op_code == 3:  # Div
-            res = a_array / b_array
+            res = vector_a / vector_b
         elif op_code == 4:  # Pow
-            res = a_array ** b_array
+            res = vector_a ** vector_b
         else:
             raise ValueError("Unknown operation (Op)")
 
-        return [res.tolist()]
+        return [map_last_level(res.tolist(), float, lambda v: Vector(v[0], v[1], v[2]))]
