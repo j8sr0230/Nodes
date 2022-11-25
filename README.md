@@ -14,16 +14,16 @@ A visual scripting workbench for [FreeCAD](https://www.freecad.org) using
 ## Installation
 Download and install the Nodes workbench via the Addon Manager (**Tools → Addon Manager**).
 
-![Nodes installation](https://github.com/j8sr0230/Nodes/blob/main/docs/nodes_installation.png)
-
 ## Usage
-### Feature overview
-![Feature overview](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_base_node_features.gif)
+### Showcase
+![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_voronoi_extrusion.gif)
+![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_voronoi_extrusion_graph.png)
 
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_animation.gif)
+![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_animation.gif)
+![Feature overview](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_base_node_features.gif)
 
 Tutorials coming soon!
 
 ## License
-
 LGPLv2.1 ([LICENSE](LICENSE))
