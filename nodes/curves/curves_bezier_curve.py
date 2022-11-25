@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  curves_bspline.py
+#  curves_bezier_curve.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -33,10 +33,10 @@ from nodes_locator import icon
 
 
 @register_node
-class BSpline(FCNNodeModel):
+class BezierCurve(FCNNodeModel):
 
-    icon: str = icon("nodes_bspline.svg")
-    op_title: str = "BSpline"
+    icon: str = icon("nodes_default.png")
+    op_title: str = "Bezier Crv"
     op_category: str = "Curves"
     content_label_objname: str = "fcn_node_bg"
 
@@ -45,24 +45,24 @@ class BSpline(FCNNodeModel):
                          inputs_init_list=[("Point", True), ("Closed", False)],
                          outputs_init_list=[("Curve", True)])
 
+        self.is_closed: bool = False
+
         self.grNode.resize(100, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    @staticmethod
-    def make_occ_closed_bspline(flat_points: list) -> Part.Shape:
-        return Part.BSplineCurve(flat_points, None, None, True, 3, None, False)
+    def make_occ_bezier(self, flat_points: list) -> Part.Shape:
+        if self.is_closed:
+            flat_points.append(flat_points[0])
 
-    @staticmethod
-    def make_occ_open_bspline(flat_points: list) -> Part.Shape:
-        return Part.BSplineCurve(flat_points, None, None, False, 3, None, False)
+        curve = Part.BezierCurve()
+        curve.setPoles(flat_points)
+        return curve
 
     def eval_operation(self, sockets_input_data: list) -> list:
         points: list = sockets_input_data[0] if len(list(flatten(sockets_input_data[0]))) > 2 else [Vector(0, 0, 0),
                                                                                                     Vector(10, 0, 0),
                                                                                                     Vector(10, 10, 0)]
-        is_closed: bool = bool(sockets_input_data[1][0] if len(sockets_input_data[1]) > 0 else 0)
-        if is_closed:
-            return [[map_last_level(points, Vector, self.make_occ_closed_bspline)]]
-        else:
-            return [[map_last_level(points, Vector, self.make_occ_open_bspline)]]
+        self.is_closed: bool = bool(sockets_input_data[1][0] if len(sockets_input_data[1]) > 0 else 0)
+
+        return [[map_last_level(points, Vector, self.make_occ_bezier)]]
