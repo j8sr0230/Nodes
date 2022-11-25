@@ -18,8 +18,6 @@ Download and install the Nodes workbench via the Addon Manager (**Tools → Addo
 ### Showcase
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_voronoi_extrusion.gif)
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_voronoi_extrusion_graph.png)
-
-![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_animation.gif)
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_animation.gif)
 ![Feature overview](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_base_node_features.gif)
 
