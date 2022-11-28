@@ -22,6 +22,8 @@
 #
 #
 ###################################################################################
+from itertools import product
+
 import Part
 import awkward as ak
 
@@ -56,28 +58,24 @@ class EvaluateSurface(FCNNodeModel):
     def evaluate_position(self, parameter_zip: tuple) -> list:
         surface: Part.Face = self.flat_srf_list[parameter_zip[0]]
         us: list = self.flat_u_list[parameter_zip[1]]
-        vs: list = self.flat_u_list[parameter_zip[2]]
+        vs: list = self.flat_v_list[parameter_zip[2]]
 
+        us, vs = ak.broadcast_arrays(us, vs)
         res = []
-        if type(us) is list:
-            for i, u in enumerate(us):
-                res.append(surface.valueAt(u, vs[i]))
-        else:
-            res.append(surface.valueAt(us, vs))
+        for i, u in enumerate(us):
+            res.append(surface.valueAt(u, vs[i]))
 
         return res
 
     def evaluate_normal(self, parameter_zip: tuple) -> list:
         surface: Part.Face = self.flat_srf_list[parameter_zip[0]]
         us: list = self.flat_u_list[parameter_zip[1]]
-        vs: list = self.flat_u_list[parameter_zip[2]]
+        vs: list = self.flat_v_list[parameter_zip[2]]
 
+        us, vs = ak.broadcast_arrays(us, vs)
         res = []
-        if type(us) is list:
-            for i, u in enumerate(us):
-                res.append(surface.normalAt(u, vs[i]))
-        else:
-            res.append(surface.normalAt(us, vs))
+        for i, u in enumerate(us):
+            res.append(surface.normalAt(u, vs[i]))
 
         return res
 
