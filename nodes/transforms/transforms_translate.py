@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  modifiers_extrude.py
+#  transform_translate.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -35,11 +35,11 @@ from nodes_locator import icon
 
 
 @register_node
-class Extrude(FCNNodeModel):
+class Translate(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Extrude"
-    op_category: str = "Modifiers"
+    op_title: str = "Translate"
+    op_category: str = "Transforms"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
@@ -54,11 +54,11 @@ class Extrude(FCNNodeModel):
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_occ_extrusion(self, parameter_zip: tuple) -> Part.Shape:
+    def make_occ_translation(self, parameter_zip: tuple) -> Part.Shape:
         shape: Part.Shape = self.flat_shape_list[parameter_zip[0]]
         direction: Vector = self.flat_dir_list[parameter_zip[1]]
 
-        return shape.extrude(direction)
+        return shape.translate(direction)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         shape: list = sockets_input_data[0]
@@ -73,4 +73,4 @@ class Extrude(FCNNodeModel):
         shape_idx_list, dir_idx_list = ak.broadcast_arrays(shape_idx_list, dir_idx_list)
         parameter_zip: list = ak.zip([shape_idx_list, dir_idx_list], depth_limit=None).tolist()
 
-        return [map_objects(parameter_zip, tuple, self.make_occ_extrusion)]
+        return [map_objects(parameter_zip, tuple, self.make_occ_translation)]
