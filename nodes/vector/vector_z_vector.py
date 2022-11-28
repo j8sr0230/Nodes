@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  modifiers_extrude.py
+#  vector_z_vector.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,55 +22,32 @@
 #
 #
 ###################################################################################
+from FreeCAD import Vector
 import awkward as ak
 
-from FreeCAD import Vector
-import Part
-
-from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
+from core.nodes_conf import register_node
 from core.nodes_utils import flatten, map_objects
 
 from nodes_locator import icon
 
 
 @register_node
-class Extrude(FCNNodeModel):
+class ZVector(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Extrude"
-    op_category: str = "Modifiers"
+    op_title: str = "Z Vector"
+    op_category: str = "Vector"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Shape", True), ("Direction", True)],
-                         outputs_init_list=[("Shape", True)])
+                         inputs_init_list=[],
+                         outputs_init_list=[("Out", True)])
 
-        self.flat_shape_list: list = []
-        self.flat_dir_list: list = []
-
-        self.grNode.resize(120, 80)
+        self.grNode.resize(90, 70)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_occ_extrusion(self, parameter_zip: tuple) -> Part.Shape:
-        shape: Part.Shape = self.flat_shape_list[parameter_zip[0]]
-        direction: Vector = self.flat_dir_list[parameter_zip[1]]
-
-        return shape.extrude(direction)
-
     def eval_operation(self, sockets_input_data: list) -> list:
-        shape: list = sockets_input_data[0]
-        direction: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 1)]
-
-        # Array broadcast
-        self.flat_shape_list: list = list(flatten(shape))
-        shape_idx_list = map_objects(shape, Part.Shape, lambda shp: self.flat_shape_list.index(shp))
-        self.flat_dir_list: list = list(flatten(direction))
-        dir_idx_list: list = list(range(len(self.flat_dir_list)))
-
-        shape_idx_list, dir_idx_list = ak.broadcast_arrays(shape_idx_list, dir_idx_list)
-        parameter_zip: list = ak.zip([shape_idx_list, dir_idx_list], depth_limit=None).tolist()
-
-        return [map_objects(parameter_zip, tuple, self.make_occ_extrusion)]
+        return [[Vector(0, 0, 1)]]
