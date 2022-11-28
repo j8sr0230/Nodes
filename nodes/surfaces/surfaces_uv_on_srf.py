@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  surfaces_evaluate_srf.py
+#  surfaces_uv_on_srf.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,7 +22,9 @@
 #
 #
 ###################################################################################
+from FreeCAD import Vector
 import Part
+
 import awkward as ak
 
 from core.nodes_conf import register_node
@@ -33,67 +35,65 @@ from nodes_locator import icon
 
 
 @register_node
-class EvaluateSurface(FCNNodeModel):
+class UVOnSurface(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Evaluate Srf"
+    op_title: str = "UV on Srf"
     op_category: str = "Surfaces"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("U", True), ("V", True), ("Srf", True), ],
-                         outputs_init_list=[("Point", True), ("Normal", True)])
+                         inputs_init_list=[("Srf", True), ("Point", True)],
+                         outputs_init_list=[("U", True), ("V", True)])
 
-        self.grNode.resize(120, 100)
+        self.grNode.resize(100, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-        self.flat_u_list: list = []
-        self.flat_v_list: list = []
         self.flat_srf_list: list = []
+        self.flat_point_list: list = []
 
-    def evaluate_position(self, parameter_zip: tuple) -> list:
+    def evaluate_u(self, parameter_zip: tuple) -> list:
         surface: Part.Face = self.flat_srf_list[parameter_zip[0]]
-        us: list = self.flat_u_list[parameter_zip[1]]
-        vs: list = self.flat_v_list[parameter_zip[2]]
+        points: list = self.flat_point_list[parameter_zip[1]]
 
-        us, vs = ak.broadcast_arrays(us, vs)
-        res = []
-        for i, u in enumerate(us):
-            res.append(surface.valueAt(u, vs[i]))
+        res: list = []
+        if type(points) is list:
+            for point in points:
+                res.append(surface.Surface.parameter(point))
+        else:
+            res.append(surface.Surface.parameter(points)[0])
 
         return res
 
-    def evaluate_normal(self, parameter_zip: tuple) -> list:
+    def evaluate_v(self, parameter_zip: tuple) -> list:
         surface: Part.Face = self.flat_srf_list[parameter_zip[0]]
-        us: list = self.flat_u_list[parameter_zip[1]]
-        vs: list = self.flat_v_list[parameter_zip[2]]
+        points: list = self.flat_point_list[parameter_zip[1]]
 
-        us, vs = ak.broadcast_arrays(us, vs)
-        res = []
-        for i, u in enumerate(us):
-            res.append(surface.normalAt(u, vs[i]))
+        res: list = []
+        if type(points) is list:
+            for point in points:
+                res.append(surface.Surface.parameter(point))
+        else:
+            res.append(surface.Surface.parameter(points)[1])
 
         return res
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        u_param: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [0]
-        v_param: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [0]
-        surfaces: list = sockets_input_data[2]
+        surfaces: list = sockets_input_data[0]
+        point: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
 
         # Array broadcast
         self.flat_srf_list: list = list(flatten(surfaces))
         srf_idx_list = map_objects(surfaces, Part.Face, lambda srf: self.flat_srf_list.index(srf))
-        self.flat_u_list: list = list(simplify(u_param))
-        u_idx_list: list = list(range(len(self.flat_u_list)))
-        self.flat_v_list: list = list(simplify(v_param))
-        v_idx_list: list = list(range(len(self.flat_v_list)))
+        self.flat_point_list: list = list(flatten(point))
+        point_idx_list = map_objects(point, Vector, lambda vec: self.flat_point_list.index(vec))
 
-        srf_idx_list, u_idx_list, v_idx_list = ak.broadcast_arrays(srf_idx_list, u_idx_list, v_idx_list)
-        parameter_zip: list = ak.zip([srf_idx_list, u_idx_list, v_idx_list], depth_limit=None).tolist()
+        srf_idx_list, point_idx_list = ak.broadcast_arrays(srf_idx_list, point_idx_list)
+        parameter_zip: list = ak.zip([srf_idx_list, point_idx_list], depth_limit=None).tolist()
 
-        pos_vectors: list = list(map_objects(parameter_zip, tuple, self.evaluate_position))
-        normal_vectors: list = list(map_objects(parameter_zip, tuple, self.evaluate_normal))
+        us: list = list(map_objects(parameter_zip, tuple, self.evaluate_u))
+        vs: list = list(map_objects(parameter_zip, tuple, self.evaluate_v))
 
-        return [pos_vectors, normal_vectors]
+        return [us, vs]
