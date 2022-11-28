@@ -295,11 +295,11 @@ class FCNNodeModel(Node):
         try:
             # Run new evaluation and return the desired output socket (index)
             return self.eval_primer()[index]
-        # except (ValueError, TypeError, SyntaxError, NameError, ZeroDivisionError, IndexError, AttributeError,
-        #         OCCError) as e:
-        #     self.markInvalid()
-        #     self.grNode.setToolTip(str(e))
-        #     self.markDescendantsDirty()
+        except (ValueError, TypeError, SyntaxError, NameError, ZeroDivisionError, IndexError, AttributeError,
+                OCCError) as e:
+            self.markInvalid()
+            self.grNode.setToolTip(str(e))
+            self.markDescendantsDirty()
         except Exception as e:
             self.markInvalid()
             self.grNode.setToolTip(str(e))
