@@ -51,7 +51,7 @@ class Arc3Pts(FCNNodeModel):
         self.point_2: list = []
         self.point_3: list = []
 
-        self.grNode.resize(100, 100)
+        self.grNode.resize(120, 100)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
