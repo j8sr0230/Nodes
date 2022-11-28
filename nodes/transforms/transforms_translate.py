@@ -58,7 +58,8 @@ class Translate(FCNNodeModel):
         shape: Part.Shape = self.flat_shape_list[parameter_zip[0]]
         direction: Vector = self.flat_dir_list[parameter_zip[1]]
 
-        return shape.translate(direction)
+        copy: Part.Shape = Part.Shape(shape)
+        return copy.translate(direction)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         shape: list = sockets_input_data[0]
