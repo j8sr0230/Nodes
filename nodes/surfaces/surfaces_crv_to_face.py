@@ -44,7 +44,7 @@ class CrvToFace(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Crv", True)],
+                         inputs_init_list=[("Curve", True)],
                          outputs_init_list=[("Face", True)])
 
         self.grNode.resize(110, 70)

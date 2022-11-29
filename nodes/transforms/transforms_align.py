@@ -64,7 +64,7 @@ class Align(FCNNodeModel):
 
         copy: Part.Shape = Part.Shape(shape)
         rot: Rotation = Rotation(shp_axis, target_axis)
-        return copy.rotate(copy.CenterOfGravity, rot.Axis, degrees(rot.Angle))
+        return copy.rotate(shape.Placement.Base, rot.Axis, degrees(rot.Angle))
 
     def eval_operation(self, sockets_input_data: list) -> list:
         shape: list = sockets_input_data[0]

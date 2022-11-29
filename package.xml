@@ -2,8 +2,8 @@
 <package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
   <name>Nodes</name>
   <description>Visual scripting workbench for FreeCAD</description>
-  <version>0.1.19</version>
-  <date>2022-11-28</date>
+  <version>0.1.20</version>
+  <date>2022-11-29</date>
   <maintainer email="ronny.scharf08@gmail.com">Ronny Scharf-Wildenhain</maintainer>
   <license file="LICENSE">LGPLv2.1</license>
   <url type="repository" branch="main">https://github.com/j8sr0230/Nodes</url>

@@ -22,8 +22,6 @@
 #
 #
 ###################################################################################
-from itertools import product
-
 import Part
 import awkward as ak
 
