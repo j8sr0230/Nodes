@@ -51,49 +51,41 @@ class UVOnSurface(FCNNodeModel):
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-        self.flat_srf_list: list = []
-        self.simple_point_list: list = []
-
-    def evaluate_u(self, parameter_zip: tuple) -> list:
-        surface: Part.Face = self.flat_srf_list[parameter_zip[0]]
-        points: list = self.simple_point_list[parameter_zip[1]]
+    @staticmethod
+    def evaluate_uv(parameter_zip: tuple) -> list:
+        surface: Part.Face = parameter_zip[0]
+        points: list = parameter_zip[1]
 
         res: list = []
         if type(points) is list:
             for point in points:
-                res.append(surface.Surface.parameter(point))
+                res.append((surface.Surface.parameter(point)[0], surface.Surface.parameter(point)[1]))
         else:
-            res.append(surface.Surface.parameter(points)[0])
-
-        return res
-
-    def evaluate_v(self, parameter_zip: tuple) -> list:
-        surface: Part.Face = self.flat_srf_list[parameter_zip[0]]
-        points: list = self.simple_point_list[parameter_zip[1]]
-
-        res: list = []
-        if type(points) is list:
-            for point in points:
-                res.append(surface.Surface.parameter(point))
-        else:
-            res.append(surface.Surface.parameter(points)[1])
+            res.append((surface.Surface.parameter(points)[0], surface.Surface.parameter(points)[1]))
 
         return res
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        surfaces: list = sockets_input_data[0]
-        point: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
+        surface_input: list = sockets_input_data[0]
+        point_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
 
-        # Array broadcast
-        self.flat_srf_list: list = list(flatten(surfaces))
-        srf_idx_list = map_objects(surfaces, Part.Face, lambda srf: self.flat_srf_list.index(srf))
-        self.simple_point_list: list = list(simplify(point))
-        point_idx_list = map_last_level(point, Vector, lambda last_level: self.simple_point_list.index(last_level))
+        # Array preprocessing
+        surface_list: list = list(flatten(surface_input))
+        point_list: list = list(simplify(point_input))
 
-        srf_idx_list, point_idx_list = ak.broadcast_arrays(srf_idx_list, point_idx_list)
-        parameter_zip: list = ak.zip([srf_idx_list, point_idx_list], depth_limit=None).tolist()
+        surface_idx_tree: list = list(map_objects(surface_input, Part.Face, lambda srf: surface_list.index(srf)))
+        try:
+            # Nested input array
+            point_idx_tree: list = list(map_last_level(point_input, Vector,
+                                                       lambda last_level: point_list.index(last_level)))
+        except ValueError:
+            # Flat input array
+            point_idx_tree: list = list(map_objects(point_input, Vector, lambda vec: point_list.index(vec)))
 
-        us: list = list(map_objects(parameter_zip, tuple, self.evaluate_u))
-        vs: list = list(map_objects(parameter_zip, tuple, self.evaluate_v))
+        # Array broadcasting
+        surface_idx_tree, point_idx_tree = ak.broadcast_arrays(surface_idx_tree, point_idx_tree)
+        index_zip: list = ak.zip([surface_idx_tree, point_idx_tree], depth_limit=None).tolist()
+        input_zip: list = list(map_objects(index_zip, tuple, lambda data: (surface_list[data[0]], point_list[data[1]])))
 
-        return [us, vs]
+        uvs: list = list(map_objects(input_zip, tuple, self.evaluate_uv))
+        return [map_objects(uvs, tuple, lambda uv: uv[0]), map_objects(uvs, tuple, lambda uv: uv[1])]
