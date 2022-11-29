@@ -87,5 +87,9 @@ class UVOnSurface(FCNNodeModel):
         index_zip: list = ak.zip([surface_idx_tree, point_idx_tree], depth_limit=None).tolist()
         input_zip: list = list(map_objects(index_zip, tuple, lambda data: (surface_list[data[0]], point_list[data[1]])))
 
+        # Calculate output and distribute result to sockets
         uvs: list = list(map_objects(input_zip, tuple, self.evaluate_uv))
-        return [map_objects(uvs, tuple, lambda uv: uv[0]), map_objects(uvs, tuple, lambda uv: uv[1])]
+        u_output: list = list(map_objects(uvs, tuple, lambda uv: uv[0]))
+        v_output: list = list(map_objects(uvs, tuple, lambda uv: uv[1]))
+
+        return [u_output, v_output]
