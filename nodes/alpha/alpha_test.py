@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  alpha_default_op.py
+#  alpha_test.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -31,7 +31,7 @@ from nodes_locator import icon
 class DefaultOp(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Op"
+    op_title: str = "Test"
     op_category: str = "Alpha"
     content_label_objname: str = "fcn_node_bg"
 
@@ -41,5 +41,8 @@ class DefaultOp(FCNNodeModel):
                          outputs_init_list=[("Out", True)])
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        in_val: float = float(sockets_input_data[0][0])
-        return [[in_val]]
+        a_input: float = float(sockets_input_data[0][0] if len(sockets_input_data[0]) > 0 else 0)
+        b_input: float = float(sockets_input_data[1][0] if len(sockets_input_data[1]) > 0 else 0)
+
+        output = a_input + b_input
+        return [[output]]
