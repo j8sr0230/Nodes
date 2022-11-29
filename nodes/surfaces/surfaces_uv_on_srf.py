@@ -29,7 +29,7 @@ import awkward as ak
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, simplify, map_objects
+from core.nodes_utils import flatten, simplify, map_objects, map_last_level
 
 from nodes_locator import icon
 
@@ -44,7 +44,7 @@ class UVOnSurface(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Srf", True), ("Point", True)],
+                         inputs_init_list=[("Surface", True), ("Point", True)],
                          outputs_init_list=[("U", True), ("V", True)])
 
         self.grNode.resize(100, 80)
@@ -52,11 +52,11 @@ class UVOnSurface(FCNNodeModel):
             socket.setSocketPosition()
 
         self.flat_srf_list: list = []
-        self.flat_point_list: list = []
+        self.simple_point_list: list = []
 
     def evaluate_u(self, parameter_zip: tuple) -> list:
         surface: Part.Face = self.flat_srf_list[parameter_zip[0]]
-        points: list = self.flat_point_list[parameter_zip[1]]
+        points: list = self.simple_point_list[parameter_zip[1]]
 
         res: list = []
         if type(points) is list:
@@ -69,7 +69,7 @@ class UVOnSurface(FCNNodeModel):
 
     def evaluate_v(self, parameter_zip: tuple) -> list:
         surface: Part.Face = self.flat_srf_list[parameter_zip[0]]
-        points: list = self.flat_point_list[parameter_zip[1]]
+        points: list = self.simple_point_list[parameter_zip[1]]
 
         res: list = []
         if type(points) is list:
@@ -87,8 +87,8 @@ class UVOnSurface(FCNNodeModel):
         # Array broadcast
         self.flat_srf_list: list = list(flatten(surfaces))
         srf_idx_list = map_objects(surfaces, Part.Face, lambda srf: self.flat_srf_list.index(srf))
-        self.flat_point_list: list = list(flatten(point))
-        point_idx_list = map_objects(point, Vector, lambda vec: self.flat_point_list.index(vec))
+        self.simple_point_list: list = list(simplify(point))
+        point_idx_list = map_last_level(point, Vector, lambda last_level: self.simple_point_list.index(last_level))
 
         srf_idx_list, point_idx_list = ak.broadcast_arrays(srf_idx_list, point_idx_list)
         parameter_zip: list = ak.zip([srf_idx_list, point_idx_list], depth_limit=None).tolist()
