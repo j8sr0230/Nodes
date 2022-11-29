@@ -35,7 +35,7 @@ from nodes_locator import icon
 @register_node
 class ZVector(FCNNodeModel):
 
-    icon: str = icon("nodes_default.png")
+    icon: str = icon("nodes_vect_z.svg")
     op_title: str = "Z Vector"
     op_category: str = "Vector"
     content_label_objname: str = "fcn_node_bg"
