@@ -37,7 +37,7 @@ from nodes_locator import icon
 @register_node
 class Extrude(FCNNodeModel):
 
-    icon: str = icon("nodes_default.png")
+    icon: str = icon("nodes_extrude.svg")
     op_title: str = "Extrude"
     op_category: str = "Modifiers"
     content_label_objname: str = "fcn_node_bg"
