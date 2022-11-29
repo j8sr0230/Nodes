@@ -35,7 +35,7 @@ from nodes_locator import icon
 @register_node
 class YVector(FCNNodeModel):
 
-    icon: str = icon("nodes_default.png")
+    icon: str = icon("nodes_vect_y.svg")
     op_title: str = "Y Vector"
     op_category: str = "Vector"
     content_label_objname: str = "fcn_node_bg"
