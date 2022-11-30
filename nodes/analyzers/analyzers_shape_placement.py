@@ -43,7 +43,7 @@ class ShapePlacement(FCNNodeModel):
         super().__init__(scene=scene,
                          inputs_init_list=[("Shape", True)],
                          outputs_init_list=[("Base", True),
-                                            ("Rotation", True)])
+                                            ("Euler Rotation", True)])
 
         self.grNode.resize(150, 80)
         for socket in self.inputs + self.outputs:
@@ -53,6 +53,7 @@ class ShapePlacement(FCNNodeModel):
         shape_input: list = sockets_input_data[0]
 
         base_output: list = list(map_objects(shape_input, Part.Shape, lambda shape: shape.Placement.Base))
-        rotation_output: list = list(map_objects(shape_input, Part.Shape, lambda shape: shape.Placement.Rotation))
+        rotation_output: list = list(map_objects(shape_input, Part.Shape,
+                                                 lambda shape: shape.Placement.Rotation.toEulerAngles('Euler')))
 
         return [base_output, rotation_output]
