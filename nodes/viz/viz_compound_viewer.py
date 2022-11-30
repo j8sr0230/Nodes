@@ -36,7 +36,7 @@ from nodes_locator import icon
 @register_node
 class CompoundViewer(FCNNodeModel):
 
-    icon: str = icon("nodes_default.png")
+    icon: str = icon("nodes_cview.svg")
     op_title: str = "CViewer"
     op_category: str = "Viz"
     content_label_objname: str = "fcn_node_bg"
