@@ -37,7 +37,7 @@ from nodes_locator import icon
 @register_node
 class Translate(FCNNodeModel):
 
-    icon: str = icon("nodes_default.png")
+    icon: str = icon("nodes_translate.svg")
     op_title: str = "Translate"
     op_category: str = "Transforms"
     content_label_objname: str = "fcn_node_bg"
