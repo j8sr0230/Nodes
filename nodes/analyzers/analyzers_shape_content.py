@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  analyzers_shape_info.py
+#  analyzers_shape_content.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -33,10 +33,10 @@ from nodes_locator import icon
 
 
 @register_node
-class ShapeInfo(FCNNodeModel):
+class ShapeContent(FCNNodeModel):
 
-    icon: str = icon("nodes_shape_info.svg")
-    op_title: str = "Shape Info"
+    icon: str = icon("nodes_shape_content.svg")
+    op_title: str = "Shape Content"
     op_category: str = "Analyzers"
     content_label_objname: str = "fcn_node_bg"
 
@@ -48,7 +48,7 @@ class ShapeInfo(FCNNodeModel):
                                             ("Wires", True), ("Edges", True),
                                             ("Vertexes", True)])
 
-        self.grNode.resize(120, 170)
+        self.grNode.resize(130, 170)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
