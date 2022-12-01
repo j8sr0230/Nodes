@@ -44,7 +44,7 @@ from nodes_locator import icon
 @register_node
 class VoronoiOnSolid(FCNNodeModel):
 
-    icon: str = icon("nodes_voronoi3D.svg")
+    icon: str = icon("nodes_voronoi_on_sld.svg")
     op_title: str = "Voronoi on Sld"
     op_category: str = "Spatial"
     content_label_objname: str = "fcn_node_bg"
