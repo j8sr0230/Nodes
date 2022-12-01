@@ -35,7 +35,7 @@ from nodes_locator import icon
 @register_node
 class BezierCurve(FCNNodeModel):
 
-    icon: str = icon("nodes_default.png")
+    icon: str = icon("nodes_bezcurve.svg")
     op_title: str = "Bezier Crv"
     op_category: str = "Curves"
     content_label_objname: str = "fcn_node_bg"

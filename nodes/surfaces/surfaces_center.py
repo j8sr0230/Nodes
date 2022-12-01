@@ -34,7 +34,7 @@ from nodes_locator import icon
 @register_node
 class SurfaceCenter(FCNNodeModel):
 
-    icon: str = icon("nodes_default.png")
+    icon: str = icon("nodes_center.svg")
     op_title: str = "Center"
     op_category: str = "Surfaces"
     content_label_objname: str = "fcn_node_bg"
