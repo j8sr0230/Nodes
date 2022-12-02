@@ -29,7 +29,7 @@ import awkward as ak
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, simplify, map_objects, map_last_level
+from core.nodes_utils import flatten, map_objects
 
 from nodes_locator import icon
 

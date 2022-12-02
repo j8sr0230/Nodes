@@ -205,6 +205,31 @@ def map_last_level(nested_list: Iterable, object_type: type, callback: 'function
             return temp_list
 
 
+def broadcast_data_tree(socket_inputs: list) -> list:
+
+    flatten_inputs: list = [flatten(socket_input) for socket_input in socket_inputs]
+    nested_idx_trees: list = []
+    for idx, socket_input in enumerate(socket_inputs):
+        nested_idx_trees.append(map_objects(socket_input, object, lambda obj: flatten_inputs[idx].index(obj)))
+
+    broadcasted_idx_trees: list = ak.broadcast_arrays(nested_idx_trees).tolist()
+    broadcasted_idx_zip: list = ak.zip(broadcasted_idx_trees, depth_limit=None).tolist()
+    broadcasted_input_zip: list = list(map_objects(broadcasted_idx_zip, tuple, lambda data_tuple: (flatten_inputs[socket_idx][value] for socket_idx, value in enumerate(data_tuple))))
+
+    return broadcasted_input_zip
+
+    # Array preprocessing
+    # surface_list: list = list(flatten(surface_input))
+    # point_list: list = list(flatten(point_input))
+    # surface_idx_tree: list = list(map_objects(surface_input, Part.Face, lambda srf: surface_list.index(srf)))
+    # point_idx_tree: list = list(map_objects(point_input, Vector, lambda vec: point_list.index(vec)))
+    #
+    # # Array broadcasting
+    # surface_idx_tree, point_idx_tree = ak.broadcast_arrays(surface_idx_tree, point_idx_tree)
+    # index_zip: list = ak.zip([surface_idx_tree, point_idx_tree], depth_limit=None).tolist()
+    # input_zip: list = list(map_objects(index_zip, tuple, lambda data: (surface_list[data[0]], point_list[data[1]])))
+
+
 def traverse_tuples(nested_list: Iterable) -> Iterable:
     """Generator to yield every tuple within an arbitrary nested iterable.
 
