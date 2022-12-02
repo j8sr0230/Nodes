@@ -88,7 +88,7 @@ def graft(nested_list: Iterable) -> Iterable:
     """
 
     if isinstance(nested_list, Iterable):
-        if len(list(nested_list)) == 3 and not all([isinstance(i, Iterable) for i in nested_list]):
+        if len(list(nested_list)) == 3 and all([isinstance(i, float) for i in nested_list]):
             # Vectors with three components
             return [nested_list]
         else:

@@ -52,18 +52,12 @@ class UVOnSurface(FCNNodeModel):
             socket.setSocketPosition()
 
     @staticmethod
-    def evaluate_uv(parameter_zip: tuple) -> list:
+    def evaluate_uv(parameter_zip: tuple) -> tuple:
         surface: Part.Face = parameter_zip[0]
-        points: list = parameter_zip[1]
+        point: Vector = parameter_zip[1]
 
-        res: list = []
-        if type(points) is list:
-            for point in points:
-                res.append((surface.Surface.parameter(point)[0], surface.Surface.parameter(point)[1]))
-        else:
-            res.append((surface.Surface.parameter(points)[0], surface.Surface.parameter(points)[1]))
-
-        return res
+        uv: tuple = surface.Surface.parameter(point)
+        return uv[0], uv[1]
 
     def eval_operation(self, sockets_input_data: list) -> list:
         surface_input: list = sockets_input_data[0]
@@ -71,16 +65,9 @@ class UVOnSurface(FCNNodeModel):
 
         # Array preprocessing
         surface_list: list = list(flatten(surface_input))
-        point_list: list = list(simplify(point_input))
-
+        point_list: list = list(flatten(point_input))
         surface_idx_tree: list = list(map_objects(surface_input, Part.Face, lambda srf: surface_list.index(srf)))
-        try:
-            # Nested input array
-            point_idx_tree: list = list(map_last_level(point_input, Vector,
-                                                       lambda last_level: point_list.index(last_level)))
-        except ValueError:
-            # Flat input array
-            point_idx_tree: list = list(map_objects(point_input, Vector, lambda vec: point_list.index(vec)))
+        point_idx_tree: list = list(map_objects(point_input, Vector, lambda vec: point_list.index(vec)))
 
         # Array broadcasting
         surface_idx_tree, point_idx_tree = ak.broadcast_arrays(surface_idx_tree, point_idx_tree)
