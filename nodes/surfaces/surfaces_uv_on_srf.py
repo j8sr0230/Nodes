@@ -29,7 +29,7 @@ import awkward as ak
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_objects
+from core.nodes_utils import flatten, map_objects, broadcast_data_tree
 
 from nodes_locator import icon
 
@@ -62,6 +62,9 @@ class UVOnSurface(FCNNodeModel):
     def eval_operation(self, sockets_input_data: list) -> list:
         surface_input: list = sockets_input_data[0]
         point_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
+
+        tree = broadcast_data_tree(surface_input, point_input)
+        print(tree)
 
         # Array preprocessing
         surface_list: list = list(flatten(surface_input))
