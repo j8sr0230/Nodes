@@ -1,7 +1,42 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;">
-    <g transform="matrix(2.29751,0,0,2.10229,-102.787,-43.4679)">
-        <path id="path3057" d="M53.507,27.518L57.187,26.638L57.187,45.718L53.947,45.718C52.107,45.718 51.267,45.798 51.267,47.078C51.267,47.998 51.787,48.478 52.827,48.478L64.507,48.478C65.547,48.478 66.067,47.998 66.067,47.078C66.067,45.798 65.227,45.718 63.387,45.718L60.267,45.718L60.267,24.598C60.267,23.798 59.947,23.318 59.467,23.318C59.227,23.318 58.947,23.358 58.627,23.438L52.827,24.998C51.987,25.238 51.547,25.718 51.547,26.358C51.547,27.078 52.067,27.598 52.907,27.598C53.107,27.598 53.307,27.558 53.507,27.518Z" style="fill:rgb(211,215,207);fill-rule:nonzero;stroke:rgb(46,52,54);stroke-width:0.91px;"/>
+<svg
+   width="32"
+   height="32"
+   viewBox="0 0 32 32"
+   version="1.1"
+   xml:space="preserve"
+   style="clip-rule:evenodd;fill-rule:evenodd"
+   id="svg2853"
+   sodipodi:docname="nodes_number.svg"
+   inkscape:version="1.1.2 (b8e25be833, 2022-02-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs2857" /><sodipodi:namedview
+   id="namedview2855"
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1.0"
+   inkscape:pageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   showgrid="false"
+   inkscape:zoom="12.625"
+   inkscape:cx="31.960396"
+   inkscape:cy="19.366337"
+   inkscape:window-width="1920"
+   inkscape:window-height="1001"
+   inkscape:window-x="-9"
+   inkscape:window-y="-9"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="g2851" />
+    <g
+   transform="matrix(2.29751,0,0,2.10229,-102.787,-43.4679)"
+   id="g2851">
+        <path
+   id="path3057"
+   d="m 48.689725,23.394369 2.148643,-0.513806 v 11.140244 h -1.89174 c -1.074321,0 -1.564772,0.04671 -1.564772,0.794063 0,0.537161 0.303612,0.817419 0.910837,0.817419 h 6.819605 c 0.607225,0 0.910837,-0.280258 0.910837,-0.817419 0,-0.747354 -0.490451,-0.794063 -1.564772,-0.794063 H 52.636688 V 21.689468 c 0,-0.467096 -0.186839,-0.747354 -0.467096,-0.747354 -0.140129,0 -0.303613,0.02335 -0.490451,0.07006 l -3.386448,0.910838 c -0.490451,0.140129 -0.747353,0.420386 -0.747353,0.794063 0,0.420387 0.303612,0.723999 0.794063,0.723999 0.116774,0 0.233548,-0.02335 0.350322,-0.04671 z"
+   style="fill:#d3d7cf;fill-rule:nonzero;stroke:#2e3436;stroke-width:0.531322px" />
     </g>
 </svg>
