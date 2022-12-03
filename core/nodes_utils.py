@@ -215,7 +215,7 @@ def broadcast_data_tree(*socket_inputs: list) -> list:
 
     :param socket_inputs: Arbitrary nested socket inputs
     :type socket_inputs: list
-    :return: Broadcasted socket inputs as list of tuples
+    :return: Broadcasted zipped socket inputs as list of tuples
     :rtype: list
     """
 

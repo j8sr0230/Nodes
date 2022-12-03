@@ -60,26 +60,15 @@ class UVOnSurface(FCNNodeModel):
         return uv[0], uv[1]
 
     def eval_operation(self, sockets_input_data: list) -> list:
+        # Get socket inputs
         surface_input: list = sockets_input_data[0]
         point_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
 
-        tree = broadcast_data_tree(surface_input, point_input)
-        print(tree)
+        # Broadcast and calculate result
+        data_tree = broadcast_data_tree(surface_input, point_input)
+        uvs: list = list(map_objects(data_tree, tuple, self.evaluate_uv))
 
-        # Array preprocessing
-        surface_list: list = list(flatten(surface_input))
-        point_list: list = list(flatten(point_input))
-        surface_idx_tree: list = list(map_objects(surface_input, Part.Face, lambda srf: surface_list.index(srf)))
-        point_idx_tree: list = list(map_objects(point_input, Vector, lambda vec: point_list.index(vec)))
-
-        # Array broadcasting
-        surface_idx_tree, point_idx_tree = ak.broadcast_arrays(surface_idx_tree, point_idx_tree)
-        index_zip: list = ak.zip([surface_idx_tree, point_idx_tree], depth_limit=None).tolist()
-        input_zip: list = list(map_objects(index_zip, tuple, lambda data: (surface_list[data[0]], point_list[data[1]])))
-
-        # Calculate output and distribute result to sockets
-        uvs: list = list(map_objects(input_zip, tuple, self.evaluate_uv))
+        # Distribute result to socket outputs
         u_output: list = list(map_objects(uvs, tuple, lambda uv: uv[0]))
         v_output: list = list(map_objects(uvs, tuple, lambda uv: uv[1]))
-
         return [u_output, v_output]
