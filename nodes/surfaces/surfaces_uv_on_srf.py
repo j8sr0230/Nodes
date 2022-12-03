@@ -29,7 +29,7 @@ import awkward as ak
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, simplify, map_objects, map_last_level
+from core.nodes_utils import flatten, map_objects, broadcast_data_tree
 
 from nodes_locator import icon
 
@@ -52,44 +52,23 @@ class UVOnSurface(FCNNodeModel):
             socket.setSocketPosition()
 
     @staticmethod
-    def evaluate_uv(parameter_zip: tuple) -> list:
+    def evaluate_uv(parameter_zip: tuple) -> tuple:
         surface: Part.Face = parameter_zip[0]
-        points: list = parameter_zip[1]
+        point: Vector = parameter_zip[1]
 
-        res: list = []
-        if type(points) is list:
-            for point in points:
-                res.append((surface.Surface.parameter(point)[0], surface.Surface.parameter(point)[1]))
-        else:
-            res.append((surface.Surface.parameter(points)[0], surface.Surface.parameter(points)[1]))
-
-        return res
+        uv: tuple = surface.Surface.parameter(point)
+        return uv[0], uv[1]
 
     def eval_operation(self, sockets_input_data: list) -> list:
+        # Get socket inputs
         surface_input: list = sockets_input_data[0]
         point_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
 
-        # Array preprocessing
-        surface_list: list = list(flatten(surface_input))
-        point_list: list = list(simplify(point_input))
+        # Broadcast and calculate result
+        data_tree = broadcast_data_tree(surface_input, point_input)
+        uvs: list = list(map_objects(data_tree, tuple, self.evaluate_uv))
 
-        surface_idx_tree: list = list(map_objects(surface_input, Part.Face, lambda srf: surface_list.index(srf)))
-        try:
-            # Nested input array
-            point_idx_tree: list = list(map_last_level(point_input, Vector,
-                                                       lambda last_level: point_list.index(last_level)))
-        except ValueError:
-            # Flat input array
-            point_idx_tree: list = list(map_objects(point_input, Vector, lambda vec: point_list.index(vec)))
-
-        # Array broadcasting
-        surface_idx_tree, point_idx_tree = ak.broadcast_arrays(surface_idx_tree, point_idx_tree)
-        index_zip: list = ak.zip([surface_idx_tree, point_idx_tree], depth_limit=None).tolist()
-        input_zip: list = list(map_objects(index_zip, tuple, lambda data: (surface_list[data[0]], point_list[data[1]])))
-
-        # Calculate output and distribute result to sockets
-        uvs: list = list(map_objects(input_zip, tuple, self.evaluate_uv))
+        # Distribute result to socket outputs
         u_output: list = list(map_objects(uvs, tuple, lambda uv: uv[0]))
         v_output: list = list(map_objects(uvs, tuple, lambda uv: uv[1]))
-
         return [u_output, v_output]
