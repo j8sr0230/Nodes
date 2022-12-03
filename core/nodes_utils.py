@@ -206,19 +206,32 @@ def map_last_level(nested_list: Iterable, object_type: type, callback: 'function
             return temp_list
 
 
-def broadcast_data_tree(*socket_inputs: tuple) -> list:
+def broadcast_data_tree(*socket_inputs: list) -> list:
+    """Broadcast any number of socket inputs against each other.
+
+    Like NumPy's broadcast_arrays function, this function returns the socket inputs, duplicating elements if necessary
+    so that the socket inputs can be combined element by element. This replaces individual elements of the socket inputs
+    with element arrays and increases the dimension.
+
+    :param socket_inputs: Arbitrary nested socket inputs
+    :type socket_inputs: list
+    :return: Broadcasted socket inputs as list of tuples
+    :rtype: list
+    """
+
     flatten_inputs: list = [flatten(socket_input) for socket_input in socket_inputs]
     nested_idx_trees: list = []
     for idx, socket_input in enumerate(socket_inputs):
         nested_idx_trees.append(map_objects(socket_input, object, lambda obj: flatten_inputs[idx].index(obj)))
 
     broadcasted_idx_trees: list = ak.broadcast_arrays(*nested_idx_trees)
-    broadcasted_idx_zip: list = ak.zip(broadcasted_idx_trees, depth_limit=None).tolist()
+    broadcasted_idx_zip: list = ak.zip(broadcasted_idx_trees).tolist()
 
-    def map_idx_tuple(idx_tuple: tuple) -> tuple:
+    # Transforms index tuple to socket input value tuple
+    def index_to_obj(idx_tuple: tuple) -> tuple:
         return tuple([flatten_inputs[input_idx][input_elem] for input_idx, input_elem in enumerate(idx_tuple)])
 
-    broadcasted_input_zip: list = list(map_objects(broadcasted_idx_zip, tuple, map_idx_tuple))
+    broadcasted_input_zip: list = list(map_objects(broadcasted_idx_zip, tuple, index_to_obj))
     return broadcasted_input_zip
 
 
