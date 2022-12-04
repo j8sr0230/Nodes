@@ -22,7 +22,6 @@
 #
 #
 ###################################################################################
-import FreeCAD
 import Part
 
 from core.nodes_conf import register_node

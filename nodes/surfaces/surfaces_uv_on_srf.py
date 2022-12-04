@@ -29,7 +29,7 @@ import awkward as ak
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_objects, broadcast_data_tree
+from core.nodes_utils import map_objects, broadcast_data_tree
 
 from nodes_locator import icon
 
