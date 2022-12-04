@@ -10,6 +10,7 @@ A visual scripting workbench for [FreeCAD](https://www.freecad.org) using
 
 ## Prerequisites
 * FreeCAD >= v0.21
+* python modules: `qtpy`, `awkward`
 
 ## Installation
 Download and install the Nodes workbench via the Addon Manager (**Tools → Addon Manager**).
