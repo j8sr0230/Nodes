@@ -22,14 +22,12 @@
 #
 #
 ###################################################################################
-import awkward as ak
-
 from FreeCAD import Vector
 import Part
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_objects
+from core.nodes_utils import map_objects, broadcast_data_tree
 
 from nodes_locator import icon
 
@@ -48,44 +46,31 @@ class ArcDeg(FCNNodeModel):
                                            ("Angle 1", True), ("Angle 2", True)],
                          outputs_init_list=[("Shape", True)])
 
-        self.pos_list: list = []
-        self.dir_list: list = []
-        self.start_angle_list: list = []
-        self.end_angle_list: list = []
-
         self.grNode.resize(120, 150)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_occ_arc(self, r_pos_dir_zip: tuple) -> Part.Shape:
-        radius = r_pos_dir_zip[0]
-        position = self.pos_list[r_pos_dir_zip[1]]
-        direction = self.dir_list[r_pos_dir_zip[2]]
-        start_angel = self.start_angle_list[r_pos_dir_zip[3]]
-        end_angle = self.end_angle_list[r_pos_dir_zip[4]]
+    @staticmethod
+    def make_arc(parameter_zip: tuple) -> Part.Shape:
+        radius = parameter_zip[0]
+        position = parameter_zip[1]
+        direction = parameter_zip[2]
+        start_angel = parameter_zip[3]
+        end_angle = parameter_zip[4]
 
         return Part.makeCircle(radius, position, direction, start_angel, end_angle)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        radius: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
-        position: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
-        direction: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [Vector(0, 0, 1)]
-        start_angle: list = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [0]
-        end_angle: list = sockets_input_data[4] if len(sockets_input_data[4]) > 0 else [360]
+        # Get socket inputs
+        radius_input: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
+        position_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
+        direction_input: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [Vector(0, 0, 1)]
+        start_angle_input: list = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [0]
+        end_angle_input: list = sockets_input_data[4] if len(sockets_input_data[4]) > 0 else [360]
 
-        # Array broadcast
-        self.pos_list: list = list(flatten(position))
-        pos_idx_list: list = list(range(len(self.pos_list)))
-        self.dir_list: list = list(flatten(direction))
-        dir_idx_list: list = list(range(len(self.dir_list)))
-        self.start_angle_list: list = list(flatten(start_angle))
-        start_angle_idx_list: list = list(range(len(self.start_angle_list)))
-        self.end_angle_list: list = list(flatten(end_angle))
-        end_angle_idx_list: list = list(range(len(self.end_angle_list)))
+        # Broadcast and calculate result
+        data_tree = broadcast_data_tree(radius_input, position_input, direction_input, start_angle_input,
+                                        end_angle_input)
+        arcs: list = list(map_objects(data_tree, tuple, self.make_arc))
 
-        radius, pos_idx_list, dir_idx_list, start_angle_idx_list, end_angle_idx_list = ak.broadcast_arrays(
-            radius, pos_idx_list, dir_idx_list, start_angle_idx_list, end_angle_idx_list)
-        parameter_zip: list = ak.zip([radius, pos_idx_list, dir_idx_list,
-                                      start_angle_idx_list, end_angle_idx_list], depth_limit=None).tolist()
-
-        return [map_objects(parameter_zip, tuple, self.make_occ_arc)]
+        return [arcs]
