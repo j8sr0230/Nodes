@@ -63,13 +63,13 @@ class ArcDeg(FCNNodeModel):
     def eval_operation(self, sockets_input_data: list) -> list:
         # Get socket inputs
         radius_input: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
-        position_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
+        point_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
         direction_input: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [Vector(0, 0, 1)]
         start_angle_input: list = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [0]
         end_angle_input: list = sockets_input_data[4] if len(sockets_input_data[4]) > 0 else [360]
 
         # Broadcast and calculate result
-        data_tree: list = list(broadcast_data_tree(radius_input, position_input, direction_input, start_angle_input,
+        data_tree: list = list(broadcast_data_tree(radius_input, point_input, direction_input, start_angle_input,
                                                    end_angle_input))
         arcs: list = list(map_objects(data_tree, tuple, self.make_arc))
 

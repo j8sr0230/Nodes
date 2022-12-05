@@ -27,7 +27,7 @@ import awkward as ak
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_objects
+from core.nodes_utils import map_objects, broadcast_data_tree
 
 from nodes_locator import icon
 
@@ -49,22 +49,21 @@ class DiscretizeCurve(FCNNodeModel):
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-        self.crv_list = []
-        self.dist_list = []
+    @staticmethod
+    def discretize_curve(parameter_zip: tuple) -> list:
+        curve: Part.Shape = parameter_zip[0]
+        distance: float = parameter_zip[1]
 
-    def discretize_curve(self, curve) -> list:
-        vec_list = curve.discretize(self.dist_list.pop(0))
+        vec_list = curve.discretize(distance)
         return vec_list
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        curves: list = sockets_input_data[0]
-        distances: list = sockets_input_data[1]
+        # Get socket inputs
+        curve_input: list = sockets_input_data[0]
+        distance_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [1.0]
 
-        # Force array broadcast
-        self.crv_list: list = list(flatten(curves))
-        crv_idx_list: list = list(range(len(self.crv_list)))
-        crv_idx_list, distances = ak.broadcast_arrays(crv_idx_list, distances)
-        self.dist_list = ak.flatten(distances, axis=None).tolist()
+        # Broadcast and calculate result
+        data_tree: list = list(broadcast_data_tree(curve_input, distance_input))
+        points: list = list(map_objects(data_tree, tuple, self.discretize_curve))
 
-        vectors: list = [map_objects(curves, object, self.discretize_curve)]
-        return [vectors]
+        return [points]
