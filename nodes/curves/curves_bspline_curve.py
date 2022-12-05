@@ -61,6 +61,7 @@ class BSplineCurve(FCNNodeModel):
                 return Part.BSplineCurve(ctr_points, None, None, False, 3, None, False)
 
     def eval_operation(self, sockets_input_data: list) -> list:
+        # Get socket inputs
         point_input: list = [sockets_input_data[0]] if len(sockets_input_data[0]) > 0 \
             else [[Vector(0, 0, 0), Vector(10, 0, 0), Vector(10, 10, 0)]]
         closed_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [False]
