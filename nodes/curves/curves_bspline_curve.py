@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  curves_bspline.py
+#  curves_bspline_curve.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -27,42 +27,49 @@ import Part
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_last_level
+from core.nodes_utils import map_objects, map_last_level, broadcast_data_tree, ListWrapper
 
 from nodes_locator import icon
 
 
 @register_node
-class BSpline(FCNNodeModel):
+class BSplineCurve(FCNNodeModel):
 
     icon: str = icon("nodes_bspline.svg")
-    op_title: str = "BSpline"
+    op_title: str = "BSpline Crv"
     op_category: str = "Curves"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Point", True), ("Closed", False)],
+                         inputs_init_list=[("Ctr Points", True), ("Closed", True)],
                          outputs_init_list=[("Curve", True)])
 
-        self.grNode.resize(100, 80)
+        self.grNode.resize(120, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
     @staticmethod
-    def make_occ_closed_bspline(flat_points: list) -> Part.Shape:
-        return Part.BSplineCurve(flat_points, None, None, True, 3, None, False)
+    def make_bspline(parameter_zip: tuple) -> Part.Shape:
+        ctr_points: list = parameter_zip[0].wrapped_data if hasattr(parameter_zip[0], 'wrapped_data') else None
+        is_closed: bool = bool(parameter_zip[1])
 
-    @staticmethod
-    def make_occ_open_bspline(flat_points: list) -> Part.Shape:
-        return Part.BSplineCurve(flat_points, None, None, False, 3, None, False)
+        if ctr_points:
+            if is_closed:
+                return Part.BSplineCurve(ctr_points, None, None, True, 3, None, False)
+            else:
+                return Part.BSplineCurve(ctr_points, None, None, False, 3, None, False)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        points: list = sockets_input_data[0] if len(list(flatten(sockets_input_data[0]))) > 2 else [Vector(0, 0, 0),
-                                                                                                    Vector(10, 0, 0),
-                                                                                                    Vector(10, 10, 0)]
-        is_closed: bool = bool(sockets_input_data[1][0] if len(sockets_input_data[1]) > 0 else 0)
-        if is_closed:
-            return [[map_last_level(points, Vector, self.make_occ_closed_bspline)]]
-        else:
-            return [[map_last_level(points, Vector, self.make_occ_open_bspline)]]
+        point_input: list = [sockets_input_data[0]] if len(sockets_input_data[0]) > 0 \
+            else [[Vector(0, 0, 0), Vector(10, 0, 0), Vector(10, 10, 0)]]
+        closed_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [False]
+
+        # Needed, to treat list as atomic object during array broadcasting
+        wrapped_point_input: list = list(map_last_level(point_input, Vector, ListWrapper))
+
+        # Broadcast and calculate result
+        data_tree: list = list(broadcast_data_tree(wrapped_point_input, closed_input))
+        bspline_curves: list = list(map_objects(data_tree, tuple, self.make_bspline))
+
+        return [bspline_curves]
