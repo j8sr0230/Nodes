@@ -27,7 +27,7 @@ import Part
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_last_level
+from core.nodes_utils import map_objects, map_last_level, broadcast_data_tree, ListWrapper
 
 from nodes_locator import icon
 
@@ -42,7 +42,7 @@ class BezierCurve(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Point", True), ("Closed", False)],
+                         inputs_init_list=[("Point", True), ("Closed", True)],
                          outputs_init_list=[("Curve", True)])
 
         self.is_closed: bool = False
@@ -51,18 +51,31 @@ class BezierCurve(FCNNodeModel):
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_occ_bezier(self, flat_points: list) -> Part.Shape:
-        if self.is_closed:
-            flat_points.append(flat_points[0])
+    @staticmethod
+    def make_bezier(parameter_zip: tuple) -> Part.Shape:
+        points: list = parameter_zip[0].wrapped_data if hasattr(parameter_zip[0], 'wrapped_data') else None
+        is_closed: bool = bool(parameter_zip[1])
 
-        curve = Part.BezierCurve()
-        curve.setPoles(flat_points)
-        return curve
+        if points:
+            poles = points.copy()
+            if is_closed:
+                poles.append(poles[0])
+            curve = Part.BezierCurve()
+            curve.setPoles(poles)
+            return curve
+        else:
+            return None
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        points: list = sockets_input_data[0] if len(list(flatten(sockets_input_data[0]))) > 2 else [Vector(0, 0, 0),
-                                                                                                    Vector(10, 0, 0),
-                                                                                                    Vector(10, 10, 0)]
-        self.is_closed: bool = bool(sockets_input_data[1][0] if len(sockets_input_data[1]) > 0 else 0)
+        point_input: list = [sockets_input_data[0]] if len(sockets_input_data[0]) > 0 \
+            else [[Vector(0, 0, 0), Vector(10, 0, 0), Vector(10, 10, 0)]]
+        closed_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [False]
 
-        return [[map_last_level(points, Vector, self.make_occ_bezier)]]
+        # Needed, to treat list as atomic object during array broadcasting
+        wrapped_point_input: list = list(map_last_level(point_input, Vector, ListWrapper))
+
+        # Broadcast and calculate result
+        data_tree: list = list(broadcast_data_tree(wrapped_point_input, closed_input))
+        bezier_curves: list = list(map_objects(data_tree, tuple, self.make_bezier))
+
+        return [bezier_curves]

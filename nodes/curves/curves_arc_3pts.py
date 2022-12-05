@@ -64,7 +64,7 @@ class Arc3Pts(FCNNodeModel):
         point_3_input: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [Vector(5, 0, 0)]
 
         # Broadcast and calculate result
-        data_tree = broadcast_data_tree(point_1_input, point_2_input, point_3_input)
+        data_tree: list = list(broadcast_data_tree(point_1_input, point_2_input, point_3_input))
         arcs: list = list(map_objects(data_tree, tuple, self.make_arc))
 
         return [arcs]

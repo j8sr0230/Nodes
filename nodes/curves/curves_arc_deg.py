@@ -52,11 +52,11 @@ class ArcDeg(FCNNodeModel):
 
     @staticmethod
     def make_arc(parameter_zip: tuple) -> Part.Shape:
-        radius = parameter_zip[0]
-        position = parameter_zip[1]
-        direction = parameter_zip[2]
-        start_angel = parameter_zip[3]
-        end_angle = parameter_zip[4]
+        radius: float = parameter_zip[0]
+        position: Vector = parameter_zip[1]
+        direction: Vector = parameter_zip[2]
+        start_angel: float = parameter_zip[3]
+        end_angle: float = parameter_zip[4]
 
         return Part.makeCircle(radius, position, direction, start_angel, end_angle)
 
@@ -69,8 +69,8 @@ class ArcDeg(FCNNodeModel):
         end_angle_input: list = sockets_input_data[4] if len(sockets_input_data[4]) > 0 else [360]
 
         # Broadcast and calculate result
-        data_tree = broadcast_data_tree(radius_input, position_input, direction_input, start_angle_input,
-                                        end_angle_input)
+        data_tree: list = list(broadcast_data_tree(radius_input, position_input, direction_input, start_angle_input,
+                                                   end_angle_input))
         arcs: list = list(map_objects(data_tree, tuple, self.make_arc))
 
         return [arcs]

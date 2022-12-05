@@ -206,7 +206,7 @@ def map_last_level(nested_list: Iterable, object_type: type, callback: 'function
             return temp_list
 
 
-def broadcast_data_tree(*socket_inputs: list) -> list:
+def broadcast_data_tree(*socket_inputs: Iterable) -> Iterable:
     """Broadcast any number of socket inputs against each other.
 
     Like NumPy's broadcast_arrays function, this function returns the socket inputs, duplicating elements if necessary
@@ -214,9 +214,9 @@ def broadcast_data_tree(*socket_inputs: list) -> list:
     with element arrays and increases the dimension.
 
     :param socket_inputs: Arbitrary nested socket inputs
-    :type socket_inputs: list
+    :type socket_inputs: Iterable
     :return: Broadcasted zipped socket inputs as list of tuples
-    :rtype: list
+    :rtype: Iterable
     """
 
     flatten_inputs: list = [flatten(socket_input) for socket_input in socket_inputs]
@@ -231,7 +231,7 @@ def broadcast_data_tree(*socket_inputs: list) -> list:
     def index_to_obj(idx_tuple: tuple) -> tuple:
         return tuple([flatten_inputs[input_idx][input_elem] for input_idx, input_elem in enumerate(idx_tuple)])
 
-    broadcasted_input_zip: list = list(map_objects(broadcasted_idx_zip, tuple, index_to_obj))
+    broadcasted_input_zip: Iterable = map_objects(broadcasted_idx_zip, tuple, index_to_obj)
     return broadcasted_input_zip
 
 
@@ -250,3 +250,16 @@ def traverse_tuples(nested_list: Iterable) -> Iterable:
     else:
         if isinstance(nested_list, tuple):
             yield nested_list
+
+
+class ListWrapper:
+    """Wrapper for lists.
+
+    This simple class can be used to wrap lists into non-iterable objects to be treated as atomic, non-decomposable
+    elements in array broadcasting (many-to-one relationship).
+
+     Attributes:
+        wrapped_data (list): Wrapped list
+    """
+    def __init__(self, wrapped_data: list):
+        self.wrapped_data: list = wrapped_data

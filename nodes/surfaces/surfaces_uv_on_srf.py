@@ -65,7 +65,7 @@ class UVOnSurface(FCNNodeModel):
         point_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
 
         # Broadcast and calculate result
-        data_tree = broadcast_data_tree(surface_input, point_input)
+        data_tree: list = list(broadcast_data_tree(surface_input, point_input))
         uvs: list = list(map_objects(data_tree, tuple, self.evaluate_uv))
 
         # Distribute result to socket outputs
