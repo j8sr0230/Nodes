@@ -24,14 +24,12 @@
 ###################################################################################
 from math import degrees
 
-import awkward as ak
-
 from FreeCAD import Vector, Rotation
 import Part
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_objects
+from core.nodes_utils import map_objects, broadcast_data_tree
 
 from nodes_locator import icon
 
