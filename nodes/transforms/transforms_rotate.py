@@ -22,14 +22,12 @@
 #
 #
 ###################################################################################
-import awkward as ak
-
 from FreeCAD import Vector
 import Part
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_objects
+from core.nodes_utils import map_objects, broadcast_data_tree
 
 from nodes_locator import icon
 
@@ -44,39 +42,32 @@ class Rotate(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Shape", True), ("Axis", True), ("Degree", True)],
+                         inputs_init_list=[("Shape", True), ("Axis", True), ("Degree", True), ("Pivot", True)],
                          outputs_init_list=[("Shape", True)])
 
-        self.flat_shape_list: list = []
-        self.flat_dir_list: list = []
-        self.flat_degree_list: list = []
-
-        self.grNode.resize(120, 100)
+        self.grNode.resize(120, 120)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_occ_rotation(self, parameter_zip: tuple) -> Part.Shape:
-        shape: Part.Shape = self.flat_shape_list[parameter_zip[0]]
-        direction: Vector = self.flat_dir_list[parameter_zip[1]]
-        degree: float = self.flat_degree_list[parameter_zip[2]]
+    @staticmethod
+    def make_rotation(parameter_zip: tuple) -> Part.Shape:
+        shape: Part.Shape = parameter_zip[0]
+        direction: Vector = parameter_zip[1]
+        degree: float = parameter_zip[2]
+        pivot: Vector = parameter_zip[3]
 
         copy: Part.Shape = Part.Shape(shape)
-        return copy.rotate(copy.CenterOfGravity, direction, degree)
+        return copy.rotate(pivot, direction, degree)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        shape: list = sockets_input_data[0]
-        direction: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 1)]
-        degree: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [45]
+        # Get socket inputs
+        shape_input: list = sockets_input_data[0]
+        direction_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 1)]
+        degree_input: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [45]
+        pivot_input: list = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [Vector(0, 0, 0)]
 
-        # Array broadcast
-        self.flat_shape_list: list = list(flatten(shape))
-        shape_idx_list = map_objects(shape, Part.Shape, lambda shp: self.flat_shape_list.index(shp))
-        self.flat_dir_list: list = list(flatten(direction))
-        dir_idx_list: list = list(range(len(self.flat_dir_list)))
-        self.flat_degree_list: list = list(flatten(degree))
-        deg_idx_list: list = list(range(len(self.flat_degree_list)))
+        # Broadcast and calculate result
+        data_tree: list = list(broadcast_data_tree(shape_input, direction_input, degree_input, pivot_input))
+        shapes: list = list(map_objects(data_tree, tuple, self.make_rotation))
 
-        shape_idx_list, dir_idx_list, deg_idx_list = ak.broadcast_arrays(shape_idx_list, dir_idx_list, deg_idx_list)
-        parameter_zip: list = ak.zip([shape_idx_list, dir_idx_list, deg_idx_list], depth_limit=None).tolist()
-
-        return [map_objects(parameter_zip, tuple, self.make_occ_rotation)]
+        return [shapes]

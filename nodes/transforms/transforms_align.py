@@ -46,44 +46,34 @@ class Align(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Shape", True), ("Shape Axis", True), ("Target Axis", True)],
+                         inputs_init_list=[("Shape", True), ("Shape Axis", True), ("Target Axis", True),
+                                           ("Pivot", True)],
                          outputs_init_list=[("Shape", True)])
 
-        self.flat_shape_list: list = []
-        self.flat_shp_axis_list: list = []
-        self.flat_target_axis_list: list = []
-
-        self.grNode.resize(140, 100)
+        self.grNode.resize(140, 120)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_alignment(self, parameter_zip: tuple) -> Part.Shape:
-        shape: Part.Shape = self.flat_shape_list[parameter_zip[0]]
-        shp_axis: Vector = self.flat_shp_axis_list[parameter_zip[1]]
-        target_axis: Vector = self.flat_target_axis_list[parameter_zip[2]]
+    @staticmethod
+    def make_alignment(parameter_zip: tuple) -> Part.Shape:
+        shape: Part.Shape = parameter_zip[0]
+        shp_axis: Vector = parameter_zip[1]
+        target_axis: Vector = parameter_zip[2]
+        pivot: Vector = parameter_zip[3]
 
         copy: Part.Shape = Part.Shape(shape)
         rot: Rotation = Rotation(shp_axis, target_axis)
-        return copy.rotate(shape.Placement.Base, rot.Axis, degrees(rot.Angle))
+        return copy.rotate(pivot, rot.Axis, degrees(rot.Angle))
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        shape: list = sockets_input_data[0]
-        shape_axis: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 1)]
-        target_axis: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [Vector(1, 0, 0)]
+        # Get socket inputs
+        shape_input: list = sockets_input_data[0]
+        shape_axis_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 1)]
+        target_axis_input: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [Vector(1, 0, 0)]
+        pivot_input: list = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [Vector(0, 0, 0)]
 
-        # Array broadcast
-        self.flat_shape_list: list = list(flatten(shape))
-        shape_idx_list = map_objects(shape, Part.Shape, lambda shp: self.flat_shape_list.index(shp))
-        self.flat_shp_axis_list: list = list(flatten(shape_axis))
-        shp_axis_idx_list: list = list(map_objects(shape_axis, Vector,
-                                                   lambda vect: self.flat_shp_axis_list.index(vect)))
-        self.flat_target_axis_list: list = list(flatten(target_axis))
-        target_axis_idx_list: list = list(map_objects(target_axis, Vector,
-                                                      lambda vect: self.flat_target_axis_list.index(vect)))
+        # Broadcast and calculate result
+        data_tree: list = list(broadcast_data_tree(shape_input, shape_axis_input, target_axis_input, pivot_input))
+        shapes: list = list(map_objects(data_tree, tuple, self.make_alignment))
 
-        shape_idx_list, shp_axis_idx_list, target_axis_idx_list = ak.broadcast_arrays(shape_idx_list, shp_axis_idx_list,
-                                                                                      target_axis_idx_list)
-        parameter_zip: list = ak.zip([shape_idx_list, shp_axis_idx_list, target_axis_idx_list],
-                                     depth_limit=None).tolist()
-
-        return [map_objects(parameter_zip, tuple, self.make_alignment)]
+        return [shapes]

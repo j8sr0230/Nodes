@@ -22,14 +22,12 @@
 #
 #
 ###################################################################################
-import awkward as ak
-
 from FreeCAD import Vector
 import Part
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_objects
+from core.nodes_utils import map_objects, broadcast_data_tree
 
 from nodes_locator import icon
 
@@ -54,24 +52,21 @@ class UniformScale(FCNNodeModel):
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_occ_uniform_scale(self, parameter_zip: tuple) -> Part.Shape:
-        shape: Part.Shape = self.flat_shape_list[parameter_zip[0]]
-        factor: Vector = self.flat_scale_list[parameter_zip[1]]
+    @staticmethod
+    def make_uniform_scale(parameter_zip: tuple) -> Part.Shape:
+        shape: Part.Shape = parameter_zip[0]
+        factor: Vector = parameter_zip[1]
 
         copy: Part.Shape = Part.Shape(shape)
         return copy.scale(factor, copy.CenterOfGravity)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        shape: list = sockets_input_data[0]
-        factor: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [0.9]
+        # Get socket inputs
+        shape_input: list = sockets_input_data[0]
+        factor_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [0.9]
 
-        # Array broadcast
-        self.flat_shape_list: list = list(flatten(shape))
-        shape_idx_list = map_objects(shape, Part.Shape, lambda shp: self.flat_shape_list.index(shp))
-        self.flat_scale_list: list = list(flatten(factor))
-        factor_idx_list: list = list(range(len(self.flat_scale_list)))
+        # Broadcast and calculate result
+        data_tree: list = list(broadcast_data_tree(shape_input, factor_input))
+        shapes: list = list(map_objects(data_tree, tuple, self.make_uniform_scale))
 
-        shape_idx_list, factor_idx_list = ak.broadcast_arrays(shape_idx_list, factor_idx_list)
-        parameter_zip: list = ak.zip([shape_idx_list, factor_idx_list], depth_limit=None).tolist()
-
-        return [map_objects(parameter_zip, tuple, self.make_occ_uniform_scale)]
+        return [shapes]

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  surfaces_center.py
+#  analyzers_center.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -32,11 +32,11 @@ from nodes_locator import icon
 
 
 @register_node
-class SurfaceCenter(FCNNodeModel):
+class ShapeCenter(FCNNodeModel):
 
     icon: str = icon("nodes_center.svg")
     op_title: str = "Center"
-    op_category: str = "Surfaces"
+    op_category: str = "Analyzers"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
