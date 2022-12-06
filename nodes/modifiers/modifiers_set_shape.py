@@ -49,10 +49,11 @@ class SetShape(FCNNodeModel):
             socket.setSocketPosition()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        obj_in: list = sockets_input_data[0]
+        object_input: list = sockets_input_data[0]
+        shape_input: list = sockets_input_data[1]
 
-        obj_list = list(flatten(obj_in))
-        shp_list = list(flatten(sockets_input_data[1]))
+        obj_list: list = list(flatten(object_input))
+        shp_list: list = list(flatten(shape_input))
 
         if hasattr(FreeCAD, "ActiveDocument") and FreeCAD.ActiveDocument:
             for obj in obj_list:
@@ -62,4 +63,4 @@ class SetShape(FCNNodeModel):
         else:
             raise ValueError('No active document')
 
-        return [obj_in]
+        return [object_input]
