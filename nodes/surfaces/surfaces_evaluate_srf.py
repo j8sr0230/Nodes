@@ -68,4 +68,3 @@ class EvaluateSurface(FCNNodeModel):
         position_output: list = list(map_objects(result, tuple, lambda pos_norm_tuple: pos_norm_tuple[0]))
         normal_output: list = list(map_objects(result, tuple, lambda pos_norm_tuple: pos_norm_tuple[1]))
         return [position_output, normal_output]
-
