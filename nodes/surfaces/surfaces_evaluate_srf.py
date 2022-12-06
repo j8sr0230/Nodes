@@ -22,12 +22,9 @@
 #
 #
 ###################################################################################
-import Part
-import awkward as ak
-
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, simplify, map_objects
+from core.nodes_utils import map_objects, broadcast_data_tree
 
 from nodes_locator import icon
 
@@ -49,51 +46,25 @@ class EvaluateSurface(FCNNodeModel):
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-        self.flat_u_list: list = []
-        self.flat_v_list: list = []
-        self.flat_srf_list: list = []
+    @staticmethod
+    def evaluate_surface(parameter_zip: tuple) -> tuple:
+        u: float = parameter_zip[0]
+        v: float = parameter_zip[1]
+        surface: Part.Face = parameter_zip[2]
 
-    def evaluate_position(self, parameter_zip: tuple) -> list:
-        surface: Part.Face = self.flat_srf_list[parameter_zip[0]]
-        us: list = self.flat_u_list[parameter_zip[1]]
-        vs: list = self.flat_v_list[parameter_zip[2]]
-
-        us, vs = ak.broadcast_arrays(us, vs)
-        res = []
-        for i, u in enumerate(us):
-            res.append(surface.valueAt(u, vs[i]))
-
-        return res
-
-    def evaluate_normal(self, parameter_zip: tuple) -> list:
-        surface: Part.Face = self.flat_srf_list[parameter_zip[0]]
-        us: list = self.flat_u_list[parameter_zip[1]]
-        vs: list = self.flat_v_list[parameter_zip[2]]
-
-        us, vs = ak.broadcast_arrays(us, vs)
-        res = []
-        for i, u in enumerate(us):
-            res.append(surface.normalAt(u, vs[i]))
-
-        return res
+        return surface.valueAt(u, v), surface.normalAt(u, v)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        u_param: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [0]
-        v_param: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [0]
-        surfaces: list = sockets_input_data[2]
+        # Get socket inputs
+        u_input: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [0.0]
+        v_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [0.0]
+        surface_input: list = sockets_input_data[2]
 
-        # Array broadcast
-        self.flat_srf_list: list = list(flatten(surfaces))
-        srf_idx_list = map_objects(surfaces, Part.Face, lambda srf: self.flat_srf_list.index(srf))
-        self.flat_u_list: list = list(simplify(u_param))
-        u_idx_list: list = list(range(len(self.flat_u_list)))
-        self.flat_v_list: list = list(simplify(v_param))
-        v_idx_list: list = list(range(len(self.flat_v_list)))
+        # Broadcast and calculate result
+        data_tree: list = list(broadcast_data_tree(u_input, v_input, surface_input))
+        result: list = list(map_objects(data_tree, tuple, self.evaluate_surface))
 
-        srf_idx_list, u_idx_list, v_idx_list = ak.broadcast_arrays(srf_idx_list, u_idx_list, v_idx_list)
-        parameter_zip: list = ak.zip([srf_idx_list, u_idx_list, v_idx_list], depth_limit=None).tolist()
-
-        pos_vectors: list = list(map_objects(parameter_zip, tuple, self.evaluate_position))
-        normal_vectors: list = list(map_objects(parameter_zip, tuple, self.evaluate_normal))
-
-        return [pos_vectors, normal_vectors]
+        # Distribute result to socket outputs
+        position_output: list = list(map_objects(result, tuple, lambda pos_norm_tuple: pos_norm_tuple[0]))
+        normal_output: list = list(map_objects(result, tuple, lambda pos_norm_tuple: pos_norm_tuple[1]))
+        return [position_output, normal_output]

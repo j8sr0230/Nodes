@@ -24,11 +24,10 @@
 ###################################################################################
 from FreeCAD import Vector
 import Part
-import awkward as ak
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_objects
+from core.nodes_utils import map_objects, broadcast_data_tree
 
 from nodes_locator import icon
 
@@ -46,24 +45,24 @@ class Sphere(FCNNodeModel):
                          inputs_init_list=[("Radius", True, ), ("Point", True, )],
                          outputs_init_list=[("Shape", True)])
 
-        self.radius_list: list = []
-
         self.grNode.resize(110, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_occ_sphere(self, position: Vector) -> Part.Shape:
-        return Part.makeSphere(self.radius_list.pop(0), position)
+    @staticmethod
+    def make_sphere(parameter_zip: tuple) -> Part.Shape:
+        radius: float = parameter_zip[0]
+        position: Vector = parameter_zip[1]
+
+        return Part.makeSphere(radius, position)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        radius: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
-        pos: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
+        # Get socket inputs
+        radius_input: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
+        point_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
 
-        # Force array broadcast
-        pos_list: list = list(flatten(pos))
-        pos_idx_list: list = list(range(len(pos_list)))
-        radius, pos_idx_list = ak.broadcast_arrays(radius, pos_idx_list)
+        # Broadcast and calculate result
+        data_tree: list = list(broadcast_data_tree(radius_input, point_input))
+        spheres: list = list(map_objects(data_tree, tuple, self.make_sphere))
 
-        self.radius_list = ak.flatten(radius, axis=None).tolist()
-
-        return [map_objects(pos, Vector, self.make_occ_sphere)]
+        return [spheres]

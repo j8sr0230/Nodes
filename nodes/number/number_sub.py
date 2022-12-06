@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  surfaces_center.py
+#  number_sub.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,33 +22,33 @@
 #
 #
 ###################################################################################
-import Part
+import awkward as ak
 
 from core.nodes_conf import register_node
-from core.nodes_utils import map_objects
 from core.nodes_default_node import FCNNodeModel
 
 from nodes_locator import icon
 
 
 @register_node
-class SurfaceCenter(FCNNodeModel):
+class Sub(FCNNodeModel):
 
-    icon: str = icon("nodes_center.svg")
-    op_title: str = "Center"
-    op_category: str = "Surfaces"
+    icon: str = icon("nodes_math.svg")
+    op_title: str = "Sub"
+    op_category: str = "Number"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Shape", True)],
-                         outputs_init_list=[("Point", True)])
-
-        self.grNode.resize(100, 70)
-        for socket in self.inputs + self.outputs:
-            socket.setSocketPosition()
+                         inputs_init_list=[("A", True), ("B", True)],
+                         outputs_init_list=[("Out", True)])
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        shape = sockets_input_data[0]
+        # Get socket inputs
+        a_input = ak.Array(sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [0])
+        b_input = ak.Array(sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [0])
 
-        return [map_objects(shape, Part.Shape, lambda shp: shp.CenterOfGravity)]
+        # Broadcast and calculate result
+        res = a_input - b_input
+
+        return [res.tolist()]

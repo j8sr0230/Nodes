@@ -23,11 +23,10 @@
 #
 ###################################################################################
 import Part
-import awkward as ak
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, simplify, map_objects
+from core.nodes_utils import map_objects, map_last_level, broadcast_data_tree, ListWrapper
 
 from nodes_locator import icon
 
@@ -49,65 +48,33 @@ class EvaluateCurve(FCNNodeModel):
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-        self.flat_crv_list: list = []
-        self.flat_u_list: list = []
+    @staticmethod
+    def evaluate_crv(parameter_zip: tuple) -> list:
+        us: list = parameter_zip[0].wrapped_data if hasattr(parameter_zip[0], 'wrapped_data') else None
+        curve: Part.Shape = parameter_zip[1]
 
-    def evaluate_position(self, parameter_zip: tuple) -> list:
-        curve = self.flat_crv_list[parameter_zip[0]]
-        us = self.flat_u_list[parameter_zip[1]]
-
-        res = []
-        if type(us) is list:
+        if us:
+            res = []
             for u in us:
-                if isinstance(curve, Part.BSplineCurve) or isinstance(curve, Part.BezierCurve) \
-                        or isinstance(curve, Part.Arc):
-                    res.append(curve.value(u))
+                if isinstance(curve, Part.BSplineCurve | Part.BezierCurve | Part.Arc):
+                    res.append((curve.value(u), curve.tangent(u)[0]))
                 else:
-                    res.append(curve.valueAt(u))
-        else:
-            if isinstance(curve, Part.BSplineCurve) or isinstance(curve, Part.BezierCurve) \
-                    or isinstance(curve, Part.Arc):
-                res.append(curve.value(us))
-            else:
-                res.append(curve.valueAt(us))
-
-        return res
-
-    def evaluate_tangent(self, parameter_zip: tuple) -> list:
-        curve = self.flat_crv_list[parameter_zip[0]]
-        us = self.flat_u_list[parameter_zip[1]]
-
-        res = []
-        if type(us) is list:
-            for u in us:
-                if isinstance(curve, Part.BSplineCurve) or isinstance(curve, Part.BezierCurve) \
-                        or isinstance(curve, Part.Arc):
-                    res.append(curve.tangent(u))
-                else:
-                    res.append(curve.tangentAt(u))
-        else:
-            if isinstance(curve, Part.BSplineCurve) or isinstance(curve, Part.BezierCurve) \
-                    or isinstance(curve, Part.Arc):
-                res.append(curve.tangent(us))
-            else:
-                res.append(curve.tangentAt(us))
-
-        return res
+                    res.append((curve.valueAt(u), curve.tangentAt(u)))
+            return res
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        parameters: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [0]
-        curves: list = sockets_input_data[1]
+        # Get socket inputs
+        parameter_input: list = [sockets_input_data[0]] if len(sockets_input_data[0]) > 0 else [[0.0]]
+        curve_input: list = sockets_input_data[1]
 
-        # Array broadcasting
-        self.flat_crv_list: list = list(flatten(curves))
-        crv_idx_list = map_objects(curves, object, lambda crv: self.flat_crv_list.index(crv))
-        self.flat_u_list: list = list(simplify(parameters))
-        u_idx_list: list = list(range(len(self.flat_u_list)))
+        # Needed, to treat list as atomic object during array broadcasting
+        wrapped_parameter_input: list = list(map_last_level(parameter_input, float, ListWrapper))
 
-        crv_idx_list, u_idx_list = ak.broadcast_arrays(crv_idx_list, u_idx_list)
-        parameter_zip: list = ak.zip([crv_idx_list, u_idx_list], depth_limit=None).tolist()
+        # Broadcast and calculate result
+        data_tree: list = list(broadcast_data_tree(wrapped_parameter_input, curve_input))
+        result: list = list(map_objects(data_tree, tuple, self.evaluate_crv))
 
-        pos_vectors: list = list(map_objects(parameter_zip, tuple, self.evaluate_position))
-        tangent_vectors: list = list(map_objects(parameter_zip, tuple, self.evaluate_tangent))
-
-        return [pos_vectors, tangent_vectors]
+        # Distribute result to socket outputs
+        point_output: list = list(map_objects(result, tuple, lambda point_tangent_tuple: point_tangent_tuple[0]))
+        tangent_output: list = list(map_objects(result, tuple, lambda point_tangent_tuple: point_tangent_tuple[1]))
+        return [point_output, tangent_output]

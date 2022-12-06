@@ -22,14 +22,12 @@
 #
 #
 ###################################################################################
-import awkward as ak
-
 from FreeCAD import Vector
 import Part
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_last_level
+from core.nodes_utils import map_last_level, map_objects, broadcast_data_tree, ListWrapper
 
 from nodes_locator import icon
 
@@ -44,29 +42,39 @@ class Polyline(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Point", True), ("Closed", False)],
+                         inputs_init_list=[("Point", True), ("Closed", True)],
                          outputs_init_list=[("Shape", True)])
 
         self.grNode.resize(100, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-        self.is_closed = 0
+    @staticmethod
+    def make_polyline(parameter_zip: tuple) -> Part.Shape:
+        points: list = parameter_zip[0].wrapped_data if hasattr(parameter_zip[0], 'wrapped_data') else None
+        is_closed: bool = bool(parameter_zip[1])
 
-    def make_occ_polyline(self, flat_points: list) -> Part.Shape:
-        segments = []
-        for i in range(len(flat_points)):
-            if i + 1 < len(flat_points):
-                segments.append(Part.LineSegment(flat_points[i], flat_points[i + 1]))
+        if points:
+            segments = []
+            for i in range(len(points)):
+                if i + 1 < len(points):
+                    segments.append(Part.LineSegment(points[i], points[i + 1]))
+            if is_closed:
+                segments.append(Part.LineSegment(points[-1], points[0]))
 
-        if self.is_closed:
-            segments.append(Part.LineSegment(flat_points[-1], flat_points[0]))
-
-        return Part.Wire(Part.Shape(segments).Edges)
+            return Part.Wire(Part.Shape(segments).Edges)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        points: list = sockets_input_data[0] if len(list(flatten(sockets_input_data[0]))) > 1 else [Vector(0, 0, 0),
-                                                                                                    Vector(10, 10, 0)]
-        self.is_closed: bool = bool(sockets_input_data[1][0] if len(sockets_input_data[1]) > 0 else 0)
+        # Get socket inputs
+        point_input: list = [sockets_input_data[0]] if len(sockets_input_data[0]) > 0 \
+            else [[Vector(0, 0, 0), Vector(10, 10, 0)]]
+        closed_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [False]
 
-        return [[map_last_level(points, Vector, self.make_occ_polyline)]]
+        # Needed, to treat list as atomic object during array broadcasting
+        wrapped_point_input: list = list(map_last_level(point_input, Vector, ListWrapper))
+
+        # Broadcast and calculate result
+        data_tree: list = list(broadcast_data_tree(wrapped_point_input, closed_input))
+        polylines: list = list(map_objects(data_tree, tuple, self.make_polyline))
+
+        return [polylines]

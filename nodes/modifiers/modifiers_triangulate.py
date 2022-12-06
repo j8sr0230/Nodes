@@ -22,8 +22,6 @@
 #
 #
 ###################################################################################
-import awkward as ak
-
 from FreeCAD import Vector
 import Part
 import Mesh
@@ -31,7 +29,7 @@ from MeshPart import meshFromShape
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_objects
+from core.nodes_utils import map_objects, broadcast_data_tree
 
 from nodes_locator import icon
 
@@ -46,20 +44,27 @@ class Triangulate(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Shape", True), ("Quality", False)],
+                         inputs_init_list=[("Shape", True), ("Quality", True)],
                          outputs_init_list=[("Mesh", True)])
-
-        self.quality: int = 0
 
         self.grNode.resize(110, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_mesh(self, shape: Part.Shape) -> Mesh.Mesh:
-        return meshFromShape(Shape=shape, Fineness=self.quality, SecondOrder=0, Optimize=1, AllowQuad=0)
+    @staticmethod
+    def make_mesh(parameter_zip: tuple) -> Mesh.Mesh:
+        shape: Part.Shape = parameter_zip[0]
+        quality: int = int(parameter_zip[1])
+
+        return meshFromShape(Shape=shape, Fineness=quality, SecondOrder=0, Optimize=1, AllowQuad=0)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        shape: list = sockets_input_data[0]
-        self.quality: int = int(sockets_input_data[1][0]) if len(sockets_input_data[1]) > 0 else 0
+        # Get socket inputs
+        shape_input: list = sockets_input_data[0]
+        quality_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [0]
 
-        return [map_objects(shape, Part.Shape, self.make_mesh)]
+        # Broadcast and calculate result
+        data_tree: list = list(broadcast_data_tree(shape_input, quality_input))
+        mesh: list = list(map_objects(data_tree, tuple, self.make_mesh))
+
+        return [mesh]

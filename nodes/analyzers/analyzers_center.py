@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  vector_length.py
+#  analyzers_center.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -22,7 +22,7 @@
 #
 #
 ###################################################################################
-from FreeCAD import Vector
+import Part
 
 from core.nodes_conf import register_node
 from core.nodes_utils import map_objects
@@ -32,23 +32,23 @@ from nodes_locator import icon
 
 
 @register_node
-class VectorLength(FCNNodeModel):
+class ShapeCenter(FCNNodeModel):
 
-    icon: str = icon("nodes_default.png")
-    op_title: str = "Vector Length"
-    op_category: str = "Vector"
+    icon: str = icon("nodes_center.svg")
+    op_title: str = "Center"
+    op_category: str = "Analyzers"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Vector", True)],
-                         outputs_init_list=[("Length", True)])
+                         inputs_init_list=[("Shape", True)],
+                         outputs_init_list=[("Point", True)])
 
-        self.grNode.resize(130, 70)
+        self.grNode.resize(100, 70)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        vector = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vector(1., 0., 0.)]
+        shape = sockets_input_data[0]
 
-        return [map_objects(vector, Vector, lambda vec: vec.Length)]
+        return [map_objects(shape, Part.Shape, lambda shp: shp.CenterOfGravity)]

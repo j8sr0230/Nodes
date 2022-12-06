@@ -22,14 +22,12 @@
 #
 #
 ###################################################################################
-import awkward as ak
-
 from FreeCAD import Vector
 import Part
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_objects
+from core.nodes_utils import map_objects, broadcast_data_tree
 
 from nodes_locator import icon
 
@@ -42,10 +40,6 @@ class Line2Pts(FCNNodeModel):
     op_category: str = "Curves"
     content_label_objname: str = "fcn_node_bg"
 
-    start_flat: list
-    end_flat: list
-    end_idx: list
-
     def __init__(self, scene):
         super().__init__(scene=scene,
                          inputs_init_list=[("Point 1", True), ("Point 2", True)],
@@ -55,21 +49,20 @@ class Line2Pts(FCNNodeModel):
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_occ_line(self, start_idx: int) -> Part.Shape:
-        return Part.makeLine(self.start_flat[start_idx], self.end_flat[self.end_idx.pop(0)])
+    @staticmethod
+    def make_line(parameter_zip: tuple) -> Part.Shape:
+        start: Vector = parameter_zip[0]
+        end: Vector = parameter_zip[1]
+
+        return Part.makeLine(start, end)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        start: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vector(0, 0, 0)]
-        self.start_flat = list(flatten(start))
+        # Get socket inputs
+        start_input: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vector(0, 0, 0)]
+        end_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(10, 0, 0)]
 
-        end: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(10, 0, 0)]
-        self.end_flat = list(flatten(end))
+        # Broadcast and calculate result
+        data_tree: list = list(broadcast_data_tree(start_input, end_input))
+        lines: list = list(map_objects(data_tree, tuple, self.make_line))
 
-        # Force array broadcast
-        start_idx_nested = map_objects(start, Vector, lambda vec: self.start_flat.index(vec))
-        end_idx_flat = list(range(len(self.end_flat)))
-
-        start_idx, end_idx = ak.broadcast_arrays(start_idx_nested, end_idx_flat)
-        self.end_idx = ak.flatten(end_idx, axis=None).tolist()
-
-        return [map_objects(start_idx.tolist(), int, self.make_occ_line)]
+        return [lines]

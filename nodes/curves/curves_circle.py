@@ -29,7 +29,7 @@ import Part
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import flatten, map_objects
+from core.nodes_utils import map_objects, broadcast_data_tree
 
 from nodes_locator import icon
 
@@ -47,32 +47,26 @@ class Circle(FCNNodeModel):
                          inputs_init_list=[("Radius", True), ("Point", True), ("Direction", True)],
                          outputs_init_list=[("Shape", True)])
 
-        self.pos_list: list = []
-        self.dir_list: list = []
-
         self.grNode.resize(120, 100)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    def make_occ_circle(self, r_pos_dir_zip: tuple) -> Part.Shape:
-        radius = r_pos_dir_zip[0]
-        position = self.pos_list[r_pos_dir_zip[1]]
-        direction = self.dir_list[r_pos_dir_zip[2]]
+    @staticmethod
+    def make_arc(parameter_zip: tuple) -> Part.Shape:
+        radius: float = parameter_zip[0]
+        position: Vector = parameter_zip[1]
+        direction: Vector = parameter_zip[2]
 
         return Part.makeCircle(radius, position, direction)
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        radius: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
-        position: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
-        direction: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [Vector(0, 0, 1)]
+        # Get socket inputs
+        radius_input: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10]
+        point_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 0)]
+        direction_input: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [Vector(0, 0, 1)]
 
-        # Array broadcast
-        self.pos_list: list = list(flatten(position))
-        pos_idx_list: list = list(range(len(self.pos_list)))
-        self.dir_list: list = list(flatten(direction))
-        dir_idx_list: list = list(range(len(self.dir_list)))
+        # Broadcast and calculate result
+        data_tree: list = list(broadcast_data_tree(radius_input, point_input, direction_input))
+        arcs: list = list(map_objects(data_tree, tuple, self.make_arc))
 
-        radius, pos_idx_list, dir_idx_list = ak.broadcast_arrays(radius, pos_idx_list, dir_idx_list)
-        parameter_zip: list = ak.zip([radius, pos_idx_list, dir_idx_list], depth_limit=None).tolist()
-
-        return [map_objects(parameter_zip, tuple, self.make_occ_circle)]
+        return [arcs]

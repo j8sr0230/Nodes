@@ -22,11 +22,12 @@
 #
 #
 ###################################################################################
-import awkward as ak
 import numpy as np
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
+from core.nodes_utils import map_objects, broadcast_data_tree
+
 from nodes_locator import icon
 
 
@@ -40,25 +41,29 @@ class NumberRange(FCNNodeModel):
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Start", True), ("Stop", True), ("Step", 1, 1, False)],
+                         inputs_init_list=[("Start", True), ("Stop", True), ("Step", True)],
                          outputs_init_list=[("Out", True)])
 
         self.grNode.resize(130, 100)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
+    @staticmethod
+    def make_range(parameter_zip: tuple) -> list:
+        start: float = parameter_zip[0]
+        stop: float = parameter_zip[1]
+        step: float = parameter_zip[2]
+
+        return list(np.arange(start, stop, step))
+
     def eval_operation(self, sockets_input_data: list) -> list:
-        # Inputs
-        start = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [0]
-        stop = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [10]
-        step = sockets_input_data[2][0] if len(sockets_input_data[2]) > 0 else 1
+        # Get socket inputs
+        start_input = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [0.0]
+        stop_input = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [10.0]
+        step_input = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [1.0]
 
-        # Force array broadcast
-        start, stop = ak.broadcast_arrays(start, stop)
+        # Broadcast and calculate result
+        data_tree: list = list(broadcast_data_tree(start_input, stop_input, step_input))
+        ranges: list = list(map_objects(data_tree, tuple, self.make_range))
 
-        res = []
-        for idx, _start in enumerate(ak.flatten(start, axis=None)):
-            _stop = ak.flatten(stop, axis=None)[idx]
-            res.append(np.arange(_start, _stop, step).tolist())
-
-        return [res]
+        return [ranges]
