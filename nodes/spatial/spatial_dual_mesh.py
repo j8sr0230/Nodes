@@ -49,7 +49,7 @@ class DualMesh(FCNNodeModel):
                          inputs_init_list=[("Mesh", True), ("Scale", False)],
                          outputs_init_list=[("Wire", True)])
 
-        self.scale: float = 1
+        self.scale: float = 1.0
 
         self.grNode.resize(110, 80)
         for socket in self.inputs + self.outputs:
@@ -101,6 +101,6 @@ class DualMesh(FCNNodeModel):
 
     def eval_operation(self, sockets_input_data: list) -> list:
         mesh: list = sockets_input_data[0]
-        self.scale: float = float(sockets_input_data[1][0]) if len(sockets_input_data[1]) > 0 else 1
+        self.scale: float = float(sockets_input_data[1][0]) if len(sockets_input_data[1]) > 0 else 1.0
 
         return [map_objects(mesh, Mesh.Mesh, self.make_dual_mesh)]
