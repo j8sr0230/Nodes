@@ -37,7 +37,7 @@ class BSplineSurface(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
     op_title: str = "BSpline Srv"
-    op_category: str = "Surfaces"
+    op_category: str = "Alpha"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
