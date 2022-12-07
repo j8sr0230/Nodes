@@ -34,7 +34,7 @@ from nodes_locator import icon
 @register_node
 class VectorLength(FCNNodeModel):
 
-    icon: str = icon("nodes_default.png")
+    icon: str = icon("nodes_vect_lenght.svg")
     op_title: str = "Length (Vec)"
     op_category: str = "Vector"
     content_label_objname: str = "fcn_node_bg"
