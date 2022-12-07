@@ -20,6 +20,7 @@ Download and install the Nodes workbench via the Addon Manager (**Tools → Addo
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_voronoi_extrusion.gif)
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_voronoi_extrusion_graph.png)
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_cube_rotation.gif)
+![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_boundary_surface.gif)
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_evaluate_surface.gif)
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_align_shape_on_srf.gif)
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_animation.gif)
