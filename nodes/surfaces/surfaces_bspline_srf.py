@@ -36,7 +36,7 @@ from nodes_locator import icon
 class BSplineSurface(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "BSpline Srv"
+    op_title: str = "BSpline Srf"
     op_category: str = "Alpha"
     content_label_objname: str = "fcn_node_bg"
 
