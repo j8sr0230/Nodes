@@ -36,7 +36,7 @@ from nodes_locator import icon
 class FilledSurface(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Filled Srv"
+    op_title: str = "Filled Srf"
     op_category: str = "Surfaces"
     content_label_objname: str = "fcn_node_bg"
 

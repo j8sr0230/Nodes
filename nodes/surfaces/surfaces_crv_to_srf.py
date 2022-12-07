@@ -38,7 +38,7 @@ from nodes_locator import icon
 class CrvToSurface(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Crv to Srv"
+    op_title: str = "Crv to Srf"
     op_category: str = "Surfaces"
     content_label_objname: str = "fcn_node_bg"
 
