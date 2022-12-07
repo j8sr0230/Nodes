@@ -49,27 +49,24 @@ class FilledSurface(FCNNodeModel):
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    # @staticmethod
-    # def make_bspline_srf(parameter_zip: tuple) -> Part.Shape:
-    #     interpolation_pts: list = parameter_zip[0].wrapped_data if hasattr(parameter_zip[0], 'wrapped_data') else None
-    #     is_closed: bool = bool(parameter_zip[1])
-    #
-    #     if interpolation_pts:
-    #         if is_closed:
-    #             return Part.BSplineCurve(interpolation_pts, None, None, True, 3, None, False)
-    #         else:
-    #             return Part.BSplineCurve(interpolation_pts, None, None, False, 3, None, False)
+    @staticmethod
+    def make_filled_face(parameter_zip: tuple) -> Part.Shape:
+        bounds: list = parameter_zip[0].wrapped_data if hasattr(parameter_zip[0], 'wrapped_data') else None
+        supports: list = parameter_zip[1].wrapped_data if hasattr(parameter_zip[1], 'wrapped_data') else None
+
+        return Part.makeFilledFace(bounds + supports)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         # Get socket inputs
-        bound_input: list = sockets_input_data[0]
-        support_input: list = sockets_input_data[1]
+        bound_input: list = [sockets_input_data[0]]
+        support_input: list = [sockets_input_data[1]]
+
+        # Needed, to treat list as atomic object during array broadcasting
+        wrapped_bound_input: list = list(map_last_level(bound_input, Part.Shape, ListWrapper))
+        wrapped_support_input: list = list(map_last_level(support_input, Part.Shape, ListWrapper))
 
         # Broadcast and calculate result
-        # data_tree: list = list(broadcast_data_tree(bound_input, support_input))
-        # faces: list = list(map_objects(data_tree, tuple, self.make_arc))
+        data_tree: list = list(broadcast_data_tree(wrapped_bound_input, wrapped_support_input))
+        filled_face: list = list(map_objects(data_tree, tuple, self.make_filled_face))
 
-        # return [faces]
-
-        print(bound_input + support_input)
-        return [[Part.makeFilledFace(bound_input + support_input)]]
+        return [filled_face]
