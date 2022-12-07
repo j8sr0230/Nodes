@@ -2,7 +2,7 @@
 <package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
   <name>Nodes</name>
   <description>Visual scripting workbench for FreeCAD</description>
-  <version>0.1.27</version>
+  <version>0.1.28</version>
   <date>2022-12-07</date>
   <maintainer email="ronny.scharf08@gmail.com">Ronny Scharf-Wildenhain</maintainer>
   <license file="LICENSE">LGPLv2.1</license>
