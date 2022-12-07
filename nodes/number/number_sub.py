@@ -33,7 +33,7 @@ from nodes_locator import icon
 @register_node
 class Sub(FCNNodeModel):
 
-    icon: str = icon("nodes_math.svg")
+    icon: str = icon("nodes_sub.svg")
     op_title: str = "Sub"
     op_category: str = "Number"
     content_label_objname: str = "fcn_node_bg"
