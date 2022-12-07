@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;">
+    <g transform="matrix(0.707107,-0.707107,0.707107,0.707107,-13.2548,32)">
+        <path d="M27.102,27.102L27.102,7.857L36.898,7.857L36.898,27.102L56.143,27.102L56.143,36.898L36.898,36.898L36.898,56.143L27.102,56.143L27.102,36.898L7.857,36.898L7.857,27.102L27.102,27.102Z" style="fill:url(#_Linear1);stroke:rgb(46,52,54);stroke-width:2.44px;"/>
+    </g>
+    <g transform="matrix(0.707107,-0.707107,0.707107,0.707107,-13.2548,32)">
+        <path d="M28.501,28.501L28.501,9.645L35.499,9.645L35.499,28.501L54.355,28.501L54.355,35.499L35.499,35.499L35.499,54.355L28.501,54.355L28.501,35.499L9.645,35.499L9.645,28.501L28.501,28.501Z" style="fill:none;stroke:rgb(211,215,207);stroke-width:1.88px;stroke-linejoin:miter;"/>
+    </g>
+    <defs>
+        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(39.1927,39.1117,-39.1117,39.1927,11.6003,12.7043)"><stop offset="0" style="stop-color:rgb(198,202,194);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(57,62,53);stop-opacity:1"/></linearGradient>
+    </defs>
+</svg>
