@@ -53,7 +53,7 @@ class ScaleVec(FCNNodeModel):
         vec: Vector = parameter_zip[0]
         scale: Vector = parameter_zip[1]
 
-        return vec.scale(scale, scale, scale)
+        return Vector(vec).scale(scale, scale, scale)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         # Get socket inputs

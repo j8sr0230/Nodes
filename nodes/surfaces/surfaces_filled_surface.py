@@ -62,14 +62,13 @@ class FilledSurface(FCNNodeModel):
 
     def eval_operation(self, sockets_input_data: list) -> list:
         # Get socket inputs
-        point_input: list = sockets_input_data[0]
+        bound_input: list = sockets_input_data[0]
+        support_input: list = sockets_input_data[1]
 
-        # Calculate result
-        # bspline_surface: list = list(map_objects(data_tree, tuple, self.make_bspline_srf))
-        #
-        # return [bspline_surface]
+        # Broadcast and calculate result
+        # data_tree: list = list(broadcast_data_tree(bound_input, support_input))
+        # faces: list = list(map_objects(data_tree, tuple, self.make_arc))
 
-        bspline_surface: Part.BSplineSurface = Part.BSplineSurface()
-        bspline_surface.interpolate(point_input)
+        # return [faces]
 
-        return [[bspline_surface]]
+        return [[Part.makeFilledFace(bound_input)]]#support_input)]]
