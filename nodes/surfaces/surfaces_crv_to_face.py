@@ -29,7 +29,7 @@ import Part
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import map_objects
+from core.nodes_utils import map_objects, map_last_level, ListWrapper
 
 from nodes_locator import icon
 
@@ -52,10 +52,17 @@ class CrvToFace(FCNNodeModel):
             socket.setSocketPosition()
 
     @staticmethod
-    def make_occ_face(wire: object) -> Part.Shape:
-        return Part.makeFace(wire, "Part::FaceMakerBullseye")
+    def make_face(curves_wrapper: ListWrapper) -> Part.Shape:
+        wires: list = curves_wrapper.wrapped_data
+        return Part.makeFace(wires, "Part::FaceMakerBullseye")
 
     def eval_operation(self, sockets_input_data: list) -> list:
-        curves: list = sockets_input_data[0]
+        # Get socket inputs
+        curve_input: list = [sockets_input_data[0]]
 
-        return [map_objects(curves, object, self.make_occ_face)]
+        # Needed, to treat list as atomic object during mapping
+        wrapped_curve_input: list = list(map_last_level(curve_input, Part.Shape, ListWrapper))
+
+        # Calculate result
+        faces = list(map_objects(wrapped_curve_input, ListWrapper, self.make_face))
+        return [faces]
