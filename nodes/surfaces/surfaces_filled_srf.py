@@ -71,4 +71,5 @@ class FilledSurface(FCNNodeModel):
 
         # return [faces]
 
-        return [[Part.makeFilledFace(bound_input)]]#support_input)]]
+        print(bound_input + support_input)
+        return [[Part.makeFilledFace(bound_input + support_input)]]
