@@ -33,7 +33,7 @@ from nodes_locator import icon
 @register_node
 class Pow(FCNNodeModel):
 
-    icon: str = icon("nodes_pow.svg)
+    icon: str = icon("nodes_pow.svg")
     op_title: str = "Pow"
     op_category: str = "Number"
     content_label_objname: str = "fcn_node_bg"
