@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  surfaces_crv_to_face.py
+#  surfaces_crv_to_surface.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -35,10 +35,10 @@ from nodes_locator import icon
 
 
 @register_node
-class CrvToFace(FCNNodeModel):
+class CrvToSurface(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Crv to Face"
+    op_title: str = "Crv to Srv"
     op_category: str = "Surfaces"
     content_label_objname: str = "fcn_node_bg"
 
