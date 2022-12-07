@@ -61,7 +61,8 @@ class CrvToFace(FCNNodeModel):
         curve_input: list = [sockets_input_data[0]]
 
         # Needed, to treat list as atomic object during mapping
-        wrapped_curve_input: list = list(map_last_level(curve_input, Part.Shape, ListWrapper))
+        wrapped_curve_input: list = list(map_last_level(curve_input, Part.Shape | Part.BSplineCurve | Part.Arc,
+                                                        ListWrapper))
 
         # Calculate result
         faces = list(map_objects(wrapped_curve_input, ListWrapper, self.make_face))
