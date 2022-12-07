@@ -33,7 +33,7 @@ from nodes_locator import icon
 @register_node
 class Mult(FCNNodeModel):
 
-    icon: str = icon("nodes_math.svg")
+    icon: str = icon("nodes_multiply.svg")
     op_title: str = "Mult"
     op_category: str = "Number"
     content_label_objname: str = "fcn_node_bg"
