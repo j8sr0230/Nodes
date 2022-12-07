@@ -53,7 +53,7 @@ class CrvToFace(FCNNodeModel):
 
     @staticmethod
     def make_occ_face(wire: object) -> Part.Shape:
-        return Part.makeFilledFace(wire)
+        return Part.makeFace(wire, "Part::FaceMakerBullseye")
 
     def eval_operation(self, sockets_input_data: list) -> list:
         curves: list = sockets_input_data[0]
