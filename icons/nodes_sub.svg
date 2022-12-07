@@ -1,17 +1,79 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;">
-    <g transform="matrix(4.3513,0,0,3.11564,-225.194,-82.1308)">
-        <g>
-            <g transform="matrix(0.215144,0,0,0.243932,51.8527,32.8611)">
-                <rect x="7.93" y="9.012" width="51.58" height="12.89" style="fill:url(#_Linear1);stroke:rgb(46,52,54);stroke-width:2.44px;"/>
+<svg
+   width="32"
+   height="32"
+   viewBox="0 0 32 32"
+   version="1.1"
+   xml:space="preserve"
+   style="clip-rule:evenodd;fill-rule:evenodd;stroke-linejoin:round"
+   id="svg3379"
+   sodipodi:docname="nodes_sub.svg"
+   inkscape:version="1.1.2 (b8e25be833, 2022-02-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
+   id="namedview3381"
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1.0"
+   inkscape:pageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   showgrid="false"
+   inkscape:zoom="12.625"
+   inkscape:cx="31.960396"
+   inkscape:cy="32.039604"
+   inkscape:window-width="1920"
+   inkscape:window-height="1001"
+   inkscape:window-x="-9"
+   inkscape:window-y="-9"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="svg3379" />
+    <g
+   transform="matrix(2.7533799,0,0,1.9714891,-146.74501,-56.218715)"
+   id="g3370">
+        <g
+   id="g3368">
+            <g
+   transform="matrix(0.215144,0,0,0.243932,51.8527,32.8611)"
+   id="g3362">
+                <rect
+   x="7.9299998"
+   y="9.0120001"
+   width="51.580002"
+   height="12.89"
+   style="fill:url(#_Linear1);stroke:#2e3436;stroke-width:2.44px"
+   id="rect3360" />
             </g>
-            <g transform="matrix(0.215144,0,0,0.243932,51.8527,32.8612)">
-                <rect x="9.84" y="10.853" width="47.76" height="9.207" style="fill:none;stroke:rgb(211,215,207);stroke-width:1.88px;stroke-linejoin:miter;"/>
+            <g
+   transform="matrix(0.215144,0,0,0.243932,51.8527,32.8612)"
+   id="g3366">
+                <rect
+   x="9.8400002"
+   y="10.853"
+   width="47.759998"
+   height="9.2069998"
+   style="fill:none;stroke:#d3d7cf;stroke-width:1.88px;stroke-linejoin:miter"
+   id="rect3364" />
             </g>
         </g>
     </g>
-    <defs>
-        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(51.58,0,0,51.58,7.93,15.457)"><stop offset="0" style="stop-color:rgb(198,202,194);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(57,62,53);stop-opacity:1"/></linearGradient>
+    <defs
+   id="defs3377">
+        <linearGradient
+   id="_Linear1"
+   x1="0"
+   y1="0"
+   x2="1"
+   y2="0"
+   gradientUnits="userSpaceOnUse"
+   gradientTransform="matrix(51.58,0,0,51.58,7.93,15.457)"><stop
+     offset="0"
+     style="stop-color:rgb(198,202,194);stop-opacity:1"
+     id="stop3372" /><stop
+     offset="1"
+     style="stop-color:rgb(57,62,53);stop-opacity:1"
+     id="stop3374" /></linearGradient>
     </defs>
 </svg>
