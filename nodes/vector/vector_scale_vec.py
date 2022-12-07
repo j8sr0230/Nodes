@@ -34,7 +34,7 @@ from nodes_locator import icon
 @register_node
 class ScaleVec(FCNNodeModel):
 
-    icon: str = icon("nodes_default.png")
+    icon: str = icon("nodes_vect_scale.svg")
     op_title: str = "Scale (Vec)"
     op_category: str = "Vector"
     content_label_objname: str = "fcn_node_bg"
