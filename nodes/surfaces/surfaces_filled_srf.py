@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  vector_sub_vec.py
+#  surfaces_filled_surfaces.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -23,46 +23,50 @@
 #
 ###################################################################################
 from FreeCAD import Vector
+import Part
 
 from core.nodes_conf import register_node
-from core.nodes_utils import map_objects, broadcast_data_tree
 from core.nodes_default_node import FCNNodeModel
+from core.nodes_utils import map_objects, map_last_level, broadcast_data_tree, ListWrapper
 
 from nodes_locator import icon
 
 
 @register_node
-class SubVec(FCNNodeModel):
+class FilledSurface(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Sub (Vec)"
-    op_category: str = "Vector"
+    op_title: str = "Filled Srv"
+    op_category: str = "Surfaces"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("A", True), ("B", True)],
-                         outputs_init_list=[("Out", True)])
+                         inputs_init_list=[("Bound", True), ("Support", True)],
+                         outputs_init_list=[("Face", True)])
 
-        self.grNode.resize(100, 70)
+        self.grNode.resize(120, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
     @staticmethod
-    def sub_vectors(parameter_zip: tuple) -> Vector:
-        a: Vector = parameter_zip[0]
-        b: Vector = parameter_zip[1]
+    def make_filled_face(parameter_zip: tuple) -> Part.Shape:
+        bounds: list = parameter_zip[0].wrapped_data if hasattr(parameter_zip[0], 'wrapped_data') else None
+        supports: list = parameter_zip[1].wrapped_data if hasattr(parameter_zip[1], 'wrapped_data') else None
 
-        return Vector(a).sub(b)
+        return Part.makeFilledFace(bounds + supports)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         # Get socket inputs
-        a_input = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vector(1., 0., 0.)]
-        b_input = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0., 1., 0.)]
+        bound_input: list = [sockets_input_data[0]]
+        support_input: list = [sockets_input_data[1]]
+
+        # Needed, to treat list as atomic object during array broadcasting
+        wrapped_bound_input: list = list(map_last_level(bound_input, Part.Shape, ListWrapper))
+        wrapped_support_input: list = list(map_last_level(support_input, Part.Shape, ListWrapper))
 
         # Broadcast and calculate result
-        data_tree: list = list(broadcast_data_tree(a_input, b_input))
-        vectors: list = list(map_objects(data_tree, tuple, self.sub_vectors))
+        data_tree: list = list(broadcast_data_tree(wrapped_bound_input, wrapped_support_input))
+        filled_face: list = list(map_objects(data_tree, tuple, self.make_filled_face))
 
-        return [vectors]
-    
+        return [filled_face]

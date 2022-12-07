@@ -53,7 +53,7 @@ class AddVec(FCNNodeModel):
         a: Vector = parameter_zip[0]
         b: Vector = parameter_zip[1]
 
-        return a.add(b)
+        return Vector(a).add(b)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         # Get socket inputs

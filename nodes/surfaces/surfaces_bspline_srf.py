@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  vector_sub_vec.py
+#  surfaces_bspline_surfaces.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -23,46 +23,53 @@
 #
 ###################################################################################
 from FreeCAD import Vector
+import Part
 
 from core.nodes_conf import register_node
-from core.nodes_utils import map_objects, broadcast_data_tree
 from core.nodes_default_node import FCNNodeModel
+from core.nodes_utils import map_objects, map_last_level, broadcast_data_tree, ListWrapper
 
 from nodes_locator import icon
 
 
 @register_node
-class SubVec(FCNNodeModel):
+class BSplineSurface(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Sub (Vec)"
-    op_category: str = "Vector"
+    op_title: str = "BSpline Srv"
+    op_category: str = "Alpha"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("A", True), ("B", True)],
-                         outputs_init_list=[("Out", True)])
+                         inputs_init_list=[("Int Points", True)],
+                         outputs_init_list=[("Curve", True)])
 
-        self.grNode.resize(100, 70)
+        self.grNode.resize(120, 70)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    @staticmethod
-    def sub_vectors(parameter_zip: tuple) -> Vector:
-        a: Vector = parameter_zip[0]
-        b: Vector = parameter_zip[1]
-
-        return Vector(a).sub(b)
+    # @staticmethod
+    # def make_bspline_srf(parameter_zip: tuple) -> Part.Shape:
+    #     interpolation_pts: list = parameter_zip[0].wrapped_data if hasattr(parameter_zip[0], 'wrapped_data') else None
+    #     is_closed: bool = bool(parameter_zip[1])
+    #
+    #     if interpolation_pts:
+    #         if is_closed:
+    #             return Part.BSplineCurve(interpolation_pts, None, None, True, 3, None, False)
+    #         else:
+    #             return Part.BSplineCurve(interpolation_pts, None, None, False, 3, None, False)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         # Get socket inputs
-        a_input = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [Vector(1., 0., 0.)]
-        b_input = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0., 1., 0.)]
+        point_input: list = sockets_input_data[0]
 
-        # Broadcast and calculate result
-        data_tree: list = list(broadcast_data_tree(a_input, b_input))
-        vectors: list = list(map_objects(data_tree, tuple, self.sub_vectors))
+        # Calculate result
+        # bspline_surface: list = list(map_objects(data_tree, tuple, self.make_bspline_srf))
+        #
+        # return [bspline_surface]
 
-        return [vectors]
-    
+        bspline_surface: Part.BSplineSurface = Part.BSplineSurface()
+        bspline_surface.interpolate(point_input)
+
+        return [[bspline_surface]]
