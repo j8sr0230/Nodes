@@ -62,8 +62,10 @@ class FilledSurface(FCNNodeModel):
         support_input: list = [sockets_input_data[1]]
 
         # Needed, to treat list as atomic object during array broadcasting
-        wrapped_bound_input: list = list(map_last_level(bound_input, Part.Shape, ListWrapper))
-        wrapped_support_input: list = list(map_last_level(support_input, Part.Shape, ListWrapper))
+        wrapped_bound_input: list = list(map_last_level(bound_input, Part.Shape | Part.BSplineCurve | Part.Arc,
+                                                        ListWrapper))
+        wrapped_support_input: list = list(map_last_level(support_input, Part.Shape | Part.BSplineCurve | Part.Arc,
+                                                          ListWrapper))
 
         # Broadcast and calculate result
         data_tree: list = list(broadcast_data_tree(wrapped_bound_input, wrapped_support_input))
