@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  surfaces_bspline_surfaces.py
+#  modifiers_loft.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -27,37 +27,42 @@ import Part
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
-from core.nodes_utils import map_objects, map_last_level, broadcast_data_tree, ListWrapper
+from core.nodes_utils import map_objects, broadcast_data_tree
 
 from nodes_locator import icon
 
 
 @register_node
-class BSplineSurface(FCNNodeModel):
+class Extrude(FCNNodeModel):
 
-    icon: str = icon("nodes_default.png")
-    op_title: str = "BSpline Srf"
-    op_category: str = "Surfaces"
+    icon: str = icon("nodes_extrude.svg")
+    op_title: str = "Extrude"
+    op_category: str = "Modifiers"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Int Points", True)],
-                         outputs_init_list=[("Face", True)])
+                         inputs_init_list=[("Shape", True), ("Direction", True)],
+                         outputs_init_list=[("Shape", True)])
 
-        self.grNode.resize(120, 70)
+        self.grNode.resize(120, 80)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
+    @staticmethod
+    def make_extrusion(parameter_zip: tuple) -> Part.Shape:
+        shape: Part.Shape = parameter_zip[0]
+        direction: Vector = parameter_zip[1]
+
+        return shape.extrude(direction)
+
     def eval_operation(self, sockets_input_data: list) -> list:
         # Get socket inputs
-        point_input: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else \
-            [[Vector(-5, 5, 5), Vector(0, 5, 0), Vector(5, 5, 5)],
-             [Vector(-5, 0, 0), Vector(0, 0, 3), Vector(5, 0, 0)],
-             [Vector(-5, -5, 5), Vector(0, -5, 0), Vector(5, -5, 5)]]
+        shape_input: list = sockets_input_data[0]
+        direction_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [Vector(0, 0, 1)]
 
-        # Calculate result
-        bspline_surface: Part.BSplineSurface = Part.BSplineSurface()
-        bspline_surface.interpolate(point_input)
+        # Broadcast and calculate result
+        data_tree: list = list(broadcast_data_tree(shape_input, direction_input))
+        shapes: list = list(map_objects(data_tree, tuple, self.make_extrusion))
 
-        return [[bspline_surface]]
+        return [shapes]
