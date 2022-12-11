@@ -22,7 +22,6 @@ For FreeCAD version 0.21 or higher, it is recommended to download and install th
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_evaluate_surface.gif)
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_align_shape_on_srf.gif)
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_animation.gif)
-![Feature overview](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_base_node_features.gif)
 
 ## Usage
 Tutorials coming soon!
