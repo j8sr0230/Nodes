@@ -12,8 +12,7 @@ A visual scripting workbench for [FreeCAD](https://www.freecad.org) using
 For FreeCAD version 0.21 or higher, it is recommended to download and install the Nodes Workbench via the Addon Manager 
 (**Tools → Addon Manager**). The required Python modules `qtpy` and `awkward` are automatically installed this way.
 
-## Usage
-### Showcase
+## Showcase
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_voronoi_extrusion.gif)
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_voronoi_extrusion_graph.png)
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_iterative_loft.gif)
@@ -25,6 +24,7 @@ For FreeCAD version 0.21 or higher, it is recommended to download and install th
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_animation.gif)
 ![Feature overview](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_base_node_features.gif)
 
+## Usage
 Tutorials coming soon!
 
 ## License
