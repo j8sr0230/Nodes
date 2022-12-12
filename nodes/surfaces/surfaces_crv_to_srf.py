@@ -37,7 +37,7 @@ from nodes_locator import icon
 @register_node
 class CrvToSurface(FCNNodeModel):
 
-    icon: str = icon("nodes_default.png")
+    icon: str = icon("nodes_crv_srf.svg")
     op_title: str = "Crv to Srf"
     op_category: str = "Surfaces"
     content_label_objname: str = "fcn_node_bg"

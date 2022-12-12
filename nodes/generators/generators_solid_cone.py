@@ -35,7 +35,7 @@ from nodes_locator import icon
 @register_node
 class SolidCone(FCNNodeModel):
 
-    icon: str = icon("nodes_default.png")
+    icon: str = icon("nodes_cone.svg")
     op_title: str = "Cone"
     op_category: str = "Generators"
     content_label_objname: str = "fcn_node_bg"
