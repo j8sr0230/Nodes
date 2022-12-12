@@ -37,38 +37,26 @@ class BSplineSurface(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
     op_title: str = "BSpline Srf"
-    op_category: str = "Alpha"
+    op_category: str = "Surfaces"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
                          inputs_init_list=[("Int Points", True)],
-                         outputs_init_list=[("Curve", True)])
+                         outputs_init_list=[("Face", True)])
 
         self.grNode.resize(120, 70)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
-    # @staticmethod
-    # def make_bspline_srf(parameter_zip: tuple) -> Part.Shape:
-    #     interpolation_pts: list = parameter_zip[0].wrapped_data if hasattr(parameter_zip[0], 'wrapped_data') else None
-    #     is_closed: bool = bool(parameter_zip[1])
-    #
-    #     if interpolation_pts:
-    #         if is_closed:
-    #             return Part.BSplineCurve(interpolation_pts, None, None, True, 3, None, False)
-    #         else:
-    #             return Part.BSplineCurve(interpolation_pts, None, None, False, 3, None, False)
-
     def eval_operation(self, sockets_input_data: list) -> list:
         # Get socket inputs
-        point_input: list = sockets_input_data[0]
+        point_input: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else \
+            [[Vector(-5, 5, 5), Vector(0, 5, 0), Vector(5, 5, 5)],
+             [Vector(-5, 0, 0), Vector(0, 0, 3), Vector(5, 0, 0)],
+             [Vector(-5, -5, 5), Vector(0, -5, 0), Vector(5, -5, 5)]]
 
         # Calculate result
-        # bspline_surface: list = list(map_objects(data_tree, tuple, self.make_bspline_srf))
-        #
-        # return [bspline_surface]
-
         bspline_surface: Part.BSplineSurface = Part.BSplineSurface()
         bspline_surface.interpolate(point_input)
 

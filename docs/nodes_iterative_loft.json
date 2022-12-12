@@ -1,0 +1,2064 @@
+{
+    "id": 1958485663632,
+    "scene_width": 64000,
+    "scene_height": 64000,
+    "nodes": [
+        {
+            "id": 2690734648160,
+            "title": "CViewer",
+            "pos_x": 1937.816162109376,
+            "pos_y": 698.2891845703124,
+            "inputs": [
+                {
+                    "id": 2688709517344,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [],
+            "content": {},
+            "op_code": "<class 'viz_compound_viewer.CompoundViewer'>"
+        },
+        {
+            "id": 2688709518352,
+            "title": "Box",
+            "pos_x": -121.35180664062491,
+            "pos_y": 575.696350097656,
+            "inputs": [
+                {
+                    "id": 2688709519120,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709514464,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709514608,
+                    "index": 2,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709510144,
+                    "index": 3,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709514416,
+                    "index": 4,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2688709519264,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'generators_solid_box.SolidBox'>"
+        },
+        {
+            "id": 2688709516672,
+            "title": "Shape Content",
+            "pos_x": 169.5,
+            "pos_y": 171.93749999999991,
+            "inputs": [
+                {
+                    "id": 2688709511968,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2688709517776,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709516288,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709511248,
+                    "index": 2,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709510672,
+                    "index": 3,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709509376,
+                    "index": 4,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709516480,
+                    "index": 5,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'analyzers_shape_content.ShapeContent'>"
+        },
+        {
+            "id": 2688709515184,
+            "title": "Evaluate Srf",
+            "pos_x": 646.2500000000002,
+            "pos_y": 206.43749999999991,
+            "inputs": [
+                {
+                    "id": 2688709516816,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709518736,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709516240,
+                    "index": 2,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2688709510240,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709514512,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'surfaces_evaluate_srf.EvaluateSurface'>"
+        },
+        {
+            "id": 2688709509472,
+            "title": "UV on Srf",
+            "pos_x": 494.0000000000002,
+            "pos_y": 165.43749999999991,
+            "inputs": [
+                {
+                    "id": 2688709509328,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709515616,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2688709510864,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709510336,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'surfaces_uv_on_srf.UVOnSurface'>"
+        },
+        {
+            "id": 2688709517728,
+            "title": "Center",
+            "pos_x": 327.0,
+            "pos_y": 298.4374999999999,
+            "inputs": [
+                {
+                    "id": 2688709523056,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2688709514368,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'analyzers_center.ShapeCenter'>"
+        },
+        {
+            "id": 2688709514080,
+            "title": "Translate",
+            "pos_x": 1138.5000000000002,
+            "pos_y": 207.93749999999991,
+            "inputs": [
+                {
+                    "id": 2688709521472,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709510624,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2688709514272,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'transforms_translate.Translate'>"
+        },
+        {
+            "id": 2688709519168,
+            "title": "Scale (Vec)",
+            "pos_x": 980.0000000000002,
+            "pos_y": 296.4374999999999,
+            "inputs": [
+                {
+                    "id": 2688709742736,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688709743312,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2688709741056,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'vector_scale_vec.ScaleVec'>"
+        },
+        {
+            "id": 2688709521136,
+            "title": "Number",
+            "pos_x": 663.5000000000002,
+            "pos_y": 322.9374999999999,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2688709524928,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "0"
+            },
+            "op_code": "<class 'number_number.Number'>"
+        },
+        {
+            "id": 2688709525072,
+            "title": "Number",
+            "pos_x": 663.5000000000002,
+            "pos_y": 413.9374999999999,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2688709514320,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": ".5"
+            },
+            "op_code": "<class 'number_number.Number'>"
+        },
+        {
+            "id": 2690734653248,
+            "title": "Socket Option",
+            "pos_x": 802.0000000000002,
+            "pos_y": 366.1874999999999,
+            "inputs": [
+                {
+                    "id": 2688720971872,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2688720969856,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "5"
+            },
+            "op_code": "<class 'list_socket_option.SocketOption'>"
+        },
+        {
+            "id": 2688720965968,
+            "title": "Socket Option",
+            "pos_x": 808.5000000000002,
+            "pos_y": 234.68749999999991,
+            "inputs": [
+                {
+                    "id": 2688720967600,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2688720977776,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "0"
+            },
+            "op_code": "<class 'list_socket_option.SocketOption'>"
+        },
+        {
+            "id": 2688720970528,
+            "title": "Socket Option",
+            "pos_x": 967.7500000000002,
+            "pos_y": 162.68749999999991,
+            "inputs": [
+                {
+                    "id": 2688720965296,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2688720961696,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "0"
+            },
+            "op_code": "<class 'list_socket_option.SocketOption'>"
+        },
+        {
+            "id": 2688720966112,
+            "title": "Loft",
+            "pos_x": 1611.5000000000002,
+            "pos_y": 263.9374999999999,
+            "inputs": [
+                {
+                    "id": 2688720968224,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688720964432,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688720965776,
+                    "index": 2,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2688720973984,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'modifiers_loft.Loft'>"
+        },
+        {
+            "id": 2688720970816,
+            "title": "Socket Option",
+            "pos_x": 1289.5000000000002,
+            "pos_y": 215.93749999999991,
+            "inputs": [
+                {
+                    "id": 2688720967504,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2688720974512,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "1"
+            },
+            "op_code": "<class 'list_socket_option.SocketOption'>"
+        },
+        {
+            "id": 2688720976576,
+            "title": "Uniform Scale",
+            "pos_x": 1464.5000000000002,
+            "pos_y": 272.9374999999999,
+            "inputs": [
+                {
+                    "id": 2688720975712,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 2688720974224,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2688720963712,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'transforms_uniform_scale.UniformScale'>"
+        },
+        {
+            "id": 2688720973552,
+            "title": "Number",
+            "pos_x": 1160.7500000000002,
+            "pos_y": 308.1874999999999,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2688720969952,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "1"
+            },
+            "op_code": "<class 'number_number.Number'>"
+        },
+        {
+            "id": 2688720968080,
+            "title": "Number",
+            "pos_x": 1162.7500000000002,
+            "pos_y": 398.1874999999999,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2688720962560,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": ".7"
+            },
+            "op_code": "<class 'number_number.Number'>"
+        },
+        {
+            "id": 2688720968800,
+            "title": "Socket Option",
+            "pos_x": 1290.2500000000002,
+            "pos_y": 351.4374999999999,
+            "inputs": [
+                {
+                    "id": 2688720967984,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2688720970480,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "5"
+            },
+            "op_code": "<class 'list_socket_option.SocketOption'>"
+        },
+        {
+            "id": 1984463507024,
+            "title": "Socket Option",
+            "pos_x": 1295.9208984375002,
+            "pos_y": 749.6630859374995,
+            "inputs": [
+                {
+                    "id": 1984463517152,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1984463518880,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "5"
+            },
+            "op_code": "<class 'list_socket_option.SocketOption'>"
+        },
+        {
+            "id": 1984463511920,
+            "title": "Number",
+            "pos_x": 1166.4208984374998,
+            "pos_y": 795.4130859374993,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 1984463518832,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": ".7"
+            },
+            "op_code": "<class 'number_number.Number'>"
+        },
+        {
+            "id": 1984463516336,
+            "title": "Shape Content",
+            "pos_x": 175.17089843749977,
+            "pos_y": 570.1630859374995,
+            "inputs": [
+                {
+                    "id": 1984463519216,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1984463516288,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1984463515328,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1984463518736,
+                    "index": 2,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1984463518352,
+                    "index": 3,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1984463515568,
+                    "index": 4,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1984463514368,
+                    "index": 5,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'analyzers_shape_content.ShapeContent'>"
+        },
+        {
+            "id": 1984463516192,
+            "title": "Socket Option",
+            "pos_x": 1295.1708984375002,
+            "pos_y": 614.1630859374995,
+            "inputs": [
+                {
+                    "id": 1984463511776,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1984463512208,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "1"
+            },
+            "op_code": "<class 'list_socket_option.SocketOption'>"
+        },
+        {
+            "id": 1984463517536,
+            "title": "Socket Option",
+            "pos_x": 807.6708984375002,
+            "pos_y": 764.4130859374995,
+            "inputs": [
+                {
+                    "id": 1984463516576,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1984463518640,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "5"
+            },
+            "op_code": "<class 'list_socket_option.SocketOption'>"
+        },
+        {
+            "id": 1984463516912,
+            "title": "Socket Option",
+            "pos_x": 973.4208984375002,
+            "pos_y": 560.9130859374995,
+            "inputs": [
+                {
+                    "id": 1984463516384,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1984463508656,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "0"
+            },
+            "op_code": "<class 'list_socket_option.SocketOption'>"
+        },
+        {
+            "id": 1984463512496,
+            "title": "UV on Srf",
+            "pos_x": 499.6708984374998,
+            "pos_y": 563.6630859374995,
+            "inputs": [
+                {
+                    "id": 1984463518208,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1984463515088,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1984463517344,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1984463514320,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'surfaces_uv_on_srf.UVOnSurface'>"
+        },
+        {
+            "id": 1984463505920,
+            "title": "Evaluate Srf",
+            "pos_x": 651.9208984374998,
+            "pos_y": 604.6630859374995,
+            "inputs": [
+                {
+                    "id": 1984463515472,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1984463514848,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1984463513696,
+                    "index": 2,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1984463518064,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1984463509472,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'surfaces_evaluate_srf.EvaluateSurface'>"
+        },
+        {
+            "id": 1984463505968,
+            "title": "Socket Option",
+            "pos_x": 814.1708984375002,
+            "pos_y": 632.9130859374995,
+            "inputs": [
+                {
+                    "id": 1984463505008,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1984463503568,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "0"
+            },
+            "op_code": "<class 'list_socket_option.SocketOption'>"
+        },
+        {
+            "id": 1984463516000,
+            "title": "Center",
+            "pos_x": 332.6708984374998,
+            "pos_y": 696.6630859374995,
+            "inputs": [
+                {
+                    "id": 1984463512352,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1984463507696,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'analyzers_center.ShapeCenter'>"
+        },
+        {
+            "id": 1984463512784,
+            "title": "Loft",
+            "pos_x": 1617.1708984375002,
+            "pos_y": 662.1630859374995,
+            "inputs": [
+                {
+                    "id": 1984463503856,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1984463508272,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1984463516432,
+                    "index": 2,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1984463509904,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'modifiers_loft.Loft'>"
+        },
+        {
+            "id": 1984463518256,
+            "title": "Scale (Vec)",
+            "pos_x": 985.6708984375002,
+            "pos_y": 694.6630859374995,
+            "inputs": [
+                {
+                    "id": 1984463511200,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1984463511440,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1984463508368,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'vector_scale_vec.ScaleVec'>"
+        },
+        {
+            "id": 1984463513216,
+            "title": "Uniform Scale",
+            "pos_x": 1470.1708984375002,
+            "pos_y": 671.1630859374995,
+            "inputs": [
+                {
+                    "id": 1984463506784,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1984463507792,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1984463518592,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'transforms_uniform_scale.UniformScale'>"
+        },
+        {
+            "id": 1984463503424,
+            "title": "Number",
+            "pos_x": 669.1708984375002,
+            "pos_y": 721.1630859374995,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 1984462943472,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "0"
+            },
+            "op_code": "<class 'number_number.Number'>"
+        },
+        {
+            "id": 1984462941120,
+            "title": "Number",
+            "pos_x": 669.1708984375002,
+            "pos_y": 812.1630859374995,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 1984462941792,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "0.35"
+            },
+            "op_code": "<class 'number_number.Number'>"
+        },
+        {
+            "id": 1984462933152,
+            "title": "Translate",
+            "pos_x": 1144.1708984375002,
+            "pos_y": 606.1630859374995,
+            "inputs": [
+                {
+                    "id": 1985890507008,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1985890505856,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1985890506384,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'transforms_translate.Translate'>"
+        },
+        {
+            "id": 1984462933200,
+            "title": "Number",
+            "pos_x": 1163.4208984374998,
+            "pos_y": 708.4130859374993,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 1984463517776,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "1"
+            },
+            "op_code": "<class 'number_number.Number'>"
+        },
+        {
+            "id": 1985890505136,
+            "title": "Shape Content",
+            "pos_x": 198.73046875,
+            "pos_y": 973.556640625,
+            "inputs": [
+                {
+                    "id": 1985890514160,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1985890510944,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1985890515744,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1985890501968,
+                    "index": 2,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1985890506240,
+                    "index": 3,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1985890509312,
+                    "index": 4,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1985890507968,
+                    "index": 5,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'analyzers_shape_content.ShapeContent'>"
+        },
+        {
+            "id": 1985890511280,
+            "title": "Socket Option",
+            "pos_x": 1318.7304687500007,
+            "pos_y": 1017.556640625,
+            "inputs": [
+                {
+                    "id": 1985890509072,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1985890505040,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "1"
+            },
+            "op_code": "<class 'list_socket_option.SocketOption'>"
+        },
+        {
+            "id": 1985890511520,
+            "title": "UV on Srf",
+            "pos_x": 523.2304687499998,
+            "pos_y": 967.056640625,
+            "inputs": [
+                {
+                    "id": 1985890504032,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1985890514208,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1985890504464,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1985890502544,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'surfaces_uv_on_srf.UVOnSurface'>"
+        },
+        {
+            "id": 1984463515856,
+            "title": "Uniform Scale",
+            "pos_x": 1493.7304687500007,
+            "pos_y": 1074.556640625,
+            "inputs": [
+                {
+                    "id": 1984463503472,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1984463514224,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1984463504960,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'transforms_uniform_scale.UniformScale'>"
+        },
+        {
+            "id": 1984463511968,
+            "title": "Socket Option",
+            "pos_x": 837.7304687500007,
+            "pos_y": 1036.306640625,
+            "inputs": [
+                {
+                    "id": 1985890502208,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1985890502640,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "0"
+            },
+            "op_code": "<class 'list_socket_option.SocketOption'>"
+        },
+        {
+            "id": 1985890509360,
+            "title": "Number",
+            "pos_x": 1189.9804687500002,
+            "pos_y": 1112.806640625,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 1985890511184,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "1"
+            },
+            "op_code": "<class 'number_number.Number'>"
+        },
+        {
+            "id": 1985890502832,
+            "title": "Number",
+            "pos_x": 1185.9804687500002,
+            "pos_y": 1201.806640625,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 1985890511040,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": ".7"
+            },
+            "op_code": "<class 'number_number.Number'>"
+        },
+        {
+            "id": 1985890511904,
+            "title": "Socket Option",
+            "pos_x": 996.9804687500007,
+            "pos_y": 964.306640625,
+            "inputs": [
+                {
+                    "id": 1985890515024,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1985890516320,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "0"
+            },
+            "op_code": "<class 'list_socket_option.SocketOption'>"
+        },
+        {
+            "id": 1985890505760,
+            "title": "Loft",
+            "pos_x": 1640.7304687500007,
+            "pos_y": 1065.556640625,
+            "inputs": [
+                {
+                    "id": 1985890503024,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1985890512096,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1985890512816,
+                    "index": 2,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1985890502736,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'modifiers_loft.Loft'>"
+        },
+        {
+            "id": 1985890502304,
+            "title": "Number",
+            "pos_x": 692.7304687500007,
+            "pos_y": 1215.556640625,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 1985890506768,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": ".2"
+            },
+            "op_code": "<class 'number_number.Number'>"
+        },
+        {
+            "id": 1985890514304,
+            "title": "Socket Option",
+            "pos_x": 1319.4804687500007,
+            "pos_y": 1153.056640625,
+            "inputs": [
+                {
+                    "id": 1985890513008,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1985890516416,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "5"
+            },
+            "op_code": "<class 'list_socket_option.SocketOption'>"
+        },
+        {
+            "id": 1985890501776,
+            "title": "Evaluate Srf",
+            "pos_x": 675.4804687499998,
+            "pos_y": 1008.056640625,
+            "inputs": [
+                {
+                    "id": 1985890502016,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1985890513296,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1985890501488,
+                    "index": 2,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1985890512864,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1985890516080,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'surfaces_evaluate_srf.EvaluateSurface'>"
+        },
+        {
+            "id": 1985890511376,
+            "title": "Scale (Vec)",
+            "pos_x": 1009.2304687500007,
+            "pos_y": 1098.056640625,
+            "inputs": [
+                {
+                    "id": 1985890510320,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1985890505472,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1985890504992,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'vector_scale_vec.ScaleVec'>"
+        },
+        {
+            "id": 1984462941936,
+            "title": "Number",
+            "pos_x": 692.7304687500007,
+            "pos_y": 1124.556640625,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 1984463513024,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "0"
+            },
+            "op_code": "<class 'number_number.Number'>"
+        },
+        {
+            "id": 1984463510576,
+            "title": "Socket Option",
+            "pos_x": 831.2304687500007,
+            "pos_y": 1167.806640625,
+            "inputs": [
+                {
+                    "id": 1985890514736,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1985890506000,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {
+                "value": "5"
+            },
+            "op_code": "<class 'list_socket_option.SocketOption'>"
+        },
+        {
+            "id": 1985890514352,
+            "title": "Translate",
+            "pos_x": 1167.7304687500007,
+            "pos_y": 1009.556640625,
+            "inputs": [
+                {
+                    "id": 1985890513392,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                },
+                {
+                    "id": 1985890504752,
+                    "index": 1,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1985890507632,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'transforms_translate.Translate'>"
+        },
+        {
+            "id": 1985890503456,
+            "title": "Center",
+            "pos_x": 356.2304687499998,
+            "pos_y": 1100.056640625,
+            "inputs": [
+                {
+                    "id": 1985890502592,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 2,
+                    "socket_type": 6
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1985890511712,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 6
+                }
+            ],
+            "content": {},
+            "op_code": "<class 'analyzers_center.ShapeCenter'>"
+        }
+    ],
+    "edges": [
+        {
+            "id": 2688709515328,
+            "edge_type": 2,
+            "start": 2688709519264,
+            "end": 2688709511968
+        },
+        {
+            "id": 2688709511056,
+            "edge_type": 2,
+            "start": 2688709510864,
+            "end": 2688709516816
+        },
+        {
+            "id": 2688709523200,
+            "edge_type": 2,
+            "start": 2688709510336,
+            "end": 2688709518736
+        },
+        {
+            "id": 2688709512976,
+            "edge_type": 2,
+            "start": 2688709741056,
+            "end": 2688709510624
+        },
+        {
+            "id": 2688720970432,
+            "edge_type": 2,
+            "start": 2688709511248,
+            "end": 2688709523056
+        },
+        {
+            "id": 2688720963184,
+            "edge_type": 2,
+            "start": 2688709511248,
+            "end": 2688709516240
+        },
+        {
+            "id": 2688720977584,
+            "edge_type": 2,
+            "start": 2688709514368,
+            "end": 2688709515616
+        },
+        {
+            "id": 2688720973792,
+            "edge_type": 2,
+            "start": 2688709511248,
+            "end": 2688709509328
+        },
+        {
+            "id": 2688720973936,
+            "edge_type": 2,
+            "start": 2688709514512,
+            "end": 2688720967600
+        },
+        {
+            "id": 2688720969472,
+            "edge_type": 2,
+            "start": 2688720977776,
+            "end": 2688709742736
+        },
+        {
+            "id": 2688720965488,
+            "edge_type": 2,
+            "start": 2688709524928,
+            "end": 2688720971872
+        },
+        {
+            "id": 2688720567456,
+            "edge_type": 2,
+            "start": 2688709514320,
+            "end": 2688720971872
+        },
+        {
+            "id": 2688720969712,
+            "edge_type": 2,
+            "start": 2688720969856,
+            "end": 2688709743312
+        },
+        {
+            "id": 2688720965008,
+            "edge_type": 2,
+            "start": 2688709510672,
+            "end": 2688720965296
+        },
+        {
+            "id": 2688720966352,
+            "edge_type": 2,
+            "start": 2688720961696,
+            "end": 2688709521472
+        },
+        {
+            "id": 2688720967216,
+            "edge_type": 2,
+            "start": 2688709514272,
+            "end": 2688720967504
+        },
+        {
+            "id": 2688720961840,
+            "edge_type": 2,
+            "start": 2688720974512,
+            "end": 2688720975712
+        },
+        {
+            "id": 2688720969808,
+            "edge_type": 2,
+            "start": 2688720963712,
+            "end": 2688720968224
+        },
+        {
+            "id": 2688720972448,
+            "edge_type": 2,
+            "start": 2688720969952,
+            "end": 2688720967984
+        },
+        {
+            "id": 2688720973600,
+            "edge_type": 2,
+            "start": 2688720962560,
+            "end": 2688720967984
+        },
+        {
+            "id": 2688720975040,
+            "edge_type": 2,
+            "start": 2688720970480,
+            "end": 2688720974224
+        },
+        {
+            "id": 1984463507984,
+            "edge_type": 2,
+            "start": 1984463518880,
+            "end": 1984463507792
+        },
+        {
+            "id": 1984463517968,
+            "edge_type": 2,
+            "start": 1984463518736,
+            "end": 1984463512352
+        },
+        {
+            "id": 1984463506208,
+            "edge_type": 2,
+            "start": 1984463508368,
+            "end": 1985890505856
+        },
+        {
+            "id": 1984463505344,
+            "edge_type": 2,
+            "start": 1984463518832,
+            "end": 1984463517152
+        },
+        {
+            "id": 1984463509040,
+            "edge_type": 2,
+            "start": 1984462941792,
+            "end": 1984463516576
+        },
+        {
+            "id": 1984463507600,
+            "edge_type": 2,
+            "start": 1984463514320,
+            "end": 1984463514848
+        },
+        {
+            "id": 1984463507456,
+            "edge_type": 2,
+            "start": 1984463518592,
+            "end": 1984463503856
+        },
+        {
+            "id": 1984463504864,
+            "edge_type": 2,
+            "start": 1984463509472,
+            "end": 1984463505008
+        },
+        {
+            "id": 1984463505728,
+            "edge_type": 2,
+            "start": 1984463517344,
+            "end": 1984463515472
+        },
+        {
+            "id": 1984463508032,
+            "edge_type": 2,
+            "start": 1984463518352,
+            "end": 1984463516384
+        },
+        {
+            "id": 1984463508512,
+            "edge_type": 2,
+            "start": 1984463508656,
+            "end": 1985890507008
+        },
+        {
+            "id": 1984463510720,
+            "edge_type": 2,
+            "start": 1984463503568,
+            "end": 1984463511200
+        },
+        {
+            "id": 1984463506448,
+            "edge_type": 2,
+            "start": 1984463518640,
+            "end": 1984463511440
+        },
+        {
+            "id": 1984463506400,
+            "edge_type": 2,
+            "start": 1984463517776,
+            "end": 1984463517152
+        },
+        {
+            "id": 1984463516096,
+            "edge_type": 2,
+            "start": 1984463507696,
+            "end": 1984463515088
+        },
+        {
+            "id": 1984463512544,
+            "edge_type": 2,
+            "start": 1984463518736,
+            "end": 1984463513696
+        },
+        {
+            "id": 1984463507648,
+            "edge_type": 2,
+            "start": 1984463512208,
+            "end": 1984463506784
+        },
+        {
+            "id": 1984463513168,
+            "edge_type": 2,
+            "start": 1984462943472,
+            "end": 1984463516576
+        },
+        {
+            "id": 1984463512304,
+            "edge_type": 2,
+            "start": 1985890506384,
+            "end": 1984463511776
+        },
+        {
+            "id": 1984463510672,
+            "edge_type": 2,
+            "start": 1984463518736,
+            "end": 1984463518208
+        },
+        {
+            "id": 1984462937808,
+            "edge_type": 2,
+            "start": 2688720973984,
+            "end": 1984463519216
+        },
+        {
+            "id": 1985890513440,
+            "edge_type": 2,
+            "start": 1985890516320,
+            "end": 1985890513392
+        },
+        {
+            "id": 1985890510272,
+            "edge_type": 2,
+            "start": 1985890501968,
+            "end": 1985890504032
+        },
+        {
+            "id": 1985890516128,
+            "edge_type": 2,
+            "start": 1985890504992,
+            "end": 1985890504752
+        },
+        {
+            "id": 1985890516896,
+            "edge_type": 2,
+            "start": 1984463513024,
+            "end": 1985890514736
+        },
+        {
+            "id": 1985890516752,
+            "edge_type": 2,
+            "start": 1985890507632,
+            "end": 1985890509072
+        },
+        {
+            "id": 1985890513680,
+            "edge_type": 2,
+            "start": 1985890504464,
+            "end": 1985890502016
+        },
+        {
+            "id": 1985890515216,
+            "edge_type": 2,
+            "start": 1985890516080,
+            "end": 1985890502208
+        },
+        {
+            "id": 1985890509648,
+            "edge_type": 2,
+            "start": 1985890502544,
+            "end": 1985890513296
+        },
+        {
+            "id": 1985890513968,
+            "edge_type": 2,
+            "start": 1985890505040,
+            "end": 1984463503472
+        },
+        {
+            "id": 1985967606704,
+            "edge_type": 2,
+            "start": 1985890506000,
+            "end": 1985890505472
+        },
+        {
+            "id": 1985967610256,
+            "edge_type": 2,
+            "start": 1985890516416,
+            "end": 1984463514224
+        },
+        {
+            "id": 1985967608816,
+            "edge_type": 2,
+            "start": 1985890511712,
+            "end": 1985890514208
+        },
+        {
+            "id": 1985967608240,
+            "edge_type": 2,
+            "start": 1985890502640,
+            "end": 1985890510320
+        },
+        {
+            "id": 1985967606080,
+            "edge_type": 2,
+            "start": 1985890511184,
+            "end": 1985890513008
+        },
+        {
+            "id": 1985967605840,
+            "edge_type": 2,
+            "start": 1985890501968,
+            "end": 1985890502592
+        },
+        {
+            "id": 1985967603776,
+            "edge_type": 2,
+            "start": 1985890506240,
+            "end": 1985890515024
+        },
+        {
+            "id": 1985967604592,
+            "edge_type": 2,
+            "start": 1984463504960,
+            "end": 1985890503024
+        },
+        {
+            "id": 1985967615248,
+            "edge_type": 2,
+            "start": 1985890511040,
+            "end": 1985890513008
+        },
+        {
+            "id": 1985967615056,
+            "edge_type": 2,
+            "start": 1985890501968,
+            "end": 1985890501488
+        },
+        {
+            "id": 1985967615968,
+            "edge_type": 2,
+            "start": 1985890506768,
+            "end": 1985890514736
+        },
+        {
+            "id": 1985890508160,
+            "edge_type": 2,
+            "start": 1984463509904,
+            "end": 1985890514160
+        },
+        {
+            "id": 1984463519696,
+            "edge_type": 2,
+            "start": 1985890502736,
+            "end": 2688709517344
+        }
+    ]
+}
