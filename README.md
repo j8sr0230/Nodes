@@ -10,7 +10,8 @@ A visual scripting workbench for [FreeCAD](https://www.freecad.org) using
 
 ## Installation
 For FreeCAD version 0.21 or higher, it is recommended to download and install the Nodes Workbench via the Addon Manager 
-(**Tools → Addon Manager**). The required Python modules `qtpy` and `awkward` are automatically installed this way.
+(**Tools → Addon Manager**). The required Python modules `qtpy` and `awkward` are automatically installed this way. For 
+older FreeCAD versions and Realthunder's Link Branch, these modules must be installed manually via PIP.
 
 ## Showcase
 ![Nodes animation](https://github.com/j8sr0230/fc_nodes/blob/main/docs/nodes_voronoi_extrusion.gif)
