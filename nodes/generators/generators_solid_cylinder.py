@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  generators_solid_cone.py
+#  generators_solid_cylinder.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -33,46 +33,43 @@ from nodes_locator import icon
 
 
 @register_node
-class SolidCone(FCNNodeModel):
+class SolidCylinder(FCNNodeModel):
 
     icon: str = icon("nodes_default.png")
-    op_title: str = "Cone"
+    op_title: str = "Cylinder"
     op_category: str = "Generators"
     content_label_objname: str = "fcn_node_bg"
 
     def __init__(self, scene):
         super().__init__(scene=scene,
-                         inputs_init_list=[("Radius 1", True), ("Radius 2", True), ("Height", True), ("Point", True),
-                                           ("Dir", True), ("Angle", True)],
+                         inputs_init_list=[("Radius", True), ("Height", True), ("Point", True), ("Dir", True),
+                                           ("Angle", True)],
                          outputs_init_list=[("Shape", True)])
 
-        self.grNode.resize(100, 160)
+        self.grNode.resize(100, 140)
         for socket in self.inputs + self.outputs:
             socket.setSocketPosition()
 
     @staticmethod
-    def make_cone(parameter_zip: tuple) -> Part.Shape:
-        radius_1: float = parameter_zip[0]
-        radius_2: float = parameter_zip[1]
-        height: float = parameter_zip[2]
-        position: Vector = parameter_zip[3]
-        direction: Vector = parameter_zip[4]
-        angle: float = parameter_zip[5]
+    def make_cylinder(parameter_zip: tuple) -> Part.Shape:
+        radius: float = parameter_zip[0]
+        height: float = parameter_zip[1]
+        position: Vector = parameter_zip[2]
+        direction: Vector = parameter_zip[3]
+        angle: float = parameter_zip[4]
 
-        return Part.makeCone(radius_1, radius_2, height, position, direction, angle)
+        return Part.makeCylinder(radius, height, position, direction, angle)
 
     def eval_operation(self, sockets_input_data: list) -> list:
         # Get socket inputs
-        radius_1_input: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10.0]
-        radius_2_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [5.0]
-        height_input: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [10.0]
-        point_input: list = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [Vector(0, 0, 0)]
-        dir_input: list = sockets_input_data[4] if len(sockets_input_data[4]) > 0 else [Vector(0, 0, 1)]
-        angle_input: list = sockets_input_data[5] if len(sockets_input_data[5]) > 0 else [270.0]
+        radius_input: list = sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [10.0]
+        height_input: list = sockets_input_data[1] if len(sockets_input_data[1]) > 0 else [10.0]
+        point_input: list = sockets_input_data[2] if len(sockets_input_data[2]) > 0 else [Vector(0, 0, 0)]
+        dir_input: list = sockets_input_data[3] if len(sockets_input_data[3]) > 0 else [Vector(0, 0, 1)]
+        angle_input: list = sockets_input_data[4] if len(sockets_input_data[4]) > 0 else [270.0]
 
         #  Broadcast and calculate result
-        data_tree: list = list(broadcast_data_tree(radius_1_input, radius_2_input, height_input, point_input,
-                                                   dir_input, angle_input))
-        cones: list = list(map_objects(data_tree, tuple, self.make_cone))
+        data_tree: list = list(broadcast_data_tree(radius_input, height_input, point_input, dir_input, angle_input))
+        cylinders: list = list(map_objects(data_tree, tuple, self.make_cylinder))
 
-        return [cones]
+        return [cylinders]
