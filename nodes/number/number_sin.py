@@ -23,6 +23,7 @@
 #
 ###################################################################################
 import awkward as ak
+import numpy as np
 
 from core.nodes_conf import register_node
 from core.nodes_default_node import FCNNodeModel
@@ -48,6 +49,6 @@ class Sin(FCNNodeModel):
         a_input = ak.Array(sockets_input_data[0] if len(sockets_input_data[0]) > 0 else [0])
 
         # Broadcast and calculate result
-        res = a_input
+        res = np.sin(a_input)
 
         return [res.tolist()]
