@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#  vector_length_vec.py
+#  vector_length.py
 #
 #  Copyright (c) 2022 Ronny Scharf-Wildenhain <ronny.scharf08@gmail.com>
 #
@@ -34,8 +34,8 @@ from nodes_locator import icon
 @register_node
 class VectorLength(FCNNodeModel):
 
-    icon: str = icon("nodes_vect_lenght.svg")
-    op_title: str = "Length (Vec)"
+    icon: str = icon("nodes_vect_length.svg")
+    op_title: str = "Length"
     op_category: str = "Vector"
     content_label_objname: str = "fcn_node_bg"
 
