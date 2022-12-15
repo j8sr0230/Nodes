@@ -6,29 +6,11 @@ Usage
 Installation
 ------------
 
-To use Lumache, first install it using pip:
+For FreeCAD version 0.21 or higher, it is recommended to download and install the Nodes Workbench via the FreeCAD's
+Addon Manager (**Tools → Addon Manager**). The required Python modules ``qtpy`` and ``awkward`` are automatically
+installed this way. For older FreeCAD versions and Realthunder's Link Branch, these modules must be installed manually
+via PIP.
 
-.. code-block:: console
-
-   (.venv) $ pip install lumache
-
-Creating recipes
+Start the node editor
 ----------------
-
-To retrieve a list of random ingredients,
-you can use the ``lumache.get_random_ingredients()`` function:
-
-.. autofunction:: lumache.get_random_ingredients
-
-The ``kind`` parameter should be either ``"meat"``, ``"fish"``,
-or ``"veggies"``. Otherwise, :py:func:`lumache.get_random_ingredients`
-will raise an exception.
-
-.. autoexception:: lumache.InvalidKindError
-
-For example:
-
->>> import lumache
->>> lumache.get_random_ingredients()
-['shells', 'gorgonzola', 'parsley']
 
