@@ -11,7 +11,7 @@ A visual scripting workbench for [FreeCAD](https://www.freecad.org) using
 
 ## Installation
 For FreeCAD version 0.21 or higher, it is recommended to download and install the Workbench via the Addon Manager 
-(**Tools → Addon Manager**). The required Python modules [qtpy](https://pypi.org/project/QtPy/) and `
+(**Tools → Addon Manager**). The required Python modules [qtpy](https://pypi.org/project/QtPy/) and 
 [awkward](https://awkward-array.org/doc/main/) are automatically installed this way. For 
 older FreeCAD versions and Realthunder's Link Branch, these modules must be installed manually via PIP.
 
