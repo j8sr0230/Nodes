@@ -5,7 +5,7 @@
   <version>0.1.36</version>
   <date>2022-12-14</date>
   <maintainer email="ronny.scharf08@gmail.com">Ronny Scharf-Wildenhain</maintainer>
-  <license file="LICENSE">LGPLv2.1</license>
+  <license file="LICENSE">LGPL-2.1-or-later</license>
   <url type="repository" branch="main">https://github.com/j8sr0230/Nodes</url>
   <url type="issues" branch="main">https://github.com/j8sr0230/Nodes/issues</url>
   <icon>icons/nodes_wb_icon.svg</icon>
