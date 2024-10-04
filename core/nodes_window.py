@@ -3,7 +3,8 @@ from fnmatch import fnmatch
 
 from qtpy.QtGui import QIcon, QKeySequence
 from qtpy.QtWidgets import QApplication, QMdiArea, QWidget, QDockWidget, QAction, QMessageBox, QFileDialog, QMenu
-from qtpy.QtCore import Qt, QSignalMapper
+from qtpy.QtCore import Qt
+from functools import partial
 
 from nodeeditor.node_editor_window import NodeEditorWindow
 from nodeeditor.node_edge import Edge
@@ -31,7 +32,6 @@ class FCNWindow(NodeEditorWindow):
     name_product: str
     empty_icon: QIcon
     mdi_area: QMdiArea
-    window_mapper: QSignalMapper
     act_close: QAction
     act_close_all: QAction
     act_tile: QAction
@@ -66,8 +66,6 @@ class FCNWindow(NodeEditorWindow):
         self.mdi_area.setTabsMovable(True)
         self.setCentralWidget(self.mdi_area)
         self.mdi_area.subWindowActivated.connect(self.update_menus)
-        self.window_mapper = QSignalMapper(self)
-        self.window_mapper.mapped[QWidget].connect(self.set_active_sub_window)
 
         # self.create_nodes_dock()
         self.createActions()
@@ -230,8 +228,7 @@ class FCNWindow(NodeEditorWindow):
             action = self.window_menu.addAction(text)
             action.setCheckable(True)
             action.setChecked(child is self.getCurrentNodeEditorWidget())
-            action.triggered.connect(self.window_mapper.map)
-            self.window_mapper.setMapping(action, window)
+            action.triggered.connect(partial(self.set_active_sub_window, window))
 
     # def on_window_nodes_toolbar(self):
     #     if self.nodes_dock.isVisible():

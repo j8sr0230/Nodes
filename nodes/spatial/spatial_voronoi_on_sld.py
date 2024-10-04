@@ -26,7 +26,7 @@ from math import fabs
 
 import numpy as np
 from scipy.spatial import Voronoi
-from scipy import rand
+from numpy.random import rand
 from collections import defaultdict
 import itertools
 

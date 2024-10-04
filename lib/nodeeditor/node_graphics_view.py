@@ -106,7 +106,7 @@ class QDMGraphicsView(QGraphicsView):
 
     def initUI(self):
         """Set up this ``QGraphicsView``"""
-        self.setRenderHints(QPainter.Antialiasing | QPainter.HighQualityAntialiasing | QPainter.TextAntialiasing | QPainter.SmoothPixmapTransform)
+        self.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing | QPainter.SmoothPixmapTransform)
 
         self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
 
@@ -121,7 +121,7 @@ class QDMGraphicsView(QGraphicsView):
 
     def isSnappingEnabled(self, event: 'QInputEvent' = None) -> bool:
         """Returns ``True`` if snapping is currently enabled"""
-        return EDGE_SNAPPING and (event.modifiers() & Qt.CTRL) if event else True
+        return EDGE_SNAPPING and (event.modifiers() & Qt.ControlModifier) if event else True
 
     def resetMode(self):
         """Helper function to re-set the grView's State Machine state to the default"""
@@ -199,7 +199,7 @@ class QDMGraphicsView(QGraphicsView):
             print("  Edges:")
             for edge in self.grScene.scene.edges: print("\t", edge, "\n\t\tgrEdge:", edge.grEdge if edge.grEdge is not None else None)
 
-            if event.modifiers() & Qt.CTRL:
+            if event.modifiers() & Qt.ControlModifier:
                 print("  Graphic Items in GraphicScene:")
                 for item in self.grScene.items():
                     print('    ', item)
@@ -260,7 +260,7 @@ class QDMGraphicsView(QGraphicsView):
             item = self.snapping.getSnappedSocketItem(event)
 
         if isinstance(item, QDMGraphicsSocket):
-            if self.mode == MODE_NOOP and event.modifiers() & Qt.CTRL:
+            if self.mode == MODE_NOOP and event.modifiers() & Qt.ControlModifier:
                 socket = item.socket
                 if socket.hasAnyEdge():
                     self.mode = MODE_EDGES_REROUTING
