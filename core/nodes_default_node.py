@@ -30,6 +30,7 @@ from qtpy.QtGui import QImage, QColor, QPen, QBrush, QFont, QFontMetrics
 from qtpy.QtWidgets import QGraphicsTextItem
 from qtpy.QtCore import QRectF, Qt
 
+import Exceptions as NodeExceptions;
 from nodeeditor.node_scene import Scene
 from nodeeditor.node_node import Node
 from nodeeditor.node_socket import Socket, LEFT_CENTER, RIGHT_CENTER
@@ -297,10 +298,12 @@ class FCNNodeModel(Node):
             return self.eval_primer()[index]
         except (ValueError, TypeError, SyntaxError, NameError, ZeroDivisionError, IndexError, AttributeError,
                 OCCError, RuntimeError) as e:
+            NodeExceptions.nodesWarning("Nodes","core",self.__class__.__name__,"eval",str(e));
             self.markInvalid()
             self.grNode.setToolTip(str(e))
             self.markDescendantsDirty()
         except Exception as e:
+            NodeExceptions.nodesWarning("Nodes","core",self.__class__.__name__,"eval",str(e));
             self.markInvalid()
             self.grNode.setToolTip(str(e))
             dumpException(e)
@@ -314,7 +317,6 @@ class FCNNodeModel(Node):
         :return: Socket output data
         :rtype: list
         """
-
         # Build input data structure
         self.sockets_input_data: list = []  # Container for input data
 

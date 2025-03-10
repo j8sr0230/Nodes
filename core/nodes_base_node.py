@@ -43,6 +43,7 @@ from qtpy.QtGui import QImage, QTextOption
 from qtpy.QtCore import QRectF, Qt
 from qtpy.QtWidgets import QWidget, QFormLayout, QLabel, QLineEdit, QSlider, QComboBox, QPlainTextEdit, QSizePolicy
 
+import Exceptions as NodeException;
 from nodeeditor.node_scene import Scene
 from nodeeditor.node_node import Node
 from nodeeditor.node_graphics_node import QDMGraphicsNode
@@ -169,8 +170,10 @@ class FCNSocketView(QDMGraphicsSocket):
 
         if self.socket.hasAnyEdge():
             # If socket is connected
+            NodeException.nodesInformation("core",self.__class__.__name__,"update_widget_status","hidden")
             self.input_widget.hide()
         else:
+            NodeException.nodesInformation("core",self.__class__.__name__,"update_widget_status","shown")
             # self.input_widget.setDisabled(False)
             self.input_widget.show()
 
@@ -405,6 +408,7 @@ class FCNNodeContentView(QDMNodeContentWidget):
                     elif isinstance(widget, QPlainTextEdit):
                         widget.setPlainText(value)
         except Exception as e:
+            NodeException.nodesError("core",self.__class__.__name__,"deserialize","hidden")
             dumpException(e)
         return res
 
@@ -567,7 +571,7 @@ class FCNNode(Node):
         :param auto_layout: Is node height managed by Qt layout manager or manual?
         :type auto_layout: bool
         """
-
+        
         self.inputs_init_list: list = inputs_init_list
         self.output_init_list: list = outputs_init_list
         self.auto_layout = auto_layout
@@ -794,10 +798,12 @@ class FCNNode(Node):
             if output_data:
                 return output_data[index]
         except (ValueError, TypeError, SyntaxError, NameError, ZeroDivisionError, IndexError, AttributeError) as e:
+            NodeException.nodesWarning("core",self.__class__.__name__,"eval",str(e));
             self.markInvalid()
             self.grNode.setToolTip(str(e))
             self.markDescendantsDirty()
         except Exception as e:
+            NodeException.nodesError("core",self.__class__.__name__,"eval",str(e));
             self.markInvalid()
             self.grNode.setToolTip(str(e))
             dumpException(e)
@@ -840,7 +846,8 @@ class FCNNode(Node):
                         input_str: str = socket_input_widget.text()
                         try:
                             socket_input_data.append(float(input_str))
-                        except ValueError:  # as e:
+                        except ValueError as e:  # as e:
+                            NodeException.nodesWarning("core",self.__class__.__name__,"eval_primer",str(e));
                             socket_input_data.append(input_str)
 
                     elif isinstance(socket_input_widget, QSlider):

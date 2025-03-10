@@ -1,5 +1,6 @@
 import importlib.util
 import sys
+import Exceptions as NodeException;
 from os.path import dirname, basename, isfile, isdir, join
 from glob import glob
 
@@ -55,6 +56,7 @@ class NodesStore:
             if DEBUG:
                 print(f'New node {module_name}')
         except Exception as e:
+            NodeException.nodesError("core","NodesStore","add_node_from_file",str(e));
             print(f'Unable to add node from "{nodes_file_path}": {e}')
 
     @staticmethod

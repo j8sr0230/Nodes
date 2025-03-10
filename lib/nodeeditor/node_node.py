@@ -2,6 +2,8 @@
 """
 A module containing NodeEditor's class for representing `Node`.
 """
+
+import Exceptions as NodeException;
 from collections import OrderedDict
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_content_widget import QDMNodeContentWidget
@@ -474,6 +476,7 @@ class Node(Serializable):
             # print("EXC: Trying to get input with socket index %d, but none is attached to" % index, self)
             return None, None
         except Exception as e:
+            NodeException.nodesError("Nodes","nodeeditor",__name__,"getInputWithSocketIndex", str(e));
             dumpException(e)
             return None, None
 
@@ -585,7 +588,9 @@ class Node(Serializable):
                     self.outputs.append(found)  # append newly created output to the list
                 found.deserialize(socket_data, hashmap, restore_id)
 
-        except Exception as e: dumpException(e)
+        except Exception as e: 
+            NodeException.nodesError("Nodes","nodeeditor",__name__,"deserialize", str(e));
+            dumpException(e)
 
         # also deserialize the content of the node
         # so far the rest was ok, now as last step the content...

@@ -41,7 +41,7 @@ class NodesWorkbench(Workbench):
     def Initialize(self):
         # FC needs lazy import at this point
         from core.nodes_window import FCNWindow
-
+        
         # Prepare the window
         self.window = FCNWindow()
 
